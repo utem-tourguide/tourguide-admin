@@ -13,7 +13,8 @@ arqueológico o un museo.
 ## Requerimientos
 
 Esta aplicación requiere PHP 5.4 o superior. También requiere los módulos
-`mcrypt` y `readline` de PHP.
+`mcrypt` y `readline` de PHP. También es necesario el módulo `pdo_sqlite`, pero
+si va a usar la configuración de base de datos predeterminada.
 
 Además, se necesita [Composer](https://getcomposer.org/) para instalar
 dependencias.
