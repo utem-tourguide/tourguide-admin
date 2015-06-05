@@ -10,6 +10,14 @@ TourGuide es un sistema para brindar información a los visitantes sobre los
 distintos lugares que componen una zona turística, como una ciudad, un recinto
 arqueológico o un museo.
 
+## Requerimientos
+
+Esta aplicación requiere PHP 5.4 o superior. También requiere los módulos
+`mcrypt` y `readline` de PHP.
+
+Además, se necesita [Composer](https://getcomposer.org/) para instalar
+dependencias.
+
 ## Autores
 
 El equipo de TourGuide:
