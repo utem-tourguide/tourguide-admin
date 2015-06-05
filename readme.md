@@ -18,6 +18,15 @@ Esta aplicación requiere PHP 5.4 o superior. También requiere los módulos
 Además, se necesita [Composer](https://getcomposer.org/) para instalar
 dependencias.
 
+## Como usar la aplicación
+
+1. Clona el repositorio en tu equipo.
+2. Entra al directorio donde clonaste y ejecuta `composer install`.
+3. Crea un archivo vacío llamado `db.sqlite` en la raíz del repositorio.
+4. Ejecuta `php artisan migrate` para instalar la base de datos.
+5. Ejecuta `php artisan serve` y déjalo correr.
+6. Visita `http://localhost:8000` en tu navegador y voilâ! ;)
+
 ## Autores
 
 El equipo de TourGuide:
