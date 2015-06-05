@@ -15,7 +15,6 @@ class CrearTablaUbicacionesTuristicas extends Migration {
     Schema::create('ubicaciones_turisticas', function($tabla) {
       $tabla->increments('id');
       $tabla->string('nombre');
-      $tabla->string('informacion');
       $tabla->timestamps();
     });
   }
