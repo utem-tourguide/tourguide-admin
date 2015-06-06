@@ -23,10 +23,12 @@ dependencias.
 
 1. Clona el repositorio en tu equipo.
 2. Entra al directorio donde clonaste y ejecuta `composer install`.
-3. Crea un archivo vacío llamado `db.sqlite` en la raíz del repositorio.
-4. Ejecuta `php artisan migrate` para instalar la base de datos.
-5. Ejecuta `php artisan serve` y déjalo correr.
-6. Visita `http://localhost:8000` en tu navegador y voilâ! ;)
+3. Rellena el archivo `.env.example` con la información de tu entorno y
+   renómbralo a `.env`.
+4. Crea un archivo vacío llamado `db.sqlite` en la raíz del repositorio.
+5. Ejecuta `php artisan migrate` para instalar la base de datos.
+6. Ejecuta `php artisan serve` y déjalo correr.
+7. Visita `http://localhost:8000` en tu navegador y voilâ! ;)
 
 ## Autores
 
