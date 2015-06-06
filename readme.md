@@ -1,10 +1,10 @@
 ## Web API de TourGuide
 
-Esta aplicación es el componente de Web API de TourGuide. Su propósito
-es actuar como el punto central donde se almacena y se accede a la
-información de TourGuide, así como permitir que cualquier aplicación
-autorizada manipule dicha información desde cualquier dispositivo o
-plataforma.
+Esta aplicación es el administrador de contenido (CMS) de TourGuide. Su
+propósito es actuar como el punto central donde se almacena, manipula y se
+accede a la información de TourGuide desde una interfaz web, así como
+proporcionar una API para que cualquier aplicación autorizada manipule dicha
+información desde cualquier dispositivo o plataforma.
 
 TourGuide es un sistema para brindar información a los visitantes sobre los
 distintos lugares que componen una zona turística, como una ciudad, un recinto
@@ -35,6 +35,7 @@ dependencias.
 El equipo de TourGuide:
 
 [Kevin Perez](https://github.com/kevindperezm)
+[Daniel Dolores](https://github.com/Dannypein)
 
 ## Relacionados
 
