@@ -10,6 +10,26 @@ TourGuide es un sistema para brindar información a los visitantes sobre los
 distintos lugares que componen una zona turística, como una ciudad, un recinto
 arqueológico o un museo.
 
+## Requerimientos
+
+Esta aplicación requiere PHP 5.4 o superior. También requiere los módulos
+`mcrypt` y `readline` de PHP. También es necesario el módulo `pdo_sqlite`, pero
+si va a usar la configuración de base de datos predeterminada.
+
+Además, se necesita [Composer](https://getcomposer.org/) para instalar
+dependencias.
+
+## Como usar la aplicación
+
+1. Clona el repositorio en tu equipo.
+2. Entra al directorio donde clonaste y ejecuta `composer install`.
+3. Rellena el archivo `.env.example` con la información de tu entorno y
+   renómbralo a `.env`.
+4. Crea un archivo vacío llamado `db.sqlite` en la raíz del repositorio.
+5. Ejecuta `php artisan migrate` para instalar la base de datos.
+6. Ejecuta `php artisan serve` y déjalo correr.
+7. Visita `http://localhost:8000` en tu navegador y voilâ! ;)
+
 ## Autores
 
 El equipo de TourGuide:
