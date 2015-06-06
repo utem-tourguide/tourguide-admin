@@ -7,7 +7,5 @@ php:
   - hhvm
   - nightly
 
-env: PATH=vendor/bin:PATH
-
 before_script: composer install
 script: phpspec run && phpunit
