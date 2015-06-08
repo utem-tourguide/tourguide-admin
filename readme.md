@@ -1,4 +1,4 @@
-## Web API de TourGuide
+## Administrador de contenido de TourGuide
 
 Esta aplicación es el administrador de contenido (CMS) de TourGuide. Su
 propósito es actuar como el punto central donde se almacena, manipula y se
