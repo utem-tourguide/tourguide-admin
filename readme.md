@@ -34,8 +34,8 @@ dependencias.
 
 El equipo de TourGuide:
 
-[Kevin Perez](https://github.com/kevindperezm)
-[Daniel Dolores](https://github.com/Dannypein)
+* [Kevin Perez](https://github.com/kevindperezm)
+* [Daniel Dolores](https://github.com/Dannypein)
 
 ## Relacionados
 
