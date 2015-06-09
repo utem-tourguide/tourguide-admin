@@ -34,10 +34,10 @@ dependencias.
 
 El equipo de TourGuide:
 
-[Kevin Perez](https://github.com/kevindperezm)
-[Daniel Dolores](https://github.com/Dannypein)
-[Sarahí Navarro](https://github.com/SaraNavarro)
-[Edgar Larios](https://github.com/Edgar-Larios)
+* [Kevin Perez](https://github.com/kevindperezm)
+* [Daniel Dolores](https://github.com/Dannypein)
+* [Sarahí Navarro](https://github.com/SaraNavarro)
+* [Edgar Larios](https://github.com/Edgar-Larios)
 
 ## Relacionados
 
