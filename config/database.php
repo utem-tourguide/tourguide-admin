@@ -4,6 +4,7 @@ return [
 
   'fetch' => PDO::FETCH_CLASS,
   'default' => 'tourguide',
+  'migrations' => 'migraciones',
 
   'connections' => [
     'tourguide' => [
