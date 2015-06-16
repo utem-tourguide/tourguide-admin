@@ -1,5 +1,5 @@
 {
-	"name": "tourguide/webapi-app",
+	"name": "utem-tourguide/tourguide-admin",
 	"description": "El componente Web API de TourGuide.",
 	"license": "MIT",
 	"type": "project",
