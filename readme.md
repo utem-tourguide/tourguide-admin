@@ -1,4 +1,4 @@
-## Web API de TourGuide
+## Administrador de contenido de TourGuide
 
 Esta aplicación es el administrador de contenido (CMS) de TourGuide. Su
 propósito es actuar como el punto central donde se almacena, manipula y se
@@ -36,6 +36,8 @@ El equipo de TourGuide:
 
 * [Kevin Perez](https://github.com/kevindperezm)
 * [Daniel Dolores](https://github.com/Dannypein)
+* [Sarahí Navarro](https://github.com/SaraNavarro)
+* [Edgar Larios](https://github.com/Edgar-Larios)
 
 ## Relacionados
 
