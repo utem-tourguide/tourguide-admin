@@ -12,3 +12,5 @@
 */
 
 Route::get('/', 'SesionesController@index');
+Route::post('/', ['as'   => 'iniciar-sesion',
+                  'uses' => 'SesionesController@entrar']);
