@@ -12,12 +12,16 @@ var elixir = require('laravel-elixir');
  */
 
 var paths = {
-  'bootstrap': './vendor/bower_components/bootstrap-sass-official/assets/'
+  'bootstrap': './vendor/bower_components/bootstrap-sass-official/assets/',
+  'jquery': './vendor/bower_components/jquery/'
 }
 
 elixir(function(mix) {
     mix.sass('styles.scss',
              'public/css/',
-             { includePaths: [paths.bootstrap + 'stylesheets/'] });
-    mix.copy(paths.bootstrap + 'fonts/bootstrap/**', 'public/fonts');
+             { includePaths: [paths.bootstrap + 'stylesheets/'] })
+       .copy(paths.bootstrap + 'fonts/bootstrap/**', 'public/fonts')
+       .scripts([paths.jquery + 'dist/jquery.js',
+                 paths.bootstrap + 'javascripts/bootstrap.js'],
+                'public/js/app.js', './')
 });
