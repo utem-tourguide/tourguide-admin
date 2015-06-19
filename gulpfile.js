@@ -19,4 +19,5 @@ elixir(function(mix) {
     mix.sass('styles.scss',
              'public/css/',
              { includePaths: [paths.bootstrap + 'stylesheets/'] });
+    mix.copy(paths.bootstrap + 'fonts/bootstrap/**', 'public/fonts');
 });
