@@ -145,6 +145,11 @@ return [
 		'TourGuide\Providers\EventServiceProvider',
 		'TourGuide\Providers\RouteServiceProvider',
 
+		/*
+		 * ServiceProviders de terceros...
+		 */
+		'Illuminate\Html\HtmlServiceProvider',
+
 	],
 
 	/*
@@ -192,6 +197,12 @@ return [
 		'URL'       => 'Illuminate\Support\Facades\URL',
 		'Validator' => 'Illuminate\Support\Facades\Validator',
 		'View'      => 'Illuminate\Support\Facades\View',
+
+		/**
+		 * Facades de terceros...
+		 */
+		'Form'      => 'Illuminate\Html\FormFacade',
+		'HTML'      => 'Illuminate\Html\HtmlFacade',
 
 	],
 
