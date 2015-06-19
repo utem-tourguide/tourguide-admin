@@ -1,7 +1,7 @@
-<?php namespace App\Http\Controllers;
+<?php namespace TourGuide\Http\Controllers;
 
-use App\Http\Requests;
-use App\Http\Controllers\Controller;
+use TourGuide\Http\Requests;
+use TourGuide\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 
