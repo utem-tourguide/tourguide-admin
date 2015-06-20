@@ -6,6 +6,14 @@ use Behat\Mink\Exception\ElementNotFoundException;
 class FeatureContext extends MinkContext {
 
   /**
+   * @BeforeScenario
+   */
+  public function preparar_bd() {
+    Artisan::call('migrate');
+    Artisan::call('db:seed');
+  }
+
+  /**
    * @Given /^que visito "(\S+)"$/
    * @When /^visito "(.*)"$/
    */
