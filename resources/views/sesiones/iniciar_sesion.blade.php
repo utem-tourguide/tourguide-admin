@@ -14,6 +14,9 @@
         <img id="app-logo" src="{{ asset('images/tourguide-logo.jpg') }}">
 
         <div id="login_form" class="well well-lg">
+          @if (Session::has( 'error' ))
+            <div class="alert alert-danger">{{ Session::get('error') }}</div>
+          @endif
           {!! Form::open(['route' => 'iniciar-sesion']) !!}
             {!! Form::email('email', '', ['class' => 'form-control', 'placeholder' => 'Correo electrónico', 'required']) !!}
             {!! Form::password('contrasena', ['class' => 'form-control', 'placeholder' => 'Contraseña', 'required']) !!}
