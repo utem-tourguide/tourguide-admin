@@ -11,14 +11,14 @@ class UsuariosSeeder extends Seeder {
    *
    * @return void
    */
-  public function run()
-  {
-    Usuario::create(['email'              => 'kevindperezm@tourguide.com',
-                     'contrasena_cifrada' => Usuario::cifrarContrasena('asdfg'),
-                     'nombre'             => 'Kevin',
-                     'apellido'           => 'Perez',
-                     'idioma'             => 'es',
-                     'rol_id'             => 1]);
+  public function run() {
+    Usuario::create([
+      'email'              => 'admin@tourguide.com',
+      'contrasena_cifrada' => Usuario::cifrarContrasena('admin'),
+      'nombre'             => 'Administrador',
+      'apellido'           => 'de TourGuide',
+      'idioma'             => 'es',
+      'rol_id'             => 1]);
   }
 
 }

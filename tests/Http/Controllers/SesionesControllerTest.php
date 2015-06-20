@@ -21,8 +21,8 @@ class SesionesControllerTest extends TestCase {
    */
   public function iniciar_sesion_correctamente() {
     $this->route('POST', 'sesiones.entrar', [
-      'email'      => 'kevindperezm@tourguide.com',
-      'contrasena' => 'asdfg',
+      'email'      => 'admin@tourguide.com',
+      'contrasena' => 'admin',
     ]);
 
     $this->assertRedirectedToRoute('dashboard');
