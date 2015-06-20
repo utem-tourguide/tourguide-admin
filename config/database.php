@@ -3,7 +3,7 @@
 return [
 
   'fetch' => PDO::FETCH_CLASS,
-  'default' => 'tourguide',
+  'default' => env('DB_DEFAULT', 'tourguide'),
   'migrations' => 'migraciones',
 
   'connections' => [
