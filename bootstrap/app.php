@@ -43,6 +43,18 @@ $app->singleton(
 
 /*
 |--------------------------------------------------------------------------
+| Cargar archivos adicionales
+|--------------------------------------------------------------------------
+|
+| En esta sección pueden cargarse archivos con código que debe ejecutarse
+| al crear una nueva instancia de aplicación.
+|
+*/
+
+require_once __DIR__.'/constants.php';
+
+/*
+|--------------------------------------------------------------------------
 | Return The Application
 |--------------------------------------------------------------------------
 |
