@@ -1,4 +1,4 @@
-<?php namespace TourGuide;
+<?php namespace TourGuide\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
