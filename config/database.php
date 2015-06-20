@@ -10,7 +10,7 @@ return [
     'tourguide' => [
       'driver'    => env('DB_DRIVER', 'sqlite'),
       'host'      => env('DB_HOST', 'localhost'),
-      'database'  => env('DB_DATABASE', 'db.sqlite'),
+      'database'  => env('DB_DATABASE', base_path().'/db.sqlite'),
       'username'  => env('DB_USERNAME', 'tourguide'),
       'password'  => env('DB_PASSWORD', ''),
       'charset'   => 'utf8',
