@@ -19,3 +19,11 @@ Característica: Iniciar sesión
     Entonces debería estar en /^\/sesiones\/entrar$/
     Y debería ver "Usuario o contraseña incorrectos"
 
+  Escenario: turista@tourguide.com inicia sesión
+    Dado que existe el usuario "turista"
+    Y que visito "/sesiones/entrar"
+    Cuando escribo "turista@tourguide.com" en el campo "email"
+    Y escribo "turista" en el campo "contrasena"
+    Y hago clic en "Entrar"
+    Entonces debería estar en /^\/obtener-app$/
+

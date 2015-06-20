@@ -1,5 +1,6 @@
 <?php
 
+use TourGuide\Models\Usuario;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Mink\Exception\ElementNotFoundException;
 
@@ -19,6 +20,14 @@ class FeatureContext extends MinkContext {
    */
   public function visitar_url($url) {
     $this->getSession()->visit($url);
+  }
+
+  /**
+   * @Given /^que existe el usuario "(.*)"$/
+   * @When /^existe el usuario "(.*)"$/
+   */
+  public function crear_usuario($usuario) {
+    Usuario::create($this->obtener_usuarios()[$usuario]);
   }
 
   /**
@@ -68,6 +77,24 @@ class FeatureContext extends MinkContext {
     }
 
     return $elemento;
+  }
+
+  /**
+   * Devuelve un array con datos de usuarios de pruebas.
+   *
+   * @return array
+   */
+  private function obtener_usuarios() {
+    return [
+      'turista' => [
+        'email'              => 'turista@tourguide.com',
+        'contrasena_cifrada' => Usuario::cifrarContrasena('turista'),
+        'nombre'             => 'Turista',
+        'apellido'           => 'de pruebas',
+        'idioma'             => 'es',
+        'rol_id'             => ROL_TURISTA,
+      ],
+    ];
   }
 
 }

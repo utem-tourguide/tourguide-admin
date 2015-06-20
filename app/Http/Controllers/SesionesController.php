@@ -26,7 +26,7 @@ class SesionesController extends Controller {
     $usuario = Usuario::whereEmail( Input::get('email') )->first();
     if ($usuario && $usuario->verificarContrasena( Input::get('contrasena') )) {
       Session::put('usuario_id', $usuario->id);
-      return redirect()->route('dashboard');
+      return $this->redirigir_a_dashboard_si_es_administrador($usuario);
     } else {
       return redirect()->route('sesiones.entrar')
                        ->with('error', 'Usuario o contraseña incorrectos.');
@@ -41,6 +41,22 @@ class SesionesController extends Controller {
   public function salir() {
     Session::flush();
     return redirect()->route('sesiones.entrar');
+  }
+
+  /**
+   * Genera una redirección hacia el dashboard si el usuario especificado es un
+   * administrador. Si el usuario no es administrador, se le redirige a la
+   * página con instrucciones para obtener la aplicación móvil de TourGuide.
+   *
+   * @param  TourGuide\Models\Usuario $usuario
+   * @return Response
+   */
+  private function redirigir_a_dashboard_si_es_administrador($usuario) {
+    if ($usuario->rol_id == ROL_ADMINISTRADOR) {
+      return redirect()->route('dashboard');
+    } else {
+      return redirect()->route('obtener_app');
+    }
   }
 
 }
