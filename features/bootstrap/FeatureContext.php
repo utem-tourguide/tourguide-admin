@@ -45,6 +45,13 @@ class FeatureContext extends MinkContext {
   }
 
   /**
+   * @Then /^debería ver "(.*)"$/
+   */
+  public function verificar_texto_en_pagina($texto) {
+    $this->assertPageContainsText($texto);
+  }
+
+  /**
    * Encuentra un elemento cliqueable en la página. Lanza una excepción si el
    * el elemento no es encontrado.
    *
