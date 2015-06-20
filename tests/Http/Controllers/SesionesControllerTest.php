@@ -25,6 +25,7 @@ class SesionesControllerTest extends TestCase {
       'contrasena' => 'asdfg',
     ]);
 
+    $this->assertRedirectedToRoute('dashboard');
     $this->assertSessionHas('usuario_id');
   }
 

@@ -2,11 +2,8 @@
 
 use Input;
 use Session;
-use TourGuide\Http\Requests;
 use TourGuide\Models\Usuario;
 use TourGuide\Http\Controllers\Controller;
-
-use Illuminate\Http\Request;
 
 class SesionesController extends Controller {
 
@@ -29,7 +26,7 @@ class SesionesController extends Controller {
     $usuario = Usuario::whereEmail( Input::get('email') )->first();
     if ($usuario && $usuario->verificarContrasena( Input::get('contrasena') )) {
       Session::put('usuario_id', $usuario->id);
-      /* TODO: Mostrar dashboard */
+      return redirect()->route('dashboard');
     } else {
       return redirect()->route('sesiones.entrar')
                        ->with('error', 'Usuario o contraseña incorrectos.');
