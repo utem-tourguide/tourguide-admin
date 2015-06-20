@@ -21,6 +21,7 @@ Route::group(['prefix' => '/sesiones'], function() {
                         'uses' => 'SesionesController@salir']);
 });
 
-Route::get('/dashboard', function() {
-  return 'Proximamente...';
-});
+Route::get('/dashboard', ['as'   => 'dashboard',
+                          'uses' => function() {
+                                      return 'Proximamente...';
+                                    }]);
