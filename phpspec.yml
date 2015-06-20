@@ -1,3 +1,5 @@
+formatter.name: dot
+
 suites:
     main:
         namespace: TourGuide
