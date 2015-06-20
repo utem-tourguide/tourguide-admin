@@ -9,4 +9,4 @@ Característica: Iniciar sesión
     Cuando escribo "kevindperezm@tourguide.com" en el campo "email"
     Y escribo "asdfg" en el campo "contrasena"
     Y hago clic en "Entrar"
-    Entonces debería estar en /^dashboard$/
+    Entonces debería estar en /^\/dashboard$/
