@@ -1,6 +1,7 @@
 <?php namespace TourGuide\Http\Controllers;
 
 use Input;
+use Session;
 use TourGuide\Http\Requests;
 use TourGuide\Models\Usuario;
 use TourGuide\Http\Controllers\Controller;
@@ -28,6 +29,7 @@ class SesionesController extends Controller {
   public function entrar() {
     $usuario = Usuario::whereEmail( Input::get('email') )->first();
     if ($usuario && $usuario->verificarContrasena( Input::get('contrasena') )) {
+      Session::put('usuario_id', $usuario->id);
       /* TODO: Mostrar dashboard */
     } else {
       return redirect('/')->with('error', 'Usuario o contraseña incorrectos.');
