@@ -32,7 +32,8 @@ class SesionesController extends Controller {
       Session::put('usuario_id', $usuario->id);
       /* TODO: Mostrar dashboard */
     } else {
-      return redirect('/')->with('error', 'Usuario o contraseña incorrectos.');
+      return redirect()->route('sesiones.entrar')
+                       ->with('error', 'Usuario o contraseña incorrectos.');
     }
   }
 

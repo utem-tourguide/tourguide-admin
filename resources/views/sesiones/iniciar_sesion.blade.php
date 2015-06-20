@@ -17,7 +17,7 @@
           @if (Session::has( 'error' ))
             <div class="alert alert-danger">{{ Session::get('error') }}</div>
           @endif
-          {!! Form::open(['route' => 'iniciar-sesion']) !!}
+          {!! Form::open(['route' => 'sesiones.entrar']) !!}
             {!! Form::email('email', '', ['class' => 'form-control', 'placeholder' => 'Correo electrónico', 'required']) !!}
             {!! Form::password('contrasena', ['class' => 'form-control', 'placeholder' => 'Contraseña', 'required']) !!}
             {!! Form::submit('Entrar', ['class' => 'btn btn-large btn-primary btn-block']) !!}

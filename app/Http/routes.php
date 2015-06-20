@@ -11,6 +11,9 @@
 |
 */
 
-Route::get('/', 'SesionesController@index');
-Route::post('/', ['as'   => 'iniciar-sesion',
-                  'uses' => 'SesionesController@entrar']);
+Route::group(['prefix' => '/sesiones'], function() {
+  Route::get('/entrar', ['as'   => 'sesiones.entrar',
+                         'uses' => 'SesionesController@index']);
+  Route::post('/entrar', ['as'   => 'sesiones.entrar',
+                          'uses' => 'SesionesController@entrar']);
+});
