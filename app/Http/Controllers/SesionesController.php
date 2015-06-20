@@ -15,8 +15,7 @@ class SesionesController extends Controller {
    *
    * @return Response
    */
-  public function index()
-  {
+  public function index() {
     return view('sesiones.iniciar_sesion');
   }
 
