@@ -9,7 +9,11 @@
 	},
 	"require-dev": {
 		"phpunit/phpunit": "~4.0",
-		"phpspec/phpspec": "^2.2"
+		"phpspec/phpspec": "^2.2",
+		"behat/behat": "^3.0",
+		"behat/mink": "^1.6",
+		"behat/mink-extension": "^2.0",
+		"laracasts/behat-laravel-extension": "^1.0"
 	},
 	"autoload": {
 		"classmap": [
