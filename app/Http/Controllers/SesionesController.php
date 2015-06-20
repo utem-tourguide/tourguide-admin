@@ -37,4 +37,14 @@ class SesionesController extends Controller {
     }
   }
 
+  /**
+   * Cierra la sesión actual en la aplicación.
+   *
+   * @return Response
+   */
+  public function salir() {
+    Session::flush();
+    return redirect()->route('sesiones.entrar');
+  }
+
 }

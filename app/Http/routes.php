@@ -16,4 +16,7 @@ Route::group(['prefix' => '/sesiones'], function() {
                          'uses' => 'SesionesController@index']);
   Route::post('/entrar', ['as'   => 'sesiones.entrar',
                           'uses' => 'SesionesController@entrar']);
+
+  Route::get('/salir', ['as'   => 'sesiones.salir',
+                        'uses' => 'SesionesController@salir']);
 });
