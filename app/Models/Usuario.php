@@ -25,4 +25,15 @@ class Usuario extends Model {
     return crypt($contrasena, $salt);
   }
 
+  /**
+   * Verifica la contraseña de un usuario.
+   *
+   * @param  string $contraseña
+   * @return boolean
+   */
+  public function verificarContrasena($contrasena) {
+    $version_cifrada = crypt($contrasena, $this->contrasena_cifrada);
+    return $version_cifrada === $this->contrasena_cifrada;
+  }
+
 }
