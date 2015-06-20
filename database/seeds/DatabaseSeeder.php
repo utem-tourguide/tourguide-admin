@@ -1,6 +1,5 @@
 <?php
 
-use App\Usuario;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 
@@ -15,14 +14,7 @@ class DatabaseSeeder extends Seeder {
 	{
 		Model::unguard();
 
-		// $this->call('UserTableSeeder');
-
-		Usuario::create(['email'              => 'kevindperezm@gmail.com',
-			               'contrasena_cifrada' => 'asdfg',
-			               'nombre'             => 'Kevin',
-			               'apellido'           => 'Perez',
-			               'idioma'             => 'es',
-			               'rol_id'             => 1]);
+		$this->call('UsuariosSeeder');
 	}
 
 }
