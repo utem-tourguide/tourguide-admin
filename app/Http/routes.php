@@ -20,3 +20,7 @@ Route::group(['prefix' => '/sesiones'], function() {
   Route::get('/salir', ['as'   => 'sesiones.salir',
                         'uses' => 'SesionesController@salir']);
 });
+
+Route::get('/dashboard', function() {
+  return 'Proximamente...';
+});
