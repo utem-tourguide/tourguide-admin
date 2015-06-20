@@ -25,3 +25,7 @@ Route::get('/dashboard', ['as'   => 'dashboard',
                           'uses' => function() {
                                       return 'Proximamente...';
                                     }]);
+Route::get('/obtener-app', ['as'   => 'obtener_app',
+                            'uses' => function() {
+                                        return 'Proximamente...';
+                                      }]);
