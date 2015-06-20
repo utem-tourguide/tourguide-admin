@@ -7,14 +7,14 @@ use Illuminate\Http\Request;
 
 class SesionesController extends Controller {
 
-	/**
-	 * Muestra el formulario de inicio de sesión.
-	 *
-	 * @return Response
-	 */
-	public function index()
-	{
-		return view('sesiones.iniciar_sesion');
-	}
+  /**
+   * Muestra el formulario de inicio de sesión.
+   *
+   * @return Response
+   */
+  public function index()
+  {
+    return view('sesiones.iniciar_sesion');
+  }
 
 }
