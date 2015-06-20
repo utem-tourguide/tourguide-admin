@@ -18,7 +18,7 @@ class UsuariosSeeder extends Seeder {
       'nombre'             => 'Administrador',
       'apellido'           => 'de TourGuide',
       'idioma'             => 'es',
-      'rol_id'             => 1]);
+      'rol_id'             => ROL_ADMINISTRADOR]);
   }
 
 }
