@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class SesionesController extends Controller {
 
 	/**
-	 * Display a listing of the resource.
+	 * Muestra el formulario de inicio de sesión.
 	 *
 	 * @return Response
 	 */
