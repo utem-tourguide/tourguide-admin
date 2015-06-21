@@ -3,7 +3,4 @@
 .env
 *.sqlite
 *.fuse_hidden*
-public/fonts
-public/js
-public/css
 /nbproject
