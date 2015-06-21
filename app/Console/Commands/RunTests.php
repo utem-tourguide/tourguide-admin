@@ -14,9 +14,9 @@ class RunTests extends Command implements SelfHandling {
    * @return void
    */
   public function handle() {
-    system('phpspec run --stop-on-failure -f dot');
-    system('phpunit --stop-on-failure');
-    system('behat --stop-on-failure -f progress');
+    system('vendor/bin/phpspec run --stop-on-failure -f dot');
+    system('vendor/bin/phpunit --stop-on-failure');
+    system('vendor/bin/behat --stop-on-failure -f progress');
   }
 
 }

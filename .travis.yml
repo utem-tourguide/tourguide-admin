@@ -6,4 +6,4 @@ php:
   - hhvm
 
 before_script: composer install
-script: "vendor/bin/phpspec run && vendor/bin/phpunit && vendor/bin/behat"
+script: php artisan test
