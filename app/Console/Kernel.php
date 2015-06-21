@@ -10,9 +10,7 @@ class Kernel extends ConsoleKernel {
 	 *
 	 * @var array
 	 */
-	protected $commands = [
-		'TourGuide\Console\Commands\Inspire',
-	];
+	protected $commands = [];
 
 	/**
 	 * Define the application's command schedule.
