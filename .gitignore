@@ -3,3 +3,4 @@
 .env
 *.sqlite
 *.fuse_hidden*
+/nbproject

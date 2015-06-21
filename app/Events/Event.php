@@ -1,4 +1,4 @@
-<?php namespace App\Events;
+<?php namespace TourGuide\Events;
 
 abstract class Event {
 
