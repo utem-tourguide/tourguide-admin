@@ -31,6 +31,17 @@ class FeatureContext extends MinkContext {
   }
 
   /**
+   * @Given /^que accedo como administrador(.*)$/
+   * @When /^accedo como administrador(.*)$/
+   */
+  public function acceder($rol) {
+    $this->visitar_url(route( 'sesiones.entrar' ));
+    $this->escribir_en_campo('admin@tourguide.com', 'email');
+    $this->escribir_en_campo('admin', 'contrasena');
+    $this->hacer_clic('Entrar');
+  }
+
+  /**
    * @When /^escribo "(.*)" en el campo "(.*)"$/
    */
   public function escribir_en_campo($valor, $campo) {
