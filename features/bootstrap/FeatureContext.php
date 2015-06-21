@@ -15,19 +15,28 @@ class FeatureContext extends MinkContext {
   }
 
   /**
-   * @Given /^que visito "(\S+)"$/
-   * @When /^visito "(.*)"$/
+   * @Given /^(?:que )?visita "(\S+)"$/
    */
   public function visitar_url($url) {
     $this->getSession()->visit($url);
   }
 
   /**
-   * @Given /^que existe el usuario "(.*)"$/
-   * @When /^existe el usuario "(.*)"$/
+   * @Given /^(?:que )?(.*) se registra como (.*) y accede$/
    */
-  public function crear_usuario($usuario) {
-    Usuario::create($this->obtener_usuarios()[$usuario]);
+  public function registrar_y_acceder($email, $rol) {
+    $this->registrar_usuario($email, 'admin', $rol);
+    $this->iniciar_sesion($email);
+  }
+
+  /**
+   * @Given /^(?:que )?(.*) inicia sesión$/
+   */
+  public function iniciar_sesion($email) {
+    $this->visitar_url(route( 'sesiones.entrar' ));
+    $this->escribir_en_campo($email, 'email');
+    $this->escribir_en_campo('admin', 'contrasena');
+    $this->hacer_clic('Entrar');
   }
 
   /**
@@ -47,10 +56,11 @@ class FeatureContext extends MinkContext {
   }
 
   /**
-   * @Then /^debería estar en (.*)$/
+   * @Then /^debería estar en la página (?:para|del) (.*)$/
    */
-  public function verificar_url($url) {
-    $this->assertUrlRegExp($url);
+  public function verificar_pagina($pagina) {
+    $url_regexp = $this->obtener_url_para_pagina($pagina);
+    $this->assertUrlRegExp($url_regexp);
   }
 
   /**
@@ -80,21 +90,39 @@ class FeatureContext extends MinkContext {
   }
 
   /**
-   * Devuelve un array con datos de usuarios de pruebas.
+   * Registra un usuario en la aplicación.
    *
-   * @return array
+   * @param  string $email
+   * @param  string $contrasena
+   * @param  string $rol
+   * @return TourGuide\Models\Usuario;
    */
-  private function obtener_usuarios() {
-    return [
-      'turista' => [
-        'email'              => 'turista@tourguide.com',
-        'contrasena_cifrada' => Usuario::cifrarContrasena('turista'),
-        'nombre'             => 'Turista',
-        'apellido'           => 'de pruebas',
-        'idioma'             => 'es',
-        'rol_id'             => ROL_TURISTA,
-      ],
+  private function registrar_usuario($email, $contrasena, $rol) {
+    $rol_id = constant('ROL_'.strtoupper($rol));
+    return Usuario::create([
+      'email'      => $email,
+      'contrasena' => $contrasena,
+      'nombre'     => 'Usuario',
+      'apellido'   => 'de pruebas',
+      'idioma'     => 'es',
+      'rol_id'     => $rol_id,
+    ]);
+  }
+
+  /**
+   * Devuelve una expresión regular para la url de la página especificada.
+   *
+   * @param  string $pagina
+   * @return regexp
+   */
+  private function obtener_url_para_pagina($pagina) {
+    $paginas = [
+      'dashboard'        => "/^\/dashboard$/",
+      'iniciar sesión'       => "/^\/sesiones\/entrar$/",
+      'obtener el app móvil' => "/^\/obtener-app$/",
     ];
+
+    return $paginas[$pagina];
   }
 
 }
