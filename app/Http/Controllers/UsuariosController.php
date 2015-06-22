@@ -80,8 +80,13 @@ class UsuariosController extends Controller {
      * @param  int  $id
      * @return Response
      */
-    public function destroy($id)
-    {
-        //
+    public function destroy($id) {
+        $usuario = Usuario::find($id);
+        $usuario->delete();
+
+        $datos = [
+            'usuario' => $usuario
+        ];
+        return view('usuarios.delete', $datos);
     }
 }
