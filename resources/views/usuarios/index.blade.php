@@ -30,7 +30,7 @@
           <td>{{ $usuario->rol_id }}</td>
           <td>
             {!! Form::open(['route' => ['usuarios.destroy', $usuario->id], 'method' => 'DELETE']) !!}
-              <input type="submit" class="btn btn-danger" value="Eliminar">
+              <input type="submit" class="btn btn-danger btn-sm" value="Eliminar">
             {!! Form::close() !!}
           </td>
         </tr>
