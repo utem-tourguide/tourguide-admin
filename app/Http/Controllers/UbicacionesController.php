@@ -5,6 +5,7 @@ namespace TourGuide\Http\Controllers;
 use Illuminate\Http\Request;
 
 use TourGuide\Http\Requests;
+use TourGuide\Models\UbicacionTuristica;
 use TourGuide\Http\Controllers\Controller;
 
 class UbicacionesController extends Controller
@@ -16,7 +17,12 @@ class UbicacionesController extends Controller
      */
     public function index()
     {
+        $ubicaciones = UbicacionTuristica::all();
+        $datos = [
+            'ubicaciones' => $ubicaciones
+        ];
 
+        return view('ubicaciones.index', $datos);
     }
 
     /**
