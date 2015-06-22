@@ -5,18 +5,20 @@ namespace TourGuide\Http\Controllers;
 use Illuminate\Http\Request;
 
 use TourGuide\Http\Requests;
+use TourGuide\Models\Usuario;
 use TourGuide\Http\Controllers\Controller;
 
-class UsuariosController extends Controller
-{
+class UsuariosController extends Controller {
     /**
-     * Display a listing of the resource.
+     * Muestra una lista de usuarios registrados en TourGuide.
      *
      * @return Response
      */
-    public function index()
-    {
-        //
+    public function index() {
+        $datos = [
+          'usuarios' => Usuario::all()
+        ];
+        return view('usuarios.index', $datos);
     }
 
     /**
