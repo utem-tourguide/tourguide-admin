@@ -7,6 +7,9 @@
 <body>
   <div class="container-fluid">
     <h1>Usuarios</h1>
+    <div class="well well-sm">
+      {!! link_to_route('usuarios.create', 'Nuevo', [], ['class' => "btn btn-primary"]) !!}
+    </div>
     <table class="table table-striped table-bordered">
       <tr>
         <th>Id</th>
