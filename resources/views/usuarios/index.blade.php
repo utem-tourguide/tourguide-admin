@@ -27,6 +27,7 @@
         </tr>
       @endforeach
     </table>
+    {!! $usuarios->render() !!}
   </div>
 </body>
 </html>
