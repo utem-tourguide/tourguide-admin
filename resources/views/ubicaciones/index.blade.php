@@ -26,6 +26,8 @@
         </tr>
       @endforeach
     </table>
+
+    {!! $ubicaciones->render() !!}
   </div>
 </body>
 </html>

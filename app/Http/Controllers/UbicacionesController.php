@@ -17,7 +17,7 @@ class UbicacionesController extends Controller
      */
     public function index()
     {
-        $ubicaciones = UbicacionTuristica::all();
+        $ubicaciones = UbicacionTuristica::paginate(15);
         $datos = [
             'ubicaciones' => $ubicaciones
         ];
