@@ -4,6 +4,7 @@ namespace TourGuide\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use Input;
 use TourGuide\Http\Requests;
 use TourGuide\Models\Usuario;
 use TourGuide\Http\Controllers\Controller;
@@ -36,9 +37,9 @@ class UsuariosController extends Controller {
      *
      * @return Response
      */
-    public function store()
-    {
-        //
+    public function store(){
+        Usuario::create(Input::all());
+        return view('usuarios.create');
     }
 
     /**
