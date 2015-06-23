@@ -29,9 +29,10 @@
           <td>{{ $usuario->idioma }}</td>
           <td>{{ $usuario->rol_id }}</td>
           <td>
-            {!! Form::open(['route' => ['usuarios.destroy', $usuario->id], 'method' => 'DELETE']) !!}
-              <input type="submit" class="btn btn-danger btn-sm" value="Eliminar">
-            {!! Form::close() !!}
+              <button class="btn btn-primary btn-sm">Editar</button>
+              {!! Form::open(['route' => ['usuarios.destroy', $usuario->id], 'method' => 'DELETE', 'style' => 'display: inline-block;']) !!}
+                <button class="btn btn-danger btn-sm">Eliminar</button>
+              {!! Form::close() !!}
           </td>
         </tr>
       @endforeach
