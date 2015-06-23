@@ -1,6 +1,7 @@
 <?php
 
 use TourGuide\Models\Usuario;
+use PHPUnit_Framework_Assert as PHPUnit;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Mink\Exception\ElementNotFoundException;
 
@@ -18,8 +19,8 @@ class FeatureContext extends MinkContext {
    * @Given /^(?:que )?visita la página (?:para|de) (.*)$/
    */
   public function visitar_pagina($pagina) {
-    $url = $this->obtener_url_para_pagina($pagina);
-    $this->visitar_url($url);
+    $regexp = $this->obtener_url_para_pagina($pagina);
+    $this->visitar_url($this->convertir_regexp_a_url($regexp));
   }
 
   /**
@@ -56,11 +57,37 @@ class FeatureContext extends MinkContext {
   }
 
   /**
+   * @When /^selecciono (\S)+ en (\S)+$/
+   */
+  public function seleccionar_en_campo($valor, $campo) {
+    $pagina = $this->getSession()->getPage();
+    $pagina->selectFieldOption($campo, $valor);
+  }
+
+  /**
    * @When /^hago clic en "(.*)"$/
    */
   public function hacer_clic($locator) {
     $elemento = $this->encontrar_cliqueable($locator);
     $elemento->click();
+  }
+
+  /**
+   * @When /^registra a (\S+) como (\S+)$/
+   */
+  public function registrar_usuario_via_formulario($email, $rol) {
+    $this->verificar_pagina('administrar usuarios');
+
+    $this->visitar_url(route( 'usuarios.create' ));
+    $this->escribir_en_campo($email, 'email');
+    $this->escribir_en_campo('admin', 'contrasena');
+    $this->escribir_en_campo('admin', 'confirmar_contrasena');
+    $this->escribir_en_campo('Usuario', 'nombre');
+    $this->escribir_en_campo('de prueba', 'apellido');
+    $this->seleccionar_en_campo('Español', 'idioma');
+    $this->seleccionar_en_campo($this->obtener_rol_id($rol), 'rol_id');
+
+    $this->hacer_clic('Guardar');
   }
 
   /**
@@ -76,6 +103,15 @@ class FeatureContext extends MinkContext {
    */
   public function verificar_texto_en_pagina($texto) {
     $this->assertPageContainsText($texto);
+  }
+
+  /**
+   * @Then /^debería haber (\d)+ (\S)+ guardados?$/
+   */
+  public function verificar_usuarios_guardados($cantidad, $rol) {
+    /*$rol_id = $this->obtener_rol_id($rol);
+
+    PHPUnit::assertEquals($cantidad, Usuario::whereRolId($rol_id)->count());*/
   }
 
   /**
@@ -106,14 +142,13 @@ class FeatureContext extends MinkContext {
    * @return TourGuide\Models\Usuario;
    */
   private function registrar_usuario($email, $contrasena, $rol) {
-    $rol_id = constant('ROL_'.strtoupper($rol));
     return Usuario::create([
       'email'      => $email,
       'contrasena' => $contrasena,
       'nombre'     => 'Usuario',
       'apellido'   => 'de pruebas',
       'idioma'     => 'es',
-      'rol_id'     => $rol_id,
+      'rol_id'     => $this->obtener_rol_id($rol),
     ]);
   }
 
@@ -132,6 +167,26 @@ class FeatureContext extends MinkContext {
     ];
 
     return $paginas[$pagina];
+  }
+
+  /**
+   * Convierte una regexp que representa una url en una simple cadena de texto.
+   *
+   * @param  regexp $regexp
+   * @return string
+   */
+  private function convertir_regexp_a_url($regexp) {
+    return preg_replace("/\^|\\\|\$/", '', trim($regexp, '/'));
+  }
+
+  /**
+   * Devuelve el rol id de un rol especificado.
+   *
+   * @param  string $rol
+   * @return int
+   */
+  private function obtener_rol_id($rol) {
+    return constant('ROL_' . strtoupper( str_singular($rol)));
   }
 
 }
