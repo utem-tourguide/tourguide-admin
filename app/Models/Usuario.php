@@ -10,7 +10,6 @@ class Usuario extends Model {
                          'nombre',
                          'apellido',
                          'idioma',
-                         'rol_id',
                         ];
 
   /**
