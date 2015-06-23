@@ -3,7 +3,7 @@
 namespace TourGuide\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use Input;
 use TourGuide\Http\Requests;
 use TourGuide\Models\UbicacionTuristica;
 use TourGuide\Http\Controllers\Controller;
@@ -42,8 +42,9 @@ class UbicacionesController extends Controller
      */
     public function store()
     {
-        $ubicaciones::create(Input::all());
-        return view('ubicaciones.index');
+        UbicacionTuristica::create(Input::all());
+        return redirect()->route('ubicaciones.index')
+                         ->with('mensaje', 'Ubicación guardada.');
     }
 
 

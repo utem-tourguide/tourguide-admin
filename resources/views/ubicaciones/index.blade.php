@@ -8,6 +8,12 @@
   <div class="container-fluid">
     <h1>Ubicaciones turísticas</h1>
 
+    @if (Session::has('mensaje'))
+      <div class="alert alert-info">
+        <p>{{ Session::get('mensaje') }}</p>
+      </div>
+    @endif
+
     <table class="table table-striped table-bordered">
       <tr>
         <th>Id</th>
