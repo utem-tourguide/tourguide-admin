@@ -15,6 +15,14 @@ class FeatureContext extends MinkContext {
   }
 
   /**
+   * @Given /^(?:que )?visita la página (?:para|de) (.*)$/
+   */
+  public function visitar_pagina($pagina) {
+    $url = $this->obtener_url_para_pagina($pagina);
+    $this->visitar_url($url);
+  }
+
+  /**
    * @Given /^(?:que )?visita "(\S+)"$/
    */
   public function visitar_url($url) {
@@ -117,7 +125,7 @@ class FeatureContext extends MinkContext {
    */
   private function obtener_url_para_pagina($pagina) {
     $paginas = [
-      'dashboard'        => "/^\/dashboard$/",
+      'dashboard'            => "/^\/dashboard$/",
       'iniciar sesión'       => "/^\/sesiones\/entrar$/",
       'obtener el app móvil' => "/^\/obtener-app$/",
     ];
