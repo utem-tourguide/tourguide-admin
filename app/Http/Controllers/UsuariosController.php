@@ -4,12 +4,18 @@ namespace TourGuide\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use Input;
 use TourGuide\Http\Requests;
 use TourGuide\Models\Usuario;
 use TourGuide\Http\Controllers\Controller;
 
 class UsuariosController extends Controller {
+
+    private $atributos_de_usuario = ['email',
+                                     'contrasena',
+                                     'nombre',
+                                     'apellido',
+                                     'idioma'];
+
     /**
      * Muestra una lista de usuarios registrados en TourGuide.
      *
@@ -29,7 +35,7 @@ class UsuariosController extends Controller {
      */
     public function create()
     {
-        return view('usuarios.create'); 
+        return view('usuarios.create');
     }
 
     /**
@@ -37,8 +43,11 @@ class UsuariosController extends Controller {
      *
      * @return Response
      */
-    public function store(){
-        Usuario::create(Input::all());
+    public function store(Request $request) {
+        $usuario = new Usuario($request->only($this->atributos_de_usuario));
+        $usuario->rol_id = $request->get('rol_id');
+        $usuario->save();
+
         return view('usuarios.create');
     }
 
