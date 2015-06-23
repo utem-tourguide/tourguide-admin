@@ -70,7 +70,8 @@ class UsuariosController extends Controller {
      */
     public function edit($id)
     {
-        //
+        $user = Usuario::findOrFail($id);
+        return view('usuarios.edit');
     }
 
     /**

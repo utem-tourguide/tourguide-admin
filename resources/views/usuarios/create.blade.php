@@ -43,7 +43,7 @@
 					<option value="fr">Frances</option>
 				</select>
 		  	</div>
-			<input type="submit" value="Guardar" class=" btn btn-primary">
+			<input type="submit" value="Guardar" class=" btn btn-primary"><a href="{{ route('usuarios.index') }}" class="btn btn-danger" style="margin: 2em;">Cancelar</a>
 		{!! Form::close() !!}
 	</div>
 	<div class="col-md-3">

@@ -31,7 +31,7 @@
           <td>
               <button class="btn btn-primary btn-sm">Editar</button>
               {!! Form::open(['route' => ['usuarios.destroy', $usuario->id], 'method' => 'DELETE', 'style' => 'display: inline-block;']) !!}
-                <button class="btn btn-danger btn-sm">Eliminar</button>
+                <button class="btn btn-danger btn-sm" href="{{ route('usuarios.edit') }}">Eliminar</button>
               {!! Form::close() !!}
           </td>
         </tr>
