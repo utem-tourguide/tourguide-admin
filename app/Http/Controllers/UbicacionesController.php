@@ -32,7 +32,7 @@ class UbicacionesController extends Controller
      */
     public function create()
     {
-        //
+        return view('ubicaciones.create');
     }
 
     /**
@@ -42,8 +42,10 @@ class UbicacionesController extends Controller
      */
     public function store()
     {
-        //
+        $ubicaciones::create(Input::all());
+        return view('ubicaciones.index');
     }
+
 
     /**
      * Display the specified resource.
