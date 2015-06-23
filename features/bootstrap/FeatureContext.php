@@ -128,6 +128,7 @@ class FeatureContext extends MinkContext {
       'dashboard'            => "/^\/dashboard$/",
       'iniciar sesión'       => "/^\/sesiones\/entrar$/",
       'obtener el app móvil' => "/^\/obtener-app$/",
+      'administrar usuarios' => "/^\/usuarios/",
     ];
 
     return $paginas[$pagina];
