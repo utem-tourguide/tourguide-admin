@@ -88,6 +88,6 @@ class UsuariosController extends Controller {
         $datos = [
             'usuario' => $usuario
         ];
-        return view('usuarios.delete', $datos);
+        return view('usuarios.destroy', $datos);
     }
 }
