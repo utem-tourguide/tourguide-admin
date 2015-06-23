@@ -106,12 +106,12 @@ class FeatureContext extends MinkContext {
   }
 
   /**
-   * @Then /^debería haber (\d)+ (\S)+ guardados?$/
+   * @Then /^debería haber (\d+) (\S*) guardados?$/
    */
   public function verificar_usuarios_guardados($cantidad, $rol) {
-    /*$rol_id = $this->obtener_rol_id($rol);
+    $rol_id = $this->obtener_rol_id($rol);
 
-    PHPUnit::assertEquals($cantidad, Usuario::whereRolId($rol_id)->count());*/
+    PHPUnit::assertEquals($cantidad, Usuario::whereRolId($rol_id)->count());
   }
 
   /**
