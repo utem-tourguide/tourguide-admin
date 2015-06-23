@@ -7,11 +7,13 @@
 
 use Doctrine\Common\Inflector\Inflector;
 
-Inflector::rules('plural', [
-  'irregular' => ['administrador' => 'administradores'],
-  'irregular' => ['turista'       => 'turistas'],
+Inflector::rules('singular', [
+  'irregular' => ['administradores' => 'administrador',
+                  'turistas'        => 'turista'],
+  'uninflected' => ['turista'],
 ], true);
 
-Inflector::rules('singular', [
-  'irregular' => ['turista' => 'turista'],
+Inflector::rules('plural', [
+  'irregular' => ['administrador' => 'administradores',
+                  'turista'       => 'turistas'],
 ], true);
