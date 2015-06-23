@@ -89,6 +89,13 @@ class UbicacionesController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $ubicaciones = ubicaciones::find($id);
+        $ubicaciones->delete();
+
+        $datos=['usuarios'=> $ubicaciones
+        ];
+
+        return redirect()->route('ubicaciones.index')
+                         ->with('mensaje', 'Ubicación eliminada.');
     }
 }

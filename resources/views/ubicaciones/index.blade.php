@@ -21,6 +21,7 @@
         <th>Localización</th>
         <th>Creada en</th>
         <th>Modificada en</th>
+        <th>Acciones</th>
       </tr>
       @foreach ($ubicaciones as $ubicacion)
         <tr>
@@ -29,6 +30,11 @@
           <td>{{ $ubicacion->localizacion }}</td>
           <td>{{ $ubicacion->created_at }}</td>
           <td>{{ $ubicacion->updated_at }}</td>
+
+         <td>{!!  Form::open(['route' => ['ubicaciones.destroy', $ubicacion->id], 'method' => 'DELETE']) !!}
+              <input type="submit" class="btn btn-danger" value="eliminar">
+              {!! Form::close()!!}
+          </td>
         </tr>
       @endforeach
     </table>
