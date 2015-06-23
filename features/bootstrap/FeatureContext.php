@@ -76,8 +76,6 @@ class FeatureContext extends MinkContext {
    * @When /^registra a (\S+) como (\S+)$/
    */
   public function registrar_usuario_via_formulario($email, $rol) {
-    $this->verificar_pagina('administrar usuarios');
-
     $this->visitar_url(route( 'usuarios.create' ));
     $this->escribir_en_campo($email, 'email');
     $this->escribir_en_campo('admin', 'contrasena');
