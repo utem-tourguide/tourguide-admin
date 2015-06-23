@@ -2,15 +2,11 @@
 
 use TestCase;
 use TourGuide\Models\Usuario;
+use Illuminate\Foundation\Testing\WithoutMiddleware;
 
 class UsuariosControllerTest extends TestCase {
 
-  private $datos_usuario = ['nombre'     => 'Sarahí',
-                           'apellido'   => 'Navarro',
-                           'email'      => 'megamaniatica666@gmail.com',
-                           'contrasena' => 'sarahinavarro',
-                           'idioma'     => 'es',
-                           'rol_id'     => ROL_ADMINISTRADOR];
+  use WithoutMiddleware;
 
   /**
    * @test
@@ -36,7 +32,7 @@ class UsuariosControllerTest extends TestCase {
    * @test
    */
   public function crear_nuevo_usuario() {
-    $this->route('POST', 'usuarios.store', $this->datos_usuario);
+    $this->route('POST', 'usuarios.store', $this->obtener_datos_de_usuario());
 
     $this->assertEquals(2, Usuario::count());
   }
@@ -45,11 +41,20 @@ class UsuariosControllerTest extends TestCase {
    * @test
    */
   public function eliminar_usuario() {
-    $usuario = Usuario::create($this->datos_usuario);
+    $usuario = Usuario::create($this->obtener_datos_de_usuario());
 
     $this->route('DELETE', 'usuarios.destroy', $usuario->id);
 
     $this->assertEquals(1, Usuario::count());
+  }
+
+  private function obtener_datos_de_usuario() {
+    return ['nombre'     => 'Sarahí',
+            'apellido'   => 'Navarro',
+            'email'      => 'megamaniatica666@gmail.com',
+            'contrasena' => 'sarahinavarro',
+            'idioma'     => 'es',
+            'rol_id'     => ROL_ADMINISTRADOR];
   }
 
 }
