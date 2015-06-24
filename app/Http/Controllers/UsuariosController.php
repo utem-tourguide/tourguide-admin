@@ -35,7 +35,9 @@ class UsuariosController extends Controller {
      */
     public function create()
     {
-        return view('usuarios.create');
+        $usuario = new Usuario;
+        $datos = ['usuario' => $usuario];
+        return view('usuarios.create', $datos);
     }
 
     /**
@@ -48,7 +50,7 @@ class UsuariosController extends Controller {
         $usuario->rol_id = $request->get('rol_id');
         $usuario->save();
 
-        return view('usuarios.create');
+        return redirect()->route('usuarios.create');
     }
 
     /**
@@ -71,7 +73,8 @@ class UsuariosController extends Controller {
     public function edit($id)
     {
         $user = Usuario::findOrFail($id);
-        return view('usuarios.edit');
+        $datos = ['usuario' => $user];
+        return view('usuarios.edit', $datos);
     }
 
     /**
@@ -82,7 +85,7 @@ class UsuariosController extends Controller {
      */
     public function update($id)
     {
-        //
+        return "update";
     }
 
     /**
