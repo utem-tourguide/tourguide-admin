@@ -1,3 +1,8 @@
+
+
+
+
+
 <div class="form-group">
 	<label>Nombre:</label>
 	<input type="text" class="form-control" name="nombre" value="{{ $usuario->nombre }}">
