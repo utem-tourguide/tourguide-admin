@@ -34,6 +34,7 @@
          <td>{!!  Form::open(['route' => ['ubicaciones.destroy', $ubicacion->id], 'method' => 'DELETE']) !!}
               <input type="submit" class="btn btn-danger" value="eliminar">
               {!! Form::close()!!}
+              <a class="btn btn-danger" href="{{ route('ubicaciones.edit') }}">Editar</a>
           </td>
         </tr>
       @endforeach
