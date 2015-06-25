@@ -9,7 +9,7 @@
 		<table class="table table-striped table-bordered">
 			<tr>
 				<th>Id</th>
-				<th>Usuario id</th>
+				<th>Nombre del turista</th>
 				<th>Postal id</th>
 				<th>Creado en</th>
 				<th>Modificado en</th>
@@ -17,7 +17,7 @@
 			@foreach($compras as $compra)
 				<tr>
 					<td>{{ $compra->id }}</td>
-					<td>{{ $compra->usuario_id }}</td>
+					<td>{{ $compra->usuario->nombre_completo() }}</td>
 					<td>{{ $compra->postal_id }}</td>
 					<td>{{ $compra->created_at }}</td>
 					<td>{{ $compra->updated_at }}</td>
