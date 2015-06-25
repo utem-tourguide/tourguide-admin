@@ -1,7 +1,11 @@
-formatter.name: dot
+formatter.name: nyan.cat
 
 suites:
     main:
         namespace: TourGuide
         psr4_prefix: TourGuide
         src_path: app
+
+extensions:
+  - PhpSpec\NyanFormattersExtension\Extension
+

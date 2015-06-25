@@ -30,4 +30,5 @@ Route::get('/obtener-app', ['as'   => 'obtener_app',
                                         return 'Proximamente...';
                                       }]);
 
-Route::resource('ubicaciones', 'UbicacionesController');
+Route::resource('/usuarios', 'UsuariosController');
+Route::resource('/ubicaciones', 'UbicacionesController');

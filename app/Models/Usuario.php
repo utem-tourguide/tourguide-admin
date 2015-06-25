@@ -6,11 +6,10 @@ class Usuario extends Model {
 
   protected $fillable = [
                          'email',
-                         'contrasena_cifrada',
+                         'contrasena',
                          'nombre',
                          'apellido',
                          'idioma',
-                         'rol_id',
                         ];
 
   /**
@@ -26,9 +25,18 @@ class Usuario extends Model {
   }
 
   /**
+   * Coloca una versión cifrada de la contraseña especificada.
+   *
+   * @param string $valor Contraseña sin cifrar
+   */
+  public function setContrasenaAttribute($valor) {
+    $this->attributes['contrasena_cifrada'] = self::cifrarContrasena($valor);
+  }
+
+  /**
    * Verifica la contraseña de un usuario.
    *
-   * @param  string $contraseña
+   * @param  string $contrasena
    * @return boolean
    */
   public function verificarContrasena($contrasena) {
