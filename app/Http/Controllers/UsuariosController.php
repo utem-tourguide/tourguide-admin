@@ -3,7 +3,7 @@
 namespace TourGuide\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use Input;
 use TourGuide\Http\Requests;
 use TourGuide\Models\Usuario;
 use TourGuide\Http\Controllers\Controller;
@@ -50,7 +50,7 @@ class UsuariosController extends Controller {
         $usuario->rol_id = $request->get('rol_id');
         $usuario->save();
 
-        return redirect()->route('usuarios.create');
+        return redirect()->route('usuarios.index')->with('mensaje', 'Usuario Creado');
     }
 
     /**
@@ -85,7 +85,17 @@ class UsuariosController extends Controller {
      */
     public function update($id)
     {
-        return "update";
+        $user = Usuario::findOrFail($id);
+        $user->update(
+            array('nombre' => Input::get('nombre'), 
+                  'apellido' => Input::get('apellido'), 
+                  'email' => Input::get('email'),
+                  'contraseña' => Input::get('contraseña'),
+                  'idioma' => Input::get('idioma'))
+        );     
+        $user->save();
+        
+        return redirect()->route('usuarios.index')->with('mensaje', 'Usuario Modificado');
     }
 
     /**

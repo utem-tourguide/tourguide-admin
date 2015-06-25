@@ -7,6 +7,13 @@
 <body>
   <div class="container-fluid">
     <h1>Usuarios</h1>
+    
+    @if (Session::has('mensaje'))
+      <div class="alert alert-info">
+        <p>{{ Session::get('mensaje') }}</p>
+      </div>
+    @endif
+
     <div class="well well-sm">
       {!! link_to_route('usuarios.create', 'Nuevo', [], ['class' => "btn btn-primary"]) !!}
     </div>
@@ -30,6 +37,7 @@
           <td>{{ $usuario->rol_id }}</td>
           <td>
               <a class="btn btn-primary btn-sm" href="{{ route('usuarios.edit', [$usuario->id]) }}">Editar</a>
+
               {!! Form::open(['route' => ['usuarios.destroy', $usuario->id], 'method' => 'DELETE', 'style' => 'display: inline-block;']) !!}
                 <button class="btn btn-danger btn-sm">Eliminar</button>
               {!! Form::close() !!}

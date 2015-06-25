@@ -8,7 +8,7 @@
 	</div>
 	<div class="col-md-6 form-group">
 		{!! Form::open(['route' => ['usuarios.update', $usuario->id], 'method' => 'PATCH']) !!}
-			@include('usuarios.partials.formulario')
+				@include('usuarios.partials.formulario')
 		{!! Form::close() !!}
 	</div>
 	<div class="col-md-3">
