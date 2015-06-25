@@ -7,3 +7,10 @@ php:
 
 before_script: composer install
 script: php artisan test
+
+deploy:
+  provider: heroku
+  api_key: 6e9b9101-5f55-4547-ab08-4f7bd6c5bf75
+  on: master
+  run:
+    php artisan migrate
