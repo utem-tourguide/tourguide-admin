@@ -67,7 +67,10 @@ class UbicacionesController extends Controller
      */
     public function edit($id)
     {
-        //
+        $ubicaciones = UbicacionTuristica::find($id);
+        $ubicaciones = ['ubicaciones' => $datos];
+         return redirect()->route('ubicaciones.index')
+                          ->with('mensaje', 'Ubicación modificada.');
     }
 
     /**
