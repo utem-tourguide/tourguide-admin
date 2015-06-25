@@ -29,3 +29,5 @@ Route::get('/obtener-app', ['as'   => 'obtener_app',
                             'uses' => function() {
                                         return 'Proximamente...';
                                       }]);
+
+Route::get('/compras', ['as' => 'compras.index', 'uses' => 'ComprasController@index']);
