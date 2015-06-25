@@ -30,4 +30,6 @@ Route::get('/obtener-app', ['as'   => 'obtener_app',
                                         return 'Proximamente...';
                                       }]);
 
+Route::resource('/usuarios', 'UsuariosController');
+
 Route::get('/compras', ['as' => 'compras.index', 'uses' => 'ComprasController@index']);
