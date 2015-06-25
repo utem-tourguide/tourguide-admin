@@ -1,6 +1,6 @@
 <html>
 <head>
-	<title>Usuarios - TourGuide Admin</title>
+	<title>Ubicasiones - TourGuide Admin</title>
 	<link rel="stylesheet" type="text/css" href="/css/styles.css">
 </head>
 <body>
