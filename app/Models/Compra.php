@@ -6,4 +6,8 @@ class Compra extends Model {
 
 	protected $fillable = ['usuario_id', 'postal_id'];
 
+	public function usuario() {
+		return $this->belongsTo('TourGuide\Models\Usuario');
+	}
+
 }
