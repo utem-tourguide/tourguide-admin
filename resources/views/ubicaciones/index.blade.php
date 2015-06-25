@@ -12,7 +12,11 @@
       <div class="alert alert-info">
         <p>{{ Session::get('mensaje') }}</p>
       </div>
-    @endif
+    @endif 
+
+    <div class="well well-sm">
+      {!! link_to_route('ubicaciones.create', 'Nuevo ubicacion', [], ['class' => "btn btn-primary"]) !!}
+    </div>
 
     <table class="table table-striped table-bordered">
       <tr>
@@ -30,11 +34,12 @@
           <td>{{ $ubicacion->localizacion }}</td>
           <td>{{ $ubicacion->created_at }}</td>
           <td>{{ $ubicacion->updated_at }}</td>
+          <td>
+            <a class="btn btn-primary btn-sm" href="{{ route('ubicaciones.edit', [$ubicacion->id]) }}">Editar</a>
 
-         <td>{!!  Form::open(['route' => ['ubicaciones.destroy', $ubicacion->id], 'method' => 'DELETE']) !!}
-              <input type="submit" class="btn btn-danger" value="eliminar">
-              {!! Form::close()!!}
-              <a class="btn btn-danger" href="{{ route('ubicaciones.edit') }}">Editar</a>
+            {!!  Form::open(['route' => ['ubicaciones.destroy', $ubicacion->id], 'method' => 'DELETE', 'style' => 'display: inline-block']) !!}
+              <input type="submit" class="btn btn-danger btn-sm" value="eliminar">
+            {!! Form::close()!!}
           </td>
         </tr>
       @endforeach
