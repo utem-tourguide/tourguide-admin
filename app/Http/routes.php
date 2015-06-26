@@ -33,3 +33,5 @@ Route::get('/obtener-app', ['as'   => 'obtener_app',
 Route::resource('/usuarios', 'UsuariosController', ['middleware' => 'csrf']);
 
 Route::get('/compras', ['as' => 'compras.index', 'uses' => 'ComprasController@index']);
+Route::post('/compras', ['as'         => 'compras.store',
+                         'uses'       => 'ComprasController@store']);
