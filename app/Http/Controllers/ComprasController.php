@@ -12,6 +12,10 @@ class ComprasController extends Controller {
 	}
 
   public function store(Request $request) {
+    if ( ! $request->has(['usuario_id', 'postal_id'])) {
+      return response('', 422);
+    }
+
     $compra = new Compra($request->only(['usuario_id', 'postal_id']));
     $compra->save();
 
