@@ -15,14 +15,8 @@ class UbicacionesController extends Controller
      *
      * @return Response
      */
-    public function index()
-    {
-        $ubicaciones = UbicacionTuristica::paginate(15);
-        $datos = [
-            'ubicaciones' => $ubicaciones
-        ];
-
-        return view('ubicaciones.index', $datos);
+    public function index() {
+        return UbicacionTuristica::all();
     }
 
     /**
