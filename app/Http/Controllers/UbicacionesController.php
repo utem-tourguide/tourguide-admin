@@ -24,8 +24,7 @@ class UbicacionesController extends Controller
      *
      * @return Response
      */
-    public function create()
-    {
+    public function create() {
         return view('ubicaciones.create');
     }
 
@@ -36,9 +35,7 @@ class UbicacionesController extends Controller
      */
     public function store()
     {
-        UbicacionTuristica::create(Input::all());
-        return redirect()->route('ubicaciones.index')
-                         ->with('mensaje', 'Ubicación guardada.');
+        return UbicacionTuristica::create(Input::all());
     }
 
 
