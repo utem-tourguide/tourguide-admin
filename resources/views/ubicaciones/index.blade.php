@@ -15,6 +15,9 @@
     @endif
 
     <div class="well well-sm">
+      <button class="btn btn-primary" data-toggle="modal" data-target="#ubicacionNuevo">
+        Nuevo
+      </button>
       <button class="btn btn-default" onclick="cargarTablaUbicaciones('{{ route('ubicaciones.index') }}')">
         Recargar
       </button>
@@ -32,6 +35,8 @@
     </table>
 
   </div>
+
+  @include('ubicaciones.partials.dialogo_nuevo')
 
   <script type="text/javascript" src="/js/app.js"></script>
   <script type="text/javascript" src="/js/ubicaciones.js"></script>
