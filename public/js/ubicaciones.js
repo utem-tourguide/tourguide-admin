@@ -17,9 +17,9 @@ function construirTablaUbicaciones(ubicaciones) {
   $(tabla).fadeIn('fast');
 }
 
-function construirFilaParaUbicacion(ubicacion) {
+function construirFilaParaUbicacion(ubicacion, nuevo) {
   return $(
-    '<tr class="ubicacion">' +
+    '<tr class="ubicacion animado' + (nuevo ? ' nuevo' : '') + '">' +
       '<td>' + ubicacion.id + '</td>' +
       '<td>' + ubicacion.nombre + '</td>' +
       '<td>' + ubicacion.localizacion + '</td>' +
@@ -27,4 +27,26 @@ function construirFilaParaUbicacion(ubicacion) {
       '<td>' + ubicacion.updated_at + '</td>' +
     '</tr>'
   );
+}
+
+function guardarNuevaUbicacion(formulario, guardarUrl) {
+  $.ajax({
+    method: 'POST',
+    url: guardarUrl,
+    data: $(formulario).serialize(),
+    success: function(ubicacion) {
+      $(ubicacionNuevo).modal('hide');
+      fila = construirFilaParaUbicacion(ubicacion, true);
+      $(tabla).append(fila);
+      $('html, body').animate({
+        scrollTop: $(fila).offset().top
+      }, 1000);
+      setTimeout(function() {
+        $('tr.ubicacion.nuevo').removeClass('nuevo');
+      }, 3000);
+    },
+    error: function() {
+      alert('Hubo un error.');
+    }
+  })
 }
