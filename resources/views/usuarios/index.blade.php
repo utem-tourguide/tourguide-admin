@@ -4,7 +4,7 @@
   <title>Usuarios - TourGuide Admin</title>
   <link rel="stylesheet" type="text/css" href="/css/styles.css">
 </head>
-<body>
+<body onload="cargarTablaUsuarios('{{ route('usuarios.index') }}')">
   <div class="container-fluid">
     <h1>Usuarios</h1>
     
@@ -15,37 +15,31 @@
     @endif
 
     <div class="well well-sm">
-      {!! link_to_route('usuarios.create', 'Nuevo', [], ['class' => "btn btn-primary"]) !!}
+      <button class="btn btn-primary" data-toggle="modal" data-target="#usuarioNuevo">
+        Nuevo
+      </button>
+      <button class="btn btn-default" onclick="cargarTablaUsuarios('{{ route('usuarios.index') }}')">
+        Recargar
+      </button>
     </div>
-    <table class="table table-striped table-bordered">
+    
+    <table id="tabla" class="table table-striped table-bordered" hidden>
       <tr>
         <th>Id</th>
-        <th>Email</th>
         <th>Nombre</th>
         <th>Apellido</th>
-        <th>Idioma</th>
+        <th>idioma</th>
+        <th>Email</th>
         <th>Id de rol</th>
         <th>Acciones</th>
       </tr>
-      @foreach ($usuarios as $usuario)
-        <tr>
-          <td>{{ $usuario->id }}</td>
-          <td>{{ $usuario->email }}</td>
-          <td>{{ $usuario->nombre }}</td>
-          <td>{{ $usuario->apellido }}</td>
-          <td>{{ $usuario->idioma }}</td>
-          <td>{{ $usuario->rol_id }}</td>
-          <td>
-              <a class="btn btn-primary btn-sm" href="{{ route('usuarios.edit', [$usuario->id]) }}">Editar</a>
-
-              {!! Form::open(['route' => ['usuarios.destroy', $usuario->id], 'method' => 'DELETE', 'style' => 'display: inline-block;']) !!}
-                <button class="btn btn-danger btn-sm">Eliminar</button>
-              {!! Form::close() !!}
-          </td>
-        </tr>
-      @endforeach
     </table>
-    {!! $usuarios->render() !!}
+
+     @include('usuarios.partials.dialogo_nuevo')
+
+  <script type="text/javascript" src="/js/app.js"></script>
+  <script type="text/javascript" src="/js/usuarios.js"></script>
+
   </div>
 </body>
 </html>
