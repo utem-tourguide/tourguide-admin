@@ -32,3 +32,15 @@ Route::get('/obtener-app', ['as'   => 'obtener_app',
 
 Route::resource('/usuarios', 'UsuariosController');
 Route::resource('/ubicaciones', 'UbicacionesController');
+
+Route::group(['prefix' => '/administrar'], function() {
+  Route::get('/ubicaciones', [
+    'as'   => 'administrar.ubicaciones',
+    'uses' => 'AdministradorController@ubicaciones'
+  ]);
+
+  Route::get('/usuarios', [
+    'as'   => 'administrar.usuarios',
+    'uses' => 'AdministradorController@usuarios'
+  ]);
+});
