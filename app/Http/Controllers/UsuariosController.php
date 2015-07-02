@@ -50,7 +50,7 @@ class UsuariosController extends Controller {
         $usuario->rol_id = $request->get('rol_id');
         $usuario->save();
 
-        return redirect()->route('usuarios.index')->with('mensaje', 'Usuario Creado');
+        return $usuario;
     }
 
     /**
