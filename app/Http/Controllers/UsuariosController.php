@@ -22,10 +22,7 @@ class UsuariosController extends Controller {
      * @return Response
      */
     public function index() {
-        $datos = [
-          'usuarios' => Usuario::paginate(15)
-        ];
-        return view('usuarios.index', $datos);
+        return Usuario::all();
     }
 
     /**

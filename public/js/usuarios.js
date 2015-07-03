@@ -1,16 +1,16 @@
 function cargarTablaUsuarios(url) {
   $.ajax({
     url: url,
-    success: function(usuarios) {
-      construirTablaUsuarios(usuarios);
+    success: function(usuario) {
+      construirTablaUsuarios(usuario);
     }
   });
 }
 
-function construirTablaUsuarios(usuarios) {
+function construirTablaUsuarios(usuario) {
   $(tabla).fadeOut('fast');
   $('tr.usuarios').remove();
-  usuarios.forEach(function(usuarios) {
+  usuario.forEach(function(usuarios) {
     fila = construirFilaParaUsuarios(usuarios);
     $(tabla).append(fila);
   });
