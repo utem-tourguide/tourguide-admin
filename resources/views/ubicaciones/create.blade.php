@@ -1,5 +1,5 @@
 {!! Form::open(['route' => 'ubicaciones.store',
-                'id'    => 'ubicacionNuevoFormulario']) !!}
+                'id'    => 'formularioNuevo']) !!}
   <div class="form-group">
       <label>Nombre:</label>
       <input type="text" class="form-control" name="nombre">

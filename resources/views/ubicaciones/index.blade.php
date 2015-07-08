@@ -37,6 +37,7 @@
   </div>
 
   @include('ubicaciones.partials.dialogo_nuevo')
+  @include('ubicaciones.partials.dialogo_edit')
 
   <script type="text/javascript" src="/js/app.js"></script>
   <script type="text/javascript" src="/js/ubicaciones.js"></script>

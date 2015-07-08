@@ -47,7 +47,7 @@ class UbicacionesController extends Controller
      */
     public function show($id)
     {
-        //
+        return UbicacionTuristica::find($id) ?: error_404();
     }
 
     /**
@@ -71,10 +71,10 @@ class UbicacionesController extends Controller
      */
     public function update($id)
     {
-        $ubicaciones = UbicacionTuristica::find($id);
-        $ubicaciones -> update( array('nombre' => Input::get('nombre'), 'localizacion'=> Input::get('localizacion')));
-        $ubicaciones -> save();
-        return redirect()->route('ubicaciones.index');
+        $ubicacion = UbicacionTuristica::find($id);
+        $ubicacion -> update( array('nombre' => Input::get('nombre'), 'localizacion'=> Input::get('localizacion')));
+        $ubicacion -> save();
+        return $ubicacion;
     }
 
     /**
