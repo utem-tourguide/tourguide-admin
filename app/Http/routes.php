@@ -11,4 +11,24 @@
 |
 */
 
-Route::get('/', 'WelcomeController@index');
+Route::group(['prefix' => '/sesiones'], function() {
+  Route::get('/entrar', ['as'   => 'sesiones.entrar',
+                         'uses' => 'SesionesController@index']);
+  Route::post('/entrar', ['as'   => 'sesiones.crear',
+                          'uses' => 'SesionesController@entrar']);
+
+  Route::get('/salir', ['as'   => 'sesiones.salir',
+                        'uses' => 'SesionesController@salir']);
+});
+
+Route::get('/dashboard', ['as'   => 'dashboard',
+                          'uses' => function() {
+                                      return 'Proximamente...';
+                                    }]);
+Route::get('/obtener-app', ['as'   => 'obtener_app',
+                            'uses' => function() {
+                                        return 'Proximamente...';
+                                      }]);
+
+Route::resource('/usuarios', 'UsuariosController');
+Route::resource('/ubicaciones', 'UbicacionesController');

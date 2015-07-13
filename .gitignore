@@ -1,3 +1,6 @@
 /vendor
 /node_modules
 .env
+*.sqlite
+*.fuse_hidden*
+/nbproject

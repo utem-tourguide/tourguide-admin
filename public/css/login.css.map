@@ -1,0 +1,1 @@
+{"version":3,"sources":["login.scss"],"names":[],"mappings":"AAAA;EACE,iBAAgB;EAChB,aAAY;EACZ,oBAAmB,EAHV","file":"login.css","sourcesContent":["#app-logo {\n  max-height: 5em;\n  width: auto;\n  margin-bottom: 2em;\n}\n"],"sourceRoot":"/source/"}

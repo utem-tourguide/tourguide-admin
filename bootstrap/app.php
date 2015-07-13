@@ -28,18 +28,31 @@ $app = new Illuminate\Foundation\Application(
 
 $app->singleton(
 	'Illuminate\Contracts\Http\Kernel',
-	'App\Http\Kernel'
+	'TourGuide\Http\Kernel'
 );
 
 $app->singleton(
 	'Illuminate\Contracts\Console\Kernel',
-	'App\Console\Kernel'
+	'TourGuide\Console\Kernel'
 );
 
 $app->singleton(
 	'Illuminate\Contracts\Debug\ExceptionHandler',
-	'App\Exceptions\Handler'
+	'TourGuide\Exceptions\Handler'
 );
+
+/*
+|--------------------------------------------------------------------------
+| Cargar archivos adicionales
+|--------------------------------------------------------------------------
+|
+| En esta sección pueden cargarse archivos con código que debe ejecutarse
+| al crear una nueva instancia de aplicación.
+|
+*/
+
+require_once __DIR__.'/constants.php';
+require_once __DIR__.'/inflections.php';
 
 /*
 |--------------------------------------------------------------------------
