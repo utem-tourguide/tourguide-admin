@@ -32,9 +32,10 @@ class UsuariosController extends Controller {
      */
     public function create()
     {
-        $usuario = new Usuario;
+        return view('usuarios.create');
+        /*$usuario = new Usuario;
         $datos = ['usuario' => $usuario];
-        return view('usuarios.create', $datos);
+        return view('usuarios.create', $datos);*/
     }
 
     /**
@@ -42,7 +43,8 @@ class UsuariosController extends Controller {
      *
      * @return Response
      */
-    public function store(Request $request) {
+    public function store(Request $request)
+    {   
         $usuario = new Usuario($request->only($this->atributos_de_usuario));
         $usuario->rol_id = $request->get('rol_id');
         $usuario->save();
@@ -58,7 +60,7 @@ class UsuariosController extends Controller {
      */
     public function show($id)
     {
-        //
+        return Usuario::find($id) ?: error_404();
     }
 
     /**
@@ -71,7 +73,7 @@ class UsuariosController extends Controller {
     {
         $user = Usuario::findOrFail($id);
         $datos = ['usuario' => $user];
-        return view('usuarios.edit', $datos);
+        return view('usuarios.index', $datos);
     }
 
     /**
@@ -82,17 +84,16 @@ class UsuariosController extends Controller {
      */
     public function update($id)
     {
-        $user = Usuario::findOrFail($id);
-        $user->update(
-            array('nombre' => Input::get('nombre'), 
-                  'apellido' => Input::get('apellido'), 
-                  'email' => Input::get('email'),
-                  'contraseña' => Input::get('contraseña'),
-                  'idioma' => Input::get('idioma'))
+        $user = Usuario::find($id);
+        $user -> update(array('nombre' => Input::get('nombre'), 
+                'apellido' => Input::get('apellido'), 
+                'email' => Input::get('email'),
+                'contraseña' => Input::get('contraseña'),
+                'idioma' => Input::get('idioma'))
         );     
         $user->save();
         
-        return redirect()->route('usuarios.index')->with('mensaje', 'Usuario Modificado');
+        return $user;
     }
 
     /**
