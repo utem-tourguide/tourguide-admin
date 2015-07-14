@@ -77,4 +77,24 @@ class SesionesControllerTest extends TestCase {
     $this->assertFalse($this->app['session.store']->has('usuario_id'));
   }
 
+  /**
+   * @test
+   */
+  public function devuelve_json_cuando_se_le_solicita() {
+    $data = ['email'      => 'admin@tourguide.com',
+             'contrasena' => 'admin'];
+    $headers = ['HTTP_Accept' => 'application/json'];
+    $response = $this->route('POST',
+                             'sesiones.entrar',
+                             [],
+                             $data,
+                             [],
+                             [],
+                             $headers);
+
+    $this->assertResponseOk();
+    $this->assertEquals('application/json',
+                        $response->headers->get('Content-Type'));
+  }
+
 }
