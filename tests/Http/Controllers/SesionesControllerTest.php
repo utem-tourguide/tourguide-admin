@@ -97,4 +97,22 @@ class SesionesControllerTest extends TestCase {
                         $response->headers->get('Content-Type'));
   }
 
+  /**
+   * @test
+   */
+  public function informa_error_de_login_con_status_code_si_se_pide_json() {
+    $data = ['email'      => 'no-admin@tourguide.com',
+             'contrasena' => 'no-admin'];
+    $headers = ['HTTP_Accept' => 'application/json'];
+    $response = $this->route('POST',
+      'sesiones.entrar',
+      [],
+      $data,
+      [],
+      [],
+      $headers);
+
+    $this->assertResponseStatus(401);
+  }
+
 }

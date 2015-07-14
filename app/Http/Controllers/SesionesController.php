@@ -29,14 +29,9 @@ class SesionesController extends Controller {
     $usuario = Usuario::whereEmail( Input::get('email') )->first();
     if ($usuario && $usuario->verificarContrasena( Input::get('contrasena') )) {
       Session::put('usuario_id', $usuario->id);
-      if ($request->wantsJson()) {
-        return response()->json($usuario);
-      } else {
-        return $this->mostrarPaginaDeInicio($usuario);
-      }
+      return $this->mostrarPaginaDeInicio($request, $usuario);
     } else {
-      return redirect()->route('sesiones.entrar')
-                       ->with('error', 'Usuario o contraseña incorrectos.');
+      return $this->mostrarUsuarioInvalido($request);
     }
   }
 
@@ -51,15 +46,44 @@ class SesionesController extends Controller {
   }
 
   /**
+   * @param Request $req
+   * @param         $usuario
+   *
+   * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+   */
+  private function mostrarPaginaDeInicio(Request $req, $usuario) {
+    if ($req->wantsJson()) {
+      return response()->json($usuario);
+    } else {
+      return $this->mostrarPaginaDeInicioSegunRol($usuario);
+    }
+  }
+
+  /**
    * @param $usuario
    *
    * @return \Illuminate\Http\RedirectResponse
    */
-  private function mostrarPaginaDeInicio($usuario) {
+  private function mostrarPaginaDeInicioSegunRol($usuario) {
     if ($usuario->rol_id == ROL_ADMINISTRADOR) {
       return redirect()->route('dashboard');
     } else {
       return redirect()->route('obtener_app');
+    }
+  }
+
+  /**
+   * @param Request $request
+   *
+   * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+   */
+  private function mostrarUsuarioInvalido(Request $request) {
+    if ($request->wantsJson()) {
+      return response('Unauthorized', 401);
+    } else {
+      return redirect()
+        ->route('sesiones.entrar')
+        ->with('error', 'Usuario o contraseña incorrectos.');
     }
   }
 
