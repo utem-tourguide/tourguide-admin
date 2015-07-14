@@ -2,6 +2,7 @@
 
 use Input;
 use Session;
+use Illuminate\Http\Request;
 use TourGuide\Models\Usuario;
 use TourGuide\Http\Controllers\Controller;
 
@@ -20,13 +21,19 @@ class SesionesController extends Controller {
    * Recibe el formulario de inicio de sesión e inicia sesión si las
    * credenciales son correctas.
    *
+   * @param Request $request
+   *
    * @return Response
    */
-  public function entrar() {
+  public function entrar(Request $request) {
     $usuario = Usuario::whereEmail( Input::get('email') )->first();
     if ($usuario && $usuario->verificarContrasena( Input::get('contrasena') )) {
       Session::put('usuario_id', $usuario->id);
-      return $this->redirigir_a_dashboard_si_es_administrador($usuario);
+      if ($request->wantsJson()) {
+        return response()->json($usuario);
+      } else {
+        return $this->mostrarPaginaDeInicio($usuario);
+      }
     } else {
       return redirect()->route('sesiones.entrar')
                        ->with('error', 'Usuario o contraseña incorrectos.');
@@ -44,14 +51,11 @@ class SesionesController extends Controller {
   }
 
   /**
-   * Genera una redirección hacia el dashboard si el usuario especificado es un
-   * administrador. Si el usuario no es administrador, se le redirige a la
-   * página con instrucciones para obtener la aplicación móvil de TourGuide.
+   * @param $usuario
    *
-   * @param  TourGuide\Models\Usuario $usuario
-   * @return Response
+   * @return \Illuminate\Http\RedirectResponse
    */
-  private function redirigir_a_dashboard_si_es_administrador($usuario) {
+  private function mostrarPaginaDeInicio($usuario) {
     if ($usuario->rol_id == ROL_ADMINISTRADOR) {
       return redirect()->route('dashboard');
     } else {
