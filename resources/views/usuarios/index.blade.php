@@ -36,6 +36,7 @@
     </table>
 
      @include('usuarios.partials.dialogo_nuevo')
+     @include('usuarios.partials.dialogo_edit')
 
   <script type="text/javascript" src="/js/app.js"></script>
   <script type="text/javascript" src="/js/usuarios.js"></script>
