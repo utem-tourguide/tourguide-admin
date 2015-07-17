@@ -6028,3 +6028,13 @@ footer {
   height: 1.5em; }
 
 /*# sourceMappingURL=styles.css.map */
+
+.animado,
+.animado td {
+  transition: 0.3s;
+}
+
+.nuevo,
+.nuevo td {
+  background: #00FF80;
+}

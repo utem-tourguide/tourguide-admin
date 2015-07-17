@@ -15,14 +15,8 @@ class UbicacionesController extends Controller
      *
      * @return Response
      */
-    public function index()
-    {
-        $ubicaciones = UbicacionTuristica::paginate(15);
-        $datos = [
-            'ubicaciones' => $ubicaciones
-        ];
-
-        return view('ubicaciones.index', $datos);
+    public function index() {
+        return UbicacionTuristica::all();
     }
 
     /**
@@ -30,8 +24,7 @@ class UbicacionesController extends Controller
      *
      * @return Response
      */
-    public function create()
-    {
+    public function create() {
         return view('ubicaciones.create');
     }
 
@@ -42,9 +35,7 @@ class UbicacionesController extends Controller
      */
     public function store()
     {
-        UbicacionTuristica::create(Input::all());
-        return redirect()->route('ubicaciones.index')
-                         ->with('mensaje', 'Ubicación guardada.');
+        return UbicacionTuristica::create(Input::all());
     }
 
 
@@ -56,7 +47,7 @@ class UbicacionesController extends Controller
      */
     public function show($id)
     {
-        //
+        return UbicacionTuristica::find($id) ?: error_404();
     }
 
     /**
@@ -80,10 +71,10 @@ class UbicacionesController extends Controller
      */
     public function update($id)
     {
-        $ubicaciones = UbicacionTuristica::find($id);
-        $ubicaciones -> update( array('nombre' => Input::get('nombre'), 'localizacion'=> Input::get('localizacion')));
-        $ubicaciones -> save();
-        return redirect()->route('ubicaciones.index');
+        $ubicacion = UbicacionTuristica::find($id);
+        $ubicacion -> update( array('nombre' => Input::get('nombre'), 'localizacion'=> Input::get('localizacion')));
+        $ubicacion -> save();
+        return $ubicacion;
     }
 
     /**
