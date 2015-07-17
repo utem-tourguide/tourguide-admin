@@ -25,8 +25,17 @@ function construirFilaParaUbicacion(ubicacion, nuevo) {
       '<td>' + ubicacion.localizacion + '</td>' +
       '<td>' + ubicacion.created_at + '</td>' +
       '<td>' + ubicacion.updated_at + '</td>' +
-      '<td>' + '<button onclick="mostrarDialogoParaEditar('+ ubicacion.id +')" class="btn btn-warning">Editar</button>' + 
-      '<button class="btn btn-danger"> Eliminar </button>' + '</td>' +
+      '<td>' +
+        '<a href="/administrar/ubicaciones/' + ubicacion.id + '/informacion" ' +
+           'class="btn btn-primary">' +
+           'Información' +
+        '</a>' +
+        '<button onclick="mostrarDialogoParaEditar('+ ubicacion.id +')" ' +
+                 'class="btn btn-warning">' +
+          'Editar' +
+        '</button>' +
+        '<button class="btn btn-danger"> Eliminar </button>' +
+      '</td>' +
     '</tr>'
   );
 }
@@ -75,7 +84,7 @@ function actualizarUbicacion(formulario) {
     success: function(ubicacion) {
       $(ubicacionEditar).modal('hide'); // Cierra el dialogo de edición
       actualizarFilaParaUbicacion(ubicacion);
-    } 
+    }
   });
 }
 
