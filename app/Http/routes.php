@@ -38,4 +38,8 @@ Route::group(['prefix' => '/administrar'], function() {
     'as'   => 'administrar.ubicaciones',
     'uses' => 'AdministradorController@ubicaciones'
   ]);
+  Route::get('/ubicaciones/{id}/informacion', [
+    'as'   => 'administrar.ubicaciones.informacion',
+    'uses' => 'AdministradorController@informacion',
+  ]);
 });
