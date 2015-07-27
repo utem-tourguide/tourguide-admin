@@ -26,7 +26,7 @@ function construirFilaParaUbicacion(ubicacion, nuevo) {
       '<td>' + ubicacion.created_at + '</td>' +
       '<td>' + ubicacion.updated_at + '</td>' +
       '<td>' + '<button onclick="mostrarDialogoParaEditar('+ ubicacion.id +')" class="btn btn-warning">Editar</button>' + 
-      '<button class="btn btn-danger"> Eliminar </button>' + '</td>' +
+      '<button  class="btn btn-danger"  onclick="eliminar('+ ubicacion.id +')"> Eliminar </button>' + '</td>' +
     '</tr>'
   );
 }
@@ -86,4 +86,23 @@ function actualizarFilaParaUbicacion(ubicacion) {
   $(fila.children()[4]).text(ubicacion.updated_at);
 }
 
-/**/
+function eliminar(ubicacionId) {
+
+/**  $('delete').click(function(){
+    var pent = $(this).parent().attr('id');
+    var service = $(this).(parent).attr('data');
+  });
+    
+  var dataString = 'id='+service;
+
+  $ajax({
+    method:'delete',
+    url:'/ubicaciones/'
+     data:dataString,
+     success:function() {
+       $('#delete-ok').empty();
+       $('#'+parent).remove();
+     }
+  });*/
+ 
+ }
