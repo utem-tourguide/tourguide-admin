@@ -13,7 +13,7 @@ class AdministradorController extends Controller {
       'ubicacion' => UbicacionTuristica::find($ubicacion_id),
     ];
 
-    return view('informacion.index', $datos);
+    return view('ubicaciones.informacion.index', $datos);
   }
 
 }
