@@ -10,7 +10,7 @@ class InformacionUbicacion extends Model {
                          'ubicacion_id'];
 
   public function ubicacion() {
-    return $this->belongsTo('TourGuide\Models\Ubicacion');
+    return $this->belongsTo('TourGuide\Models\UbicacionTuristica');
   }
 
 }
