@@ -21,13 +21,13 @@ CRUDRecurso.prototype.construirTabla = function(recursos) {
   $('tr.' + this.recurso).remove();
   var fila;
   recursos.forEach(function(recurso) {
-    fila = self.construirFilaParaRecurso(recurso);
+    fila = self.construirFila(recurso);
     $(self.tabla).append(fila);
   });
   $(this.tabla).fadeIn('fast');
 };
 
-CRUDRecurso.prototype.construirFilaParaRecurso = function(recurso, esNuevo) {
+CRUDRecurso.prototype.construirFila = function(recurso, esNuevo) {
   var fila = this.iniciarFilaRecurso(recurso, esNuevo);
 
   var columna;
@@ -45,8 +45,7 @@ CRUDRecurso.prototype.construirFilaParaRecurso = function(recurso, esNuevo) {
 CRUDRecurso.prototype.iniciarFilaRecurso = function(recurso, esNuevo) {
   var fila = $(document.createElement('tr'))
     .addClass('recurso')
-    .addClass('animado')
-    .data('recurso-id', recurso.id);
+    .attr('data-id', recurso.id);
 
   esNuevo && fila.addClass('nuevo');
 
@@ -60,7 +59,7 @@ CRUDRecurso.prototype.crearCeldaAcciones = function(recurso) {
   $(document.createElement('button'))
     .text('Modificar')
     .addClass('btn btn-default')
-    .on('click', function() { self.mostrarEditar(recurso.id); })
+    .on('click', function() { self.mostrarDialogoEditar(recurso.id); })
     .appendTo(columna);
 
   $(document.createElement('button'))
@@ -72,59 +71,47 @@ CRUDRecurso.prototype.crearCeldaAcciones = function(recurso) {
   return columna;
 };
 
-CRUDRecurso.prototype.guardarNuevoRecurso = function(formulario) {
-  $.ajax({
-    method: 'POST',
-    url: this.baseUrl,
-    data: $(formulario).serialize(),
-    success: function(ubicacion) {
-      $(ubicacionNuevo).modal('hide');
-      fila = construirFilaParaRecurso(ubicacion, true);
-      $(tabla).append(fila);
-      $('html, body').animate({
-        scrollTop: $(fila).offset().top
-      }, 1000);
-      setTimeout(function() {
-        $('tr.ubicacion.nuevo').removeClass('nuevo');
-      }, 3000);
-    },
-    error: function() {
-      alert('Hubo un error.');
-    }
-  })
-};
-
-CRUDRecurso.prototype.mostrarNuevo = function() {
+CRUDRecurso.prototype.mostrarDialogoNuevo = function() {
+  var self = this;
   BootstrapDialog.show({
     title: 'Crear ' + this.recurso,
-    message: $('<div></div>').load(this.baseUrl + '/create')
+    message: $('<div></div>').load(this.baseUrl + '/create'),
+    buttons: [
+      {
+        label: 'Guardar',
+        cssClass: 'btn-primary',
+        action: function(dialogo) {
+          self.guardarRecurso(null, function() {
+            dialogo.close();
+            $('html, body').animate({ scrollTop: $(".nuevo").offset().top }, 500);
+          });
+        }
+      }
+    ]
   });
 };
 
-CRUDRecurso.prototype.mostrarEditar = function(id) {
-  BootstrapDialog.show({
-    title: 'Editar ' + this.recurso,
-    message: $('<div></div>').load(this.baseUrl + '/' + id + '/edit')
-  });
-};
-
-function actualizarUbicacion(formulario) {
-  id = $(formulario).attr('data-ubicacion-id');
+CRUDRecurso.prototype.guardarRecurso = function(recurso, callback) {
+  var self = this;
   $.ajax({
-    method: 'PATCH',
-    url: '/ubicaciones/' + id,
-    data: $(formulario).serialize(),
-    success: function(ubicacion) {
-      $(ubicacionEditar).modal('hide'); // Cierra el dialogo de edición
-      actualizarFilaParaUbicacion(ubicacion);
+    url: this.baseUrl + (recurso ? ('/' + recurso.id) : ''),
+    method: recurso ? 'patch' : 'post',
+    data: $('#formulario').serialize(),
+    success: function(recurso) {
+      self.actualizarFila(recurso);
+      callback();
     }
   });
-}
+};
 
-function actualizarFilaParaUbicacion(ubicacion) {
-  fila = $('tr[data-ubicacion-id=' + ubicacion.id + ']');
-  $(fila.children()[1]).text(ubicacion.nombre);
-  $(fila.children()[2]).text(ubicacion.localizacion);
-  $(fila.children()[4]).text(ubicacion.updated_at);
-}
-
+CRUDRecurso.prototype.actualizarFila = function(recurso) {
+  var fila = $('tr[data-id=' + recurso.id + ']');
+  if (fila.count > 0) {
+    var columnas = fila.children();
+    this.atributos.forEach(function(atributo, indice) {
+      columnas[indice].text(recurso[atributo]);
+    });
+  } else {
+    this.construirFila(recurso, true).appendTo(this.tabla);
+  }
+};
