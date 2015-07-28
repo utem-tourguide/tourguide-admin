@@ -34,7 +34,7 @@
   <script src="/js/app.js"></script>
   <script src="/js/crud.js"></script>
   <script>
-   crud = new CRUDRecurso('informacion',
+   crud = new CRUDRecurso('información',
                           '{{ route('ubicaciones.informacion.index', [$ubicacion->id]) }}',
                           $('#informacion'),
                           ['id', 'contenido', 'idioma']);
