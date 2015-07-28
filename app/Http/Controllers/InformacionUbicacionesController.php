@@ -25,10 +25,7 @@ class InformacionUbicacionesController extends Controller {
    * @return Response
    */
   public function create($ubicacion_id) {
-    $datos = [
-      'ubicacion' => UbicacionTuristica::find($ubicacion_id),
-    ];
-    return view('ubicaciones.create', $datos);
+    return view('ubicaciones.informacion.create');
   }
 
   /**
@@ -69,7 +66,7 @@ class InformacionUbicacionesController extends Controller {
     $datos = [
       'informacion' => InformacionUbicacion::find($id),
     ];
-    return view('ubicaciones.edit', $datos);
+    return view('ubicaciones.informacion.create', $datos);
   }
 
   /**
