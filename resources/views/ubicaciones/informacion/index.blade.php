@@ -15,6 +15,10 @@
       <strong>Eliminar</strong> que corresponda.
     </p>
 
+    <div class="well">
+      <button id="nuevaInformacion" class="btn btn-primary">Nueva entrada</button>
+    </div>
+
     <div class="table-responsive">
       <table id="informacion" class="table table-striped table-condensed">
         <tr>
