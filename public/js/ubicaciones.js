@@ -95,4 +95,3 @@ function actualizarFilaParaUbicacion(ubicacion) {
   $(fila.children()[4]).text(ubicacion.updated_at);
 }
 
-/**/

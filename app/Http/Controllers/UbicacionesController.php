@@ -85,12 +85,27 @@ class UbicacionesController extends Controller
      */
     public function destroy($id)
     {
-        $ubicaciones = UbicacionTuristica::find($id);
-        $ubicaciones-> delete();
+        $ubicacion = User::find($id);
+        
+        if (is_null ($ubicacion))
+        {
+            App::abort(404);
+        }
+        
+        $ubicacion->delete();
 
-        $datos = ['Usuarios' => $ubicaciones];
-
-        return redirect()->route('ubicaciones.index')
-                         ->with('mensaje', 'Ubicación eliminada.');
+        if (Request::ajax())
+        {
+            return Response::json(array (
+                'success' => true,
+                'msg'     => 'ubicacion ' . $ubicacion->full_name . ' eliminado',
+                'id'      => $ubicacion->id
+            ));
+        }
+        else
+        {
+            return Redirect::route('administrar.ubicaciones.index');
+        }
     }
+
 }
