@@ -91,6 +91,26 @@ CRUDRecurso.prototype.mostrarDialogoNuevo = function() {
   });
 };
 
+CRUDRecurso.prototype.mostrarDialogoEditar = function(id) {
+  var self = this;
+  BootstrapDialog.show({
+    title: 'Editar ' + this.recurso,
+    message: $('<div></div>').load(this.baseUrl + '/' + id +'/edit'),
+    buttons: [
+      {
+        label: 'Guardar',
+        cssClass: 'btn-primary',
+        action: function(dialogo) {
+          self.guardarRecurso({id: id}, function() {
+            dialogo.close();
+            $('html, body').animate({ scrollTop: $(".nuevo").offset().top }, 500);
+          });
+        }
+      }
+    ]
+  });
+};
+
 CRUDRecurso.prototype.guardarRecurso = function(recurso, callback) {
   var self = this;
   $.ajax({
@@ -105,13 +125,12 @@ CRUDRecurso.prototype.guardarRecurso = function(recurso, callback) {
 };
 
 CRUDRecurso.prototype.actualizarFila = function(recurso) {
-  var fila = $('tr[data-id=' + recurso.id + ']');
-  if (fila.count > 0) {
-    var columnas = fila.children();
-    this.atributos.forEach(function(atributo, indice) {
-      columnas[indice].text(recurso[atributo]);
-    });
+  var viejaFila = $('tr[data-id=' + recurso.id + ']');
+  var nuevaFila = this.construirFila(recurso, true);
+  if (viejaFila.length > 0) {
+    nuevaFila.insertAfter(viejaFila);
+    viejaFila.remove();
   } else {
-    this.construirFila(recurso, true).appendTo(this.tabla);
+    nuevaFila.appendTo(this.tabla);
   }
 };
