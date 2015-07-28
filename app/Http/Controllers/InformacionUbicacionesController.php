@@ -1,8 +1,7 @@
 <?php namespace TourGuide\Http\Controllers;
 
-use TourGuide\Http\Requests\Request;
+use Illuminate\Http\Request;
 use TourGuide\Models\InformacionUbicacion;
-use TourGuide\Models\UbicacionTuristica;
 
 class InformacionUbicacionesController extends Controller {
 
