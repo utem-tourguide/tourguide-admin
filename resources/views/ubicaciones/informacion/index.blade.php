@@ -39,7 +39,7 @@
                           $('#informacion'),
                           ['id', 'contenido', 'idioma']);
    crud.cargarTabla();
-   $('#nuevaInformacion').on('click', function() { crud.mostrarNuevo() });
+   $('#nuevaInformacion').on('click', function() { crud.mostrarDialogoNuevo() });
  </script>
 </body>
 </html>
