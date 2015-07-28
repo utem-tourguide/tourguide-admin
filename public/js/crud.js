@@ -65,7 +65,7 @@ CRUDRecurso.prototype.crearCeldaAcciones = function(recurso) {
   $(document.createElement('button'))
     .text('Eliminar')
     .addClass('btn btn-default')
-    .on('click', function() { })
+    .on('click', function() { self.mostrarDialogoEliminar(recurso.id) })
     .appendTo(columna);
 
   return columna;
@@ -101,7 +101,7 @@ CRUDRecurso.prototype.mostrarDialogoEditar = function(id) {
         label: 'Guardar',
         cssClass: 'btn-primary',
         action: function(dialogo) {
-          self.guardarRecurso({id: id}, function() {
+          self.guardarRecurso(id, function() {
             dialogo.close();
             $('html, body').animate({ scrollTop: $(".nuevo").offset().top }, 500);
           });
@@ -111,15 +111,46 @@ CRUDRecurso.prototype.mostrarDialogoEditar = function(id) {
   });
 };
 
-CRUDRecurso.prototype.guardarRecurso = function(recurso, callback) {
+CRUDRecurso.prototype.mostrarDialogoEliminar = function(id) {
+  var self = this;
+  BootstrapDialog.show({
+    title: 'Eliminar ' + this.recurso,
+    message: '¿Confirma que desea eliminar el recurso de ' + this.recurso + ' seleccionado?',
+    buttons: [
+      {
+        label: 'Eliminar',
+        cssClass: 'btn-danger',
+        action: function(dialogo) {
+          self.eliminarRecurso(id, function() {
+            dialogo.close();
+          });
+        }
+      }
+    ]
+  });
+};
+
+CRUDRecurso.prototype.guardarRecurso = function(id, callback) {
   var self = this;
   $.ajax({
-    url: this.baseUrl + (recurso ? ('/' + recurso.id) : ''),
-    method: recurso ? 'patch' : 'post',
+    url: this.baseUrl + (id ? ('/' + id) : ''),
+    method: id ? 'patch' : 'post',
     data: $('#formulario').serialize(),
     success: function(recurso) {
       self.actualizarFila(recurso);
-      callback();
+      callback && callback();
+    }
+  });
+};
+
+CRUDRecurso.prototype.eliminarRecurso = function(id, callback) {
+  var self = this;
+  $.ajax({
+    url: this.baseUrl + '/' + id,
+    method: 'delete',
+    success: function() {
+      self.eliminarFila(id);
+      callback && callback();
     }
   });
 };
@@ -133,4 +164,8 @@ CRUDRecurso.prototype.actualizarFila = function(recurso) {
   } else {
     nuevaFila.appendTo(this.tabla);
   }
+};
+
+CRUDRecurso.prototype.eliminarFila = function(id) {
+  $('tr[data-id=' + id + ']').remove();
 };
