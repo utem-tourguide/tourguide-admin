@@ -20,6 +20,8 @@
         <th>Idioma</th>
         <th>Email</th>
         <th>Rol</th>
+        <th>Creado en</th>
+        <th>Modificado en</th>
         <th>Acciones</th>
       </tr>
     </table>
@@ -32,7 +34,9 @@
                      'apellido',
                      'idioma',
                      'email',
-                     'rol'];
+                     'rol',
+                     'created_at',
+                     'updated_at'];
     var crud = new CRUDRecurso('usuario',
                                '{{ route('usuarios.index') }}',
                                $('#usuarios'),
