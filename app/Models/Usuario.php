@@ -28,6 +28,14 @@ class Usuario extends Model {
     return $roles[$this->attributes['rol_id']];
   }
 
+  public function getIdiomaAttribute() {
+    $idiomas = ['en' => 'inglés',
+                'es' => 'español',
+                'fr' => 'francés'];
+
+    return $idiomas[$this->attributes['idioma']];
+  }
+
   /**
    * Cifra una contraseña en texto plano y devuelve su versión cifrada.
    *
