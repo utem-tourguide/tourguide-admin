@@ -91,15 +91,16 @@ class UsuariosController extends Controller {
    * Remove the specified resource from storage.
    *
    * @param  int  $id
+   *
    * @return Response
    */
   public function destroy($id) {
     $usuario = Usuario::find($id);
-    $usuario->delete();
-
-    $datos = ['usuario' => $usuario];
-
-    return view('usuarios.destroy', $datos);
+    if ($usuario) {
+      $usuario->delete();
+    } else {
+      return error_404();
+    }
   }
 
 }
