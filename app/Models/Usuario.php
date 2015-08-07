@@ -12,6 +12,8 @@ class Usuario extends Model {
                          'idioma',
                         ];
 
+  protected $hidden = ['contrasena_cifrada'];
+
   /**
    * Cifra una contraseña en texto plano y devuelve su versión cifrada.
    *
