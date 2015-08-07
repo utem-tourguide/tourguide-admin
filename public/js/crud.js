@@ -33,19 +33,32 @@ CRUDRecurso.prototype.construirFila = function(recurso, esNuevo) {
   var fila = this.iniciarFilaRecurso(recurso, esNuevo);
 
   this.renderizarAtributos(recurso, fila);
+  this.renderizarAtributosGenerados(recurso, fila);
   fila.append(this.crearCeldaAcciones(recurso));
 
   return fila;
 };
 
 CRUDRecurso.prototype.renderizarAtributos = function(recurso, fila) {
-  var columna;
+  var self = this;
   this.atributos.forEach(function(atributo){
-    columna = $(document.createElement('td'))
-      .text(recurso[atributo])
-      .appendTo(fila);
+    self.renderizarAtributo(recurso[atributo], fila);
   });
 }
+
+CRUDRecurso.prototype.renderizarAtributo = function(valor, fila) {
+  $(document.createElement('td'))
+            .text(valor)
+            .appendTo(fila);
+};
+
+CRUDRecurso.prototype.renderizarAtributosGenerados = function(recurso, fila) {
+  var valor;
+  for (var atributo in this.atributosGenerados) {
+    valor = this.atributosGenerados[atributo](recurso);
+    this.renderizarAtributo(valor, fila);
+  }
+};
 
 CRUDRecurso.prototype.iniciarFilaRecurso = function(recurso, esNuevo) {
   var fila = $(document.createElement('tr'))
