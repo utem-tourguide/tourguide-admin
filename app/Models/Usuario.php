@@ -14,6 +14,20 @@ class Usuario extends Model {
 
   protected $hidden = ['contrasena_cifrada'];
 
+  protected $appends = ['rol'];
+
+  /**
+   * Obtiene el rol del usuario como una cadena de texto.
+   *
+   * @return string
+   */
+  public function getRolAttribute() {
+    $roles = [ROL_ADMINISTRADOR => 'administrador',
+              ROL_TURISTA       => 'turista'];
+
+    return $roles[$this->attributes['rol_id']];
+  }
+
   /**
    * Cifra una contraseña en texto plano y devuelve su versión cifrada.
    *
