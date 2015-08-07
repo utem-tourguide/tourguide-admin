@@ -19,7 +19,7 @@
         <th>Apellido</th>
         <th>Idioma</th>
         <th>Email</th>
-        <th>Id de rol</th>
+        <th>Rol</th>
         <th>Acciones</th>
       </tr>
     </table>
@@ -32,7 +32,7 @@
                      'apellido',
                      'idioma',
                      'email',
-                     'rol_id'];
+                     'rol'];
     var crud = new CRUDRecurso('usuario',
                                '{{ route('usuarios.index') }}',
                                $('#usuarios'),
