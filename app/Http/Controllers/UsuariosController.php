@@ -24,7 +24,7 @@ class UsuariosController extends Controller {
   }
 
   /**
-   * Show the form for creating a new resource.
+   * Muestra el formulario para crear un nuevo usuario.
    *
    * @return Response
    */
@@ -33,20 +33,34 @@ class UsuariosController extends Controller {
   }
 
   /**
-   * Store a newly created resource in storage.
+   * Muestra el formulario para editar un usuario registrado.
+   *
+   * @param  int $id
    *
    * @return Response
    */
-  public function store(Request $request) {
-    $usuario = new Usuario($request->only($this->atributos_de_usuario));
-    $usuario->rol_id = $request->get('rol_id');
+  public function edit($id) {
+    $datos = ['usuario' => Usuario::find($id)];
+
+    return view('usuarios.create', $datos);
+  }
+
+  /**
+   * Almacena un nuevo usuario en la base de datos.
+   *
+   * @param  \Illuminate\Http\Request $peticion
+   * @return Response
+   */
+  public function store(Request $peticion) {
+    $usuario = new Usuario($peticion->only($this->atributos_de_usuario));
+    $usuario->rol_id = $peticion->get('rol_id');
     $usuario->save();
 
     return $usuario;
   }
 
   /**
-   * Display the specified resource.
+   * Muestra un usuario específico.
    *
    * @param  int  $id
    * @return Response
@@ -56,20 +70,7 @@ class UsuariosController extends Controller {
   }
 
   /**
-   * Show the form for editing the specified resource.
-   *
-   * @param  int  $id
-   * @return Response
-   */
-  public function edit($id) {
-    $usuario = Usuario::findOrFail($id);
-    $datos = ['usuario' => $usuario];
-
-    return view('usuarios.index', $datos);
-  }
-
-  /**
-   * Update the specified resource in storage.
+   * Actualiza el usuario específicado en la base de datos.
    *
    * @param  int  $id
    * @return Response

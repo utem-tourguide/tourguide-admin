@@ -4,43 +4,44 @@
   <title>Usuarios - TourGuide Admin</title>
   <link rel="stylesheet" type="text/css" href="/css/styles.css">
 </head>
-<body onload="cargarTablaUsuarios('{{ route('usuarios.index') }}')">
+<body>
   <div class="container-fluid">
-    <h1>Usuarios</h1>
-    
-    @if (Session::has('mensaje'))
-      <div class="alert alert-info">
-        <p>{{ Session::get('mensaje') }}</p>
-      </div>
-    @endif
+    <h1>Administrar usuarios</h1>
 
     <div class="well well-sm">
-      <button class="btn btn-primary" data-toggle="modal" data-target="#usuarioNuevo">
-        Nuevo
-      </button>
-      <button class="btn btn-default" onclick="cargarTablaUsuarios('{{ route('usuarios.index') }}')">
-        Recargar
-      </button>
+      <button id="nuevoUsuario" class="btn btn-primary">Nuevo usuario</button>
     </div>
-    
-    <table id="tabla" class="table table-striped table-bordered" hidden>
+
+    <table id="usuarios" class="table table-striped table-bordered" hidden>
       <tr>
         <th>Id</th>
         <th>Nombre</th>
         <th>Apellido</th>
-        <th>idioma</th>
+        <th>Idioma</th>
         <th>Email</th>
         <th>Id de rol</th>
         <th>Acciones</th>
       </tr>
     </table>
 
-     @include('usuarios.partials.dialogo_nuevo')
-     @include('usuarios.partials.dialogo_edit')
-
   <script type="text/javascript" src="/js/app.js"></script>
-  <script type="text/javascript" src="/js/usuarios.js"></script>
+  <script type="text/javascript" src="/js/crud.js"></script>
+  <script>
+    var atributos = ['id',
+                     'nombre',
+                     'apellido',
+                     'idioma',
+                     'email',
+                     'rol_id'];
+    var crud = new CRUDRecurso('usuario',
+                               '{{ route('usuarios.index') }}',
+                               $('#usuarios'),
+                               atributos);
 
+    crud.cargarTabla();
+
+    $('#nuevoUsuario').on('click', function() { crud.mostrarDialogoNuevo() });
+  </script>
   </div>
 </body>
 </html>
