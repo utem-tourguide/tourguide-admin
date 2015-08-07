@@ -3,6 +3,7 @@ function CRUDRecurso(recurso, baseUrl, tabla, atributos) {
   this.baseUrl = baseUrl;
   this.tabla = tabla;
   this.atributos = atributos;
+  this.atributosGenerados = {};
   this.accionesPersonalizadas = {};
 }
 
@@ -31,17 +32,20 @@ CRUDRecurso.prototype.construirTabla = function(recursos) {
 CRUDRecurso.prototype.construirFila = function(recurso, esNuevo) {
   var fila = this.iniciarFilaRecurso(recurso, esNuevo);
 
+  this.renderizarAtributos(recurso, fila);
+  fila.append(this.crearCeldaAcciones(recurso));
+
+  return fila;
+};
+
+CRUDRecurso.prototype.renderizarAtributos = function(recurso, fila) {
   var columna;
   this.atributos.forEach(function(atributo){
     columna = $(document.createElement('td'))
       .text(recurso[atributo])
       .appendTo(fila);
   });
-
-  fila.append(this.crearCeldaAcciones(recurso));
-
-  return fila;
-};
+}
 
 CRUDRecurso.prototype.iniciarFilaRecurso = function(recurso, esNuevo) {
   var fila = $(document.createElement('tr'))
@@ -190,3 +194,7 @@ CRUDRecurso.prototype.eliminarFila = function(id) {
 CRUDRecurso.prototype.agregarAccionPersonalizada = function(nombre, closure) {
   this.accionesPersonalizadas[nombre] = closure;
 };
+
+CRUDRecurso.prototype.agregarAtributoGenerado = function(nombre, closure) {
+  this.atributosGenerados[nombre] = closure;
+}
