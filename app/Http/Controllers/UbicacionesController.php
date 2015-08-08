@@ -55,9 +55,8 @@ class UbicacionesController extends Controller {
    * @return Response
    */
   public function edit($id) {
-    $datos = UbicacionTuristica::find($id);
-    $ubicaciones = ['ubicaciones' => $datos];
-    return view('ubicaciones.edit', $ubicaciones);
+    $datos = ['ubicacion' => UbicacionTuristica::find($id)];
+    return view('ubicaciones.create', $datos);
   }
 
   /**
@@ -80,22 +79,10 @@ class UbicacionesController extends Controller {
    * @return Response
    */
   public function destroy($id) {
-    $ubicacion = User::find($id);
-
-    if (is_null ($ubicacion)) {
-      App::abort(404);
-    }
-
-    $ubicacion->delete();
-
-    if (Request::ajax()) {
-      return Response::json(array (
-        'success' => true,
-        'msg'     => 'ubicacion ' . $ubicacion->full_name . ' eliminado',
-        'id'      => $ubicacion->id
-        ));
+    if ($ubicacion = UbicacionTuristica::find($id)) {
+      $ubicacion->delete();
     } else {
-      return Redirect::route('administrar.ubicaciones.index');
+      return response('')->status(404);
     }
   }
 

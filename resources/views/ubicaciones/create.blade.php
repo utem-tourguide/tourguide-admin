@@ -1,11 +1,10 @@
-{!! Form::open(['route' => 'ubicaciones.store',
-                'id'    => 'formularioNuevo']) !!}
+{!! Form::open(['id' => 'formulario']) !!}
   <div class="form-group">
-      <label>Nombre:</label>
-      <input type="text" class="form-control" name="nombre">
-    </div>
-    <div class="form-group">
-      <label>Localizacion</label>
-      <input type="text" class="form-control" name="localizacion">
-    </div>
+    {!! Form::label('nombre', 'Nombre') !!}
+    {!! Form::text('nombre', isset($ubicacion) ? $ubicacion->nombre : '', ['class' => 'form-control']) !!}
+  </div>
+  <div class="form-group">
+    {!! Form::label('localizacion', 'Localización') !!}
+    {!! Form::text('localizacion', isset($ubicacion) ? $ubicacion->localizacion : '', ['class' => 'form-control']) !!}
+  </div>
 {!! Form::close() !!}
