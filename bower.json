@@ -17,6 +17,7 @@
     "tests"
   ],
   "dependencies": {
-    "bootstrap-sass-official": "~3.3.5"
+    "bootstrap-sass-official": "~3.3.5",
+    "bootstrap-dialog": "~1.34.5"
   }
 }

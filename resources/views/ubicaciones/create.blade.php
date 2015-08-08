@@ -1,25 +1,10 @@
-<html>
-<head>
-	<title>Ubicasiones - TourGuide Admin</title>
-	<link rel="stylesheet" type="text/css" href="/css/styles.css">
-</head>
-<body>
-	<div class="col-md-3">
-	</div>
-	<div class="col-md-6 form-group">
-		{!! Form::open(['route' => 'ubicaciones.store']) !!}
-			<div class="form-group">
-		    	<label>Nombre:</label>
-		    	<input type="text" class="form-control" name="nombre">
-		  	</div>
-		  	<div class="form-group">
-		    	<label>Localizacion</label>
-		    	<input type="text" class="form-control" name="localizacion">
-		  	</div>
-			<input type="submit" value="Guardar" class=" btn btn-primary"><a href="{{ route('ubicaciones.index') }}" class="btn btn-danger" style="margin: 2em;">Cancelar</a>
-		{!! Form::close() !!}
-	</div>
-	<div class="col-md-3">
-	</div>
-</body>
-</html>
+{!! Form::open(['id' => 'formulario']) !!}
+  <div class="form-group">
+    {!! Form::label('nombre', 'Nombre') !!}
+    {!! Form::text('nombre', isset($ubicacion) ? $ubicacion->nombre : '', ['class' => 'form-control']) !!}
+  </div>
+  <div class="form-group">
+    {!! Form::label('localizacion', 'Localización') !!}
+    {!! Form::text('localizacion', isset($ubicacion) ? $ubicacion->localizacion : '', ['class' => 'form-control']) !!}
+  </div>
+{!! Form::close() !!}

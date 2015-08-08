@@ -8,98 +8,82 @@ use TourGuide\Http\Requests;
 use TourGuide\Models\UbicacionTuristica;
 use TourGuide\Http\Controllers\Controller;
 
-class UbicacionesController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     *
-     * @return Response
-     */
-    public function index()
-    {
-        $ubicaciones = UbicacionTuristica::paginate(15);
-        $datos = [
-            'ubicaciones' => $ubicaciones
-        ];
+class UbicacionesController extends Controller {
 
-        return view('ubicaciones.index', $datos);
+  /**
+   * Lista las ubicaciones turísticas
+   *
+   * @return Response
+   */
+  public function index() {
+    return UbicacionTuristica::all();
+  }
+
+  /**
+   * Muestra el formulario para crear una ubicación turística.
+   *
+   * @return Response
+   */
+  public function create() {
+    return view('ubicaciones.create');
+  }
+
+  /**
+   * Almacena una nueva ubicación turística en la base de datos.
+   *
+   * @return Response
+   */
+  public function store() {
+    return UbicacionTuristica::create(Input::all());
+  }
+
+
+  /**
+   * Muestra una ubicación turística en especifico
+   *
+   * @param  int  $id
+   * @return Response
+   */
+  public function show($id) {
+    return UbicacionTuristica::find($id) ?: error_404();
+  }
+
+  /**
+   * Muestra un formulario para editar una ubicación turística
+   *
+   * @param  int  $id
+   * @return Response
+   */
+  public function edit($id) {
+    $datos = ['ubicacion' => UbicacionTuristica::find($id)];
+    return view('ubicaciones.create', $datos);
+  }
+
+  /**
+   * Actualiza la ubicación turística espećíficada en la base de datos
+   *
+   * @param  int  $id
+   * @return Response
+   */
+  public function update($id) {
+    $ubicacion = UbicacionTuristica::find($id);
+    $ubicacion -> update( array('nombre' => Input::get('nombre'), 'localizacion'=> Input::get('localizacion')));
+    $ubicacion -> save();
+    return $ubicacion;
+  }
+
+  /**
+   * Remueve una ubicación turística
+   *
+   * @param  int  $id
+   * @return Response
+   */
+  public function destroy($id) {
+    if ($ubicacion = UbicacionTuristica::find($id)) {
+      $ubicacion->delete();
+    } else {
+      return response('')->status(404);
     }
+  }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return Response
-     */
-    public function create()
-    {
-        return view('ubicaciones.create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
-    public function store()
-    {
-        UbicacionTuristica::create(Input::all());
-        return redirect()->route('ubicaciones.index')
-                         ->with('mensaje', 'Ubicación guardada.');
-    }
-
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function edit($id)
-    {
-        $datos = UbicacionTuristica::find($id);
-        $ubicaciones = ['ubicaciones' => $datos];
-         return view('ubicaciones.edit', $ubicaciones);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function update($id)
-    {
-        $ubicaciones = UbicacionTuristica::find($id);
-        $ubicaciones -> update( array('nombre' => Input::get('nombre'), 'localizacion'=> Input::get('localizacion')));
-        $ubicaciones -> save();
-        return redirect()->route('ubicaciones.index');
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function destroy($id)
-    {
-        $ubicaciones = UbicacionTuristica::find($id);
-        $ubicaciones-> delete();
-
-        $datos = ['Usuarios' => $ubicaciones];
-
-        return redirect()->route('ubicaciones.index')
-                         ->with('mensaje', 'Ubicación eliminada.');
-    }
 }
