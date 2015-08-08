@@ -4,26 +4,15 @@
   <title>Ubicaciones turísticas - TourGuide Admin</title>
   <link rel="stylesheet" type="text/css" href="/css/styles.css">
 </head>
-<body onload="cargarTablaUbicaciones('{{ route('ubicaciones.index') }}')">
+<body>
   <div class="container-fluid">
     <h1>Ubicaciones turísticas</h1>
 
-    @if (Session::has('mensaje'))
-      <div class="alert alert-info">
-        <p>{{ Session::get('mensaje') }}</p>
-      </div>
-    @endif
-
     <div class="well well-sm">
-      <button class="btn btn-primary" data-toggle="modal" data-target="#ubicacionNuevo">
-        Nuevo
-      </button>
-      <button class="btn btn-default" onclick="cargarTablaUbicaciones('{{ route('ubicaciones.index') }}')">
-        Recargar
-      </button>
+      <button id="nuevaUbicacion" class="btn btn-primary">Nueva ubicación</button>
     </div>
 
-    <table id="tabla" class="table table-striped table-bordered" hidden>
+    <table id="ubicaciones" class="table table-striped table-bordered" hidden>
       <tr>
         <th>Id</th>
         <th>Nombre</th>
@@ -36,11 +25,23 @@
 
   </div>
 
-  @include('ubicaciones.partials.dialogo_nuevo')
-  @include('ubicaciones.partials.dialogo_edit')
-  
+  <script src="/js/app.js"></script>
+  <script src="/js/crud.js"></script>
+  <script>
+    crud = new CRUDRecurso('ubicación turística',
+                            '{{ route('ubicaciones.index') }}',
+                            $('#ubicaciones'),
+                            ['id', 'nombre', 'localizacion', 'created_at', 'updated_at']);
 
-  <script type="text/javascript" src="/js/app.js"></script>
-  <script type="text/javascript" src="/js/ubicaciones.js"></script>
+    crud.agregarAccionPersonalizada('Información', function(recurso, crud, boton) {
+      var url = ('{{ route('administrar.ubicaciones.informacion', ['placeholder']) }}');
+      url = url.replace('placeholder', recurso.id);
+
+      window.location = url; // ¡Esto causará un cambio de página!
+    });
+
+    crud.cargarTabla();
+    $('#nuevaUbicacion').on('click', function() { crud.mostrarDialogoNuevo() });
+  </script>
 </body>
 </html>
