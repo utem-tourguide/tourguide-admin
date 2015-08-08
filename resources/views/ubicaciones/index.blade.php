@@ -28,12 +28,20 @@
   <script src="/js/app.js"></script>
   <script src="/js/crud.js"></script>
   <script>
-  crud = new CRUDRecurso('ubicación turística',
-                          '{{ route('ubicaciones.index') }}',
-                          $('#ubicaciones'),
-                          ['id', 'nombre', 'localizacion', 'created_at', 'updated_at']);
-   crud.cargarTabla();
-   $('#nuevaUbicacion').on('click', function() { crud.mostrarDialogoNuevo() });
+    crud = new CRUDRecurso('ubicación turística',
+                            '{{ route('ubicaciones.index') }}',
+                            $('#ubicaciones'),
+                            ['id', 'nombre', 'localizacion', 'created_at', 'updated_at']);
+
+    crud.agregarAccionPersonalizada('Información', function(recurso, crud, boton) {
+      var url = ('{{ route('administrar.ubicaciones.informacion', ['placeholder']) }}');
+      url = url.replace('placeholder', recurso.id);
+
+      window.location = url; // ¡Esto causará un cambio de página!
+    });
+
+    crud.cargarTabla();
+    $('#nuevaUbicacion').on('click', function() { crud.mostrarDialogoNuevo() });
   </script>
 </body>
 </html>
