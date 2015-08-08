@@ -3,6 +3,7 @@ function CRUDRecurso(recurso, baseUrl, tabla, atributos) {
   this.baseUrl = baseUrl;
   this.tabla = tabla;
   this.atributos = atributos;
+  this.accionesPersonalizadas = {};
 }
 
 CRUDRecurso.prototype.cargarTabla = function() {
@@ -56,6 +57,8 @@ CRUDRecurso.prototype.crearCeldaAcciones = function(recurso) {
   var self = this;
   var columna = $(document.createElement('td'));
 
+  this.renderizarAccionesPersonalizadas(recurso, columna);
+
   $(document.createElement('button'))
     .text('Modificar')
     .addClass('btn btn-default')
@@ -69,6 +72,20 @@ CRUDRecurso.prototype.crearCeldaAcciones = function(recurso) {
     .appendTo(columna);
 
   return columna;
+};
+
+CRUDRecurso.prototype.renderizarAccionesPersonalizadas = function(recurso, columna) {
+  var self = this;
+
+  var boton;
+  for (var accion in this.accionesPersonalizadas) {
+    boton = $(document.createElement('button'))
+      .text(accion)
+      .addClass('btn btn-default')
+      .appendTo(columna);
+
+    boton.on('click', function() { self.accionesPersonalizadas[accion](recurso, self, boton) })
+  }
 };
 
 CRUDRecurso.prototype.mostrarDialogoNuevo = function() {
@@ -168,4 +185,8 @@ CRUDRecurso.prototype.actualizarFila = function(recurso) {
 
 CRUDRecurso.prototype.eliminarFila = function(id) {
   $('tr[data-id=' + id + ']').remove();
+};
+
+CRUDRecurso.prototype.agregarAccionPersonalizada = function(nombre, closure) {
+  this.accionesPersonalizadas[nombre] = closure;
 };
