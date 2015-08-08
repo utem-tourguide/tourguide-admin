@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use TourGuide\Models\Usuario;
 use TourGuide\Http\Controllers\Controller;
 
+/**
+ * Controlador de sesiones
+ */
 class SesionesController extends Controller {
 
   /**
