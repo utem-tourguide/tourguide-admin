@@ -4,7 +4,7 @@
   <title>Ubicaciones turísticas - TourGuide Admin</title>
   <link rel="stylesheet" type="text/css" href="/css/styles.css">
 </head>
-<body>
+<body onload="cargarTablaUbicaciones('{{ route('ubicaciones.index') }}')">
   <div class="container-fluid">
     <h1>Ubicaciones turísticas</h1>
 
@@ -12,13 +12,18 @@
       <div class="alert alert-info">
         <p>{{ Session::get('mensaje') }}</p>
       </div>
-    @endif 
+    @endif
 
     <div class="well well-sm">
-      {!! link_to_route('ubicaciones.create', 'Nuevo ubicacion', [], ['class' => "btn btn-primary"]) !!}
+      <button class="btn btn-primary" data-toggle="modal" data-target="#ubicacionNuevo">
+        Nuevo
+      </button>
+      <button class="btn btn-default" onclick="cargarTablaUbicaciones('{{ route('ubicaciones.index') }}')">
+        Recargar
+      </button>
     </div>
 
-    <table class="table table-striped table-bordered">
+    <table id="tabla" class="table table-striped table-bordered" hidden>
       <tr>
         <th>Id</th>
         <th>Nombre</th>
@@ -27,25 +32,15 @@
         <th>Modificada en</th>
         <th>Acciones</th>
       </tr>
-      @foreach ($ubicaciones as $ubicacion)
-        <tr>
-          <td>{{ $ubicacion->id }}</td>
-          <td>{{ $ubicacion->nombre }}</td>
-          <td>{{ $ubicacion->localizacion }}</td>
-          <td>{{ $ubicacion->created_at }}</td>
-          <td>{{ $ubicacion->updated_at }}</td>
-          <td>
-            <a class="btn btn-primary btn-sm" href="{{ route('ubicaciones.edit', [$ubicacion->id]) }}">Editar</a>
-
-            {!!  Form::open(['route' => ['ubicaciones.destroy', $ubicacion->id], 'method' => 'DELETE', 'style' => 'display: inline-block']) !!}
-              <input type="submit" class="btn btn-danger btn-sm" value="eliminar">
-            {!! Form::close()!!}
-          </td>
-        </tr>
-      @endforeach
     </table>
 
-    {!! $ubicaciones->render() !!}
   </div>
+
+  @include('ubicaciones.partials.dialogo_nuevo')
+  @include('ubicaciones.partials.dialogo_edit')
+  
+
+  <script type="text/javascript" src="/js/app.js"></script>
+  <script type="text/javascript" src="/js/ubicaciones.js"></script>
 </body>
 </html>
