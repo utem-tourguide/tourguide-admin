@@ -46,6 +46,11 @@ Route::group(['prefix' => '/administrar'], function() {
     'uses' => 'AdministradorController@informacion',
   ]);
 
+  Route::get('/ubicaciones/{id}/postales', [
+    'as'   => 'administrar.ubicaciones.postales',
+    'uses' => 'AdministradorController@postales',
+  ]);
+
   Route::get('/usuarios', [
     'as'   => 'administrar.usuarios',
     'uses' => 'AdministradorController@usuarios'
