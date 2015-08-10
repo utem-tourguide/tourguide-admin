@@ -53,10 +53,12 @@ class PostalesController extends Controller {
   /**
    * Muestra el formulario para editar una postal en la base de datos.
    *
-   * @param  int  $id
+   * @param  int $ubicacion_id
+   * @param  int $id
+   *
    * @return Response
    */
-  public function edit($id) {
+  public function edit($ubicacion_id, $id) {
     $datos = ['postal' => Postal::findOrFail($id)];
 
     return view('ubicaciones.postales.create', $datos);
@@ -65,11 +67,13 @@ class PostalesController extends Controller {
   /**
    * Actualiza una postal almacenada en la base de datos.
    *
-   * @param Request $peticion
-   * @param  int  $id
+   * @param  Request $peticion
+   * @param  int     $ubicacion_id
+   * @param  int     $id
+   *
    * @return Response
    */
-  public function update(Request $peticion, $id) {
+  public function update(Request $peticion, $ubicacion_id, $id) {
     $postal = Postal::findOrFail($id);
     $postal->update($peticion->all());
 
@@ -79,10 +83,12 @@ class PostalesController extends Controller {
   /**
    * Remueve la postal específicada de la base de datos.
    *
-   * @param  int  $id
+   * @param  int $ubicacion_id
+   * @param  int $id
+   *
    * @return Response
    */
-  public function destroy($id) {
+  public function destroy($ubicacion_id, $id) {
     $postal = Postal::findOrFail($id);
 
     return $postal->delete();
