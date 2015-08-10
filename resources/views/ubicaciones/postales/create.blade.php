@@ -9,6 +9,9 @@
 
   <div class="form-group">
     {!! Form::label('precio') !!}
-    {!! Form::text('precio', null, ['class' => 'form-control']) !!}
+    <div class="input-group">
+      <div class="input-group-addon">$</div>
+      {!! Form::input('number', 'precio', null, ['class' => 'form-control']) !!}
+    </div>
   </div>
 {!! Form::close() !!}
