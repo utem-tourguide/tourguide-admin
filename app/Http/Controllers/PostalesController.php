@@ -91,7 +91,8 @@ class PostalesController extends Controller {
   public function destroy($ubicacion_id, $id) {
     $postal = Postal::findOrFail($id);
 
-    return $postal->delete();
+    $postal->eliminarImagen();
+    $postal->delete();
   }
 
 }
