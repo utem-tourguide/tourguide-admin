@@ -6,6 +6,11 @@
     </div>
     {!! Form::file('imagen', ['id' => 'postalArchivo', 'class' => 'form-control']) !!}
   </div>
+
+  <div class="form-group">
+    {!! Form::label('precio') !!}
+    {!! Form::text('precio', '', ['class' => 'form-control']) !!}
+  </div>
 {!! Form::close() !!}
 
 
