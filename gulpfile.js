@@ -14,6 +14,7 @@ var elixir = require('laravel-elixir');
 var paths = {
   bootstrap:       './vendor/bower_components/bootstrap-sass-official/assets/',
   jquery:          './vendor/bower_components/jquery/',
+  jquery_form:     './vendor/bower_components/jquery-form/',
   bootstrapDialog: './vendor/bower_components/bootstrap-dialog/'
 };
 
@@ -23,7 +24,8 @@ elixir(function(mix) {
              { includePaths: [paths.bootstrap + 'stylesheets/'] })
        .copy(paths.bootstrap + 'fonts/bootstrap/**', 'public/fonts')
        .scripts([paths.jquery + 'dist/jquery.js',
+                 paths.jquery_form + 'jquery.form.js',
                  paths.bootstrap + 'javascripts/bootstrap.js',
-                 paths.bootstrapDialog + 'dist/js/bootstrap-dialog.js'],
+                 paths.bootstrapDialog + 'dist/js/bootstrap-dialog.js',],
                 'public/js/app.js', './')
 });
