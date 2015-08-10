@@ -31,7 +31,7 @@ class Postal extends Model {
    * @return string
    */
   public function obtenerImagenUrl() {
-    return self::IMAGENES_PATH."/{$this->id}";
+    return asset(self::IMAGENES_PATH."/{$this->id}");
   }
 
 }
