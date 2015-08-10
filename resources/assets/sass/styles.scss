@@ -4,3 +4,18 @@
 /** Estilos generales */
 
 .btn { margin-right: 0.5em; }
+
+/** Estilos de administrador de postales */
+#postalImagen { min-height: 5em; }
+#postales {
+  .thumbnail {
+    width: 7em;
+    height: auto;
+    cursor: pointer;
+  }
+}
+.preview {
+  max-width: 100%;
+  margin: 0 auto;
+  display: block;
+}

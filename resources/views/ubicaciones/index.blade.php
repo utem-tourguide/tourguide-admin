@@ -40,6 +40,11 @@
       window.location = url; // ¡Esto causará un cambio de página!
     });
 
+    crud.agregarAccionPersonalizada('Postales', function(recurso, crud, boton) {
+      var url = ('{{ route('administrar.ubicaciones.postales', ['id']) }}').replace('id', recurso.id);
+      window.location = url;
+    });
+
     crud.cargarTabla();
     $('#nuevaUbicacion').on('click', function() { crud.mostrarDialogoNuevo() });
   </script>

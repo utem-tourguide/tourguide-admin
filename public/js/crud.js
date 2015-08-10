@@ -3,8 +3,15 @@ function CRUDRecurso(recurso, baseUrl, tabla, atributos) {
   this.baseUrl = baseUrl;
   this.tabla = tabla;
   this.atributos = atributos;
+
   this.atributosGenerados = {};
   this.accionesPersonalizadas = {};
+
+  this.opciones = {
+    crear: {},
+    modificar: {},
+    eliminar: {}
+  };
 }
 
 CRUDRecurso.prototype.cargarTabla = function() {
@@ -48,7 +55,7 @@ CRUDRecurso.prototype.renderizarAtributos = function(recurso, fila) {
 
 CRUDRecurso.prototype.renderizarAtributo = function(valor, fila) {
   $(document.createElement('td'))
-            .text(valor)
+            .html(valor)
             .appendTo(fila);
 };
 
@@ -166,27 +173,35 @@ CRUDRecurso.prototype.mostrarDialogoEliminar = function(id) {
 
 CRUDRecurso.prototype.guardarRecurso = function(id, callback) {
   var self = this;
-  $.ajax({
-    url: this.baseUrl + (id ? ('/' + id) : ''),
-    method: id ? 'patch' : 'post',
-    data: $('#formulario').serialize(),
-    success: function(recurso) {
-      self.actualizarFila(recurso);
-      callback && callback();
-    }
-  });
+  $('#formulario').submit(function(e) {
+    e.preventDefault();
+
+    var opciones = {
+      url: self.baseUrl + (id ? ('/' + id) : ''),
+      method: id ? 'patch' : 'post',
+      success: function(recurso) {
+        self.actualizarFila(recurso);
+        callback && callback();
+      }
+    };
+
+    $(this).ajaxSubmit($.extend({}, opciones, id ? self.opciones.modificar: self.opciones.crear));
+  }).submit();
 };
 
 CRUDRecurso.prototype.eliminarRecurso = function(id, callback) {
   var self = this;
-  $.ajax({
+
+  var opciones = {
     url: this.baseUrl + '/' + id,
     method: 'delete',
     success: function() {
       self.eliminarFila(id);
       callback && callback();
     }
-  });
+  };
+
+  $.ajax($.extend({}, opciones, self.opciones.eliminar));
 };
 
 CRUDRecurso.prototype.actualizarFila = function(recurso) {
