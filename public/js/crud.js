@@ -48,7 +48,7 @@ CRUDRecurso.prototype.renderizarAtributos = function(recurso, fila) {
 
 CRUDRecurso.prototype.renderizarAtributo = function(valor, fila) {
   $(document.createElement('td'))
-            .text(valor)
+            .html(valor)
             .appendTo(fila);
 };
 
@@ -166,15 +166,18 @@ CRUDRecurso.prototype.mostrarDialogoEliminar = function(id) {
 
 CRUDRecurso.prototype.guardarRecurso = function(id, callback) {
   var self = this;
-  $.ajax({
-    url: this.baseUrl + (id ? ('/' + id) : ''),
-    method: id ? 'patch' : 'post',
-    data: $('#formulario').serialize(),
-    success: function(recurso) {
-      self.actualizarFila(recurso);
-      callback && callback();
-    }
-  });
+  $('#formulario').submit(function(e) {
+    e.preventDefault();
+
+    $(this).ajaxSubmit({
+      url: self.baseUrl + (id ? ('/' + id) : ''),
+      method: id ? 'patch' : 'post',
+      success: function(recurso) {
+        self.actualizarFila(recurso);
+        callback && callback();
+      }
+    });
+  }).submit();
 };
 
 CRUDRecurso.prototype.eliminarRecurso = function(id, callback) {
