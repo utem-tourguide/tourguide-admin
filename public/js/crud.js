@@ -3,8 +3,15 @@ function CRUDRecurso(recurso, baseUrl, tabla, atributos) {
   this.baseUrl = baseUrl;
   this.tabla = tabla;
   this.atributos = atributos;
+
   this.atributosGenerados = {};
   this.accionesPersonalizadas = {};
+
+  this.opciones = {
+    crear: {},
+    modificar: {},
+    eliminar: {}
+  };
 }
 
 CRUDRecurso.prototype.cargarTabla = function() {
@@ -169,27 +176,32 @@ CRUDRecurso.prototype.guardarRecurso = function(id, callback) {
   $('#formulario').submit(function(e) {
     e.preventDefault();
 
-    $(this).ajaxSubmit({
+    var opciones = {
       url: self.baseUrl + (id ? ('/' + id) : ''),
       method: id ? 'patch' : 'post',
       success: function(recurso) {
         self.actualizarFila(recurso);
         callback && callback();
       }
-    });
+    };
+
+    $(this).ajaxSubmit($.extend({}, opciones, id ? self.opciones.modificar: self.opciones.crear));
   }).submit();
 };
 
 CRUDRecurso.prototype.eliminarRecurso = function(id, callback) {
   var self = this;
-  $.ajax({
+
+  var opciones = {
     url: this.baseUrl + '/' + id,
     method: 'delete',
     success: function() {
       self.eliminarFila(id);
       callback && callback();
     }
-  });
+  };
+
+  $.ajax($.extend({}, opciones, self.opciones.eliminar));
 };
 
 CRUDRecurso.prototype.actualizarFila = function(recurso) {
