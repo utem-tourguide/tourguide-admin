@@ -15,8 +15,7 @@ class Postal extends Model {
    * Los atributos que pueden asignarse masivamente.
    * @var array
    */
-  protected $fillable = ['imagen_url',
-                         'precio',
+  protected $fillable = ['precio',
                          'ubicacion_id'];
 
   /**
