@@ -28,6 +28,7 @@
 
   <script src="/js/app.js"></script>
   <script src="/js/crud.js"></script>
+  <script src="/js/image_previewer.js"></script>
   <script>
    crud = new CRUDRecurso('postales',
                           '{{ route('ubicaciones.postales.index', [$ubicacion->id]) }}',
@@ -35,6 +36,11 @@
                           ['id']);
    crud.cargarTabla();
    $('#nuevaPostal').on('click', function() { crud.mostrarDialogoNuevo() });
+
+   $('body').on('change', '#postalArchivo', function() {
+    var previewer = new ImagePreviewer(this);
+    previewer.render('#postalImagen');
+   });
  </script>
 </body>
 </html>
