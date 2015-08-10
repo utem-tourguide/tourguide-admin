@@ -1,6 +1,7 @@
 <?php namespace TourGuide\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class Postal extends Model {
 
@@ -17,5 +18,12 @@ class Postal extends Model {
   protected $fillable = ['imagen_url',
                          'precio',
                          'ubicacion_id'];
+
+  /**
+   * @param UploadedFile $imagen_archivo
+   */
+  public function guardarImagen($imagen_archivo) {
+    $imagen_archivo->move(public_path('images/postales'), $this->id);
+  }
 
 }
