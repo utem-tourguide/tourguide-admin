@@ -21,6 +21,13 @@ class Postal extends Model {
                          'ubicacion_id'];
 
   /**
+   * @return float
+   */
+  public function getPrecioAttribute() {
+    return number_format($this->attributes['precio'], 2);
+  }
+
+  /**
    * @param UploadedFile $imagen_archivo
    */
   public function guardarImagen($imagen_archivo) {

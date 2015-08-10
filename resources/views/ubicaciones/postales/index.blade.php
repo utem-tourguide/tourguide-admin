@@ -37,7 +37,7 @@
                           ['id']);
 
    crud.agregarAtributoGenerado('Precio', function(recurso) {
-     return '$' + parseFloat(recurso.precio).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+     return '$' + recurso.precio;
    });
 
    crud.agregarAtributoGenerado('Imagen', function(recurso) {
