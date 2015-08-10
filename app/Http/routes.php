@@ -33,7 +33,12 @@ Route::get('/obtener-app', ['as'   => 'obtener_app',
 Route::resource('/usuarios', 'UsuariosController');
 Route::resource('/ubicaciones', 'UbicacionesController');
 Route::resource('ubicaciones.informacion', 'InformacionUbicacionesController');
-Route::resource('ubicaciones.postales', 'PostalesController');
+
+Route::resource('ubicaciones.postales', 'PostalesController', ['except' => 'update']);
+Route::post('ubicaciones/{ubicaciones}/postales/{postales}', [
+  'as'   => 'ubicaciones.postales.update',
+  'uses' => 'PostalesController@update',
+]);
 
 Route::group(['prefix' => '/administrar'], function() {
   Route::get('/ubicaciones', [
