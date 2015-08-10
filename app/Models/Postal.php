@@ -27,6 +27,11 @@ class Postal extends Model {
     $imagen_archivo->move(self::IMAGENES_PATH, $this->id);
   }
 
+  public function eliminarImagen() {
+    $path = self::IMAGENES_PATH."/{$this->id}";
+    if (file_exists($path)) unlink($path);
+  }
+
   /**
    * @return string
    */
