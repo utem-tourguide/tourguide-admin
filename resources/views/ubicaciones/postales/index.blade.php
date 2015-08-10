@@ -41,8 +41,10 @@
    });
 
    crud.agregarAtributoGenerado('Imagen', function(recurso) {
-     return '<img class="thumbnail" src="{{asset(\TourGuide\Models\Postal::IMAGENES_PATH.'/id')}}">'
-            .replace('id', recurso.id);
+     var url = '{{asset(\TourGuide\Models\Postal::IMAGENES_PATH.'/id?')}}'
+       .replace('id', recurso.id);
+
+     return '<img class="thumbnail" src="' + url + new Date().getTime() + '">'
    });
 
    crud.opciones = {
