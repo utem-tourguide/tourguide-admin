@@ -14,7 +14,6 @@ class CrearTablaPostales extends Migration {
   {
     Schema::create('postales', function($tabla) {
       $tabla->increments('id');
-      $tabla->string('imagen_url');
       $tabla->float('precio');
       $tabla->integer('ubicacion_id');
       $tabla->timestamps();
