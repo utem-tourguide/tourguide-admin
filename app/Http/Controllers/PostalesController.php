@@ -22,7 +22,7 @@ class PostalesController extends Controller {
    * @return Response
    */
   public function create() {
-    return view('postales.create');
+    return view('ubicaciones.postales.create');
   }
 
   /**
@@ -54,7 +54,7 @@ class PostalesController extends Controller {
   public function edit($id) {
     $datos = ['postal' => Postal::findOrFail($id)];
 
-    return view('postales.create', $datos);
+    return view('ubicaciones.postales.create', $datos);
   }
 
   /**
