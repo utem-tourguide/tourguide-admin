@@ -23,3 +23,13 @@ ImagePreviewer.prototype.readUrl = function(whereToRenderSelector) {
 
   reader.readAsDataURL(this.fileInput.files[0]);
 };
+
+ImagePreviewer.showPicture = function(url) {
+  var dialog = new BootstrapDialog({
+    message: '<img class="preview" src="' + url +'">'
+  });
+  dialog.realize();
+  dialog.getModalHeader().hide();
+  dialog.getModalFooter().hide();
+  dialog.open();
+};

@@ -44,7 +44,10 @@
      var url = '{{asset(\TourGuide\Models\Postal::IMAGENES_PATH.'/id?')}}'
        .replace('id', recurso.id);
 
-     return '<img class="thumbnail" src="' + url + new Date().getTime() + '">'
+     var img = $('<img class="thumbnail" src="' + url + new Date().getTime() + '">');
+     img.click(function() { ImagePreviewer.showPicture(url) });
+
+     return img;
    });
 
    crud.opciones = {
