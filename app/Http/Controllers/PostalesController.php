@@ -1,15 +1,14 @@
 <?php namespace TourGuide\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use TourGuide\Http\Requests;
-use TourGuide\Http\Controllers\Controller;
 use TourGuide\Models\Postal;
 
 class PostalesController extends Controller {
 
   /**
    * Muestra una lista de postales.
-   *
    * @return Response
    */
   public function index() {
@@ -28,11 +27,17 @@ class PostalesController extends Controller {
   /**
    * Almacena una postal en la base de datos.
    *
-   * @param Request $peticion
+   * @param  int     $ubicacion_id
+   * @param  Request $peticion
    * @return Response
    */
-  public function store(Request $peticion) {
-    return Postal::create($peticion->all());
+  public function store($ubicacion_id, Request $peticion) {
+    $datos  = $peticion->all() + ['ubicacion_id' => $ubicacion_id];
+    $postal = Postal::create($datos);
+
+    if ($peticion->hasFile('imagen')) $postal->guardarImagen($peticion->file('imagen'));
+
+    return $postal;
   }
 
   /**
