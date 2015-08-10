@@ -26,4 +26,11 @@ class Postal extends Model {
     $imagen_archivo->move(public_path('images/postales'), $this->id);
   }
 
+  /**
+   * @return string
+   */
+  public function obtenerImagenUrl() {
+    return asset("images/postales/{$this->id}");
+  }
+
 }
