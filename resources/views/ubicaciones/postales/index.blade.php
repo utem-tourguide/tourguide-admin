@@ -19,6 +19,7 @@
       <table id="postales" class="table table-striped table-condensed">
         <tr>
           <th>ID</th>
+          <th>Precio</th>
           <th>Imagen</th>
           <th>Acciones</th>
         </tr>
@@ -34,7 +35,18 @@
                           '{{ route('ubicaciones.postales.index', [$ubicacion->id]) }}',
                           $('#postales'),
                           ['id']);
+
+   crud.agregarAtributoGenerado('Precio', function(recurso) {
+     return '$' + parseFloat(recurso.precio).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+   });
+
+   crud.agregarAtributoGenerado('Imagen', function(recurso) {
+     return '<img class="thumb" src="{{asset(\TourGuide\Models\Postal::IMAGENES_PATH.'/id')}}">'
+            .replace('id', recurso.id);
+   });
+
    crud.cargarTabla();
+
    $('#nuevaPostal').on('click', function() { crud.mostrarDialogoNuevo() });
 
    $('body').on('change', '#postalArchivo', function() {
