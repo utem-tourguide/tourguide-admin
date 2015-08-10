@@ -77,6 +77,8 @@ class PostalesController extends Controller {
     $postal = Postal::findOrFail($id);
     $postal->update($peticion->all());
 
+    if ($peticion->hasFile('imagen')) $postal->guardarImagen($peticion->file('imagen'));
+
     return $postal;
   }
 

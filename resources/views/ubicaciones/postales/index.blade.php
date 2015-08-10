@@ -31,7 +31,7 @@
   <script src="/js/crud.js"></script>
   <script src="/js/image_previewer.js"></script>
   <script>
-   crud = new CRUDRecurso('postales',
+   crud = new CRUDRecurso('postal',
                           '{{ route('ubicaciones.postales.index', [$ubicacion->id]) }}',
                           $('#postales'),
                           ['id']);
@@ -44,6 +44,12 @@
      return '<img class="thumbnail" src="{{asset(\TourGuide\Models\Postal::IMAGENES_PATH.'/id')}}">'
             .replace('id', recurso.id);
    });
+
+   crud.opciones = {
+     modificar: {
+       method: 'post'
+     }
+   };
 
    crud.cargarTabla();
 
