@@ -1,8 +1,16 @@
 <?php namespace TourGuide\Http\Controllers;
 
+use Carbon\Carbon;
 use TourGuide\Models\UbicacionTuristica;
 
 class AdministradorController extends Controller {
+
+  public function compras() {
+    $datos = ['fecha_desde' => with(new Carbon)->startOfYear(),
+              'fecha_hasta' => with(new Carbon)->endOfYear()];
+
+    return view('compras.index', $datos);
+  }
 
   public function ubicaciones() {
     return view('ubicaciones.index');
