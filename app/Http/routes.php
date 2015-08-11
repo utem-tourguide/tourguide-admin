@@ -31,6 +31,7 @@ Route::get('/obtener-app', ['as'   => 'obtener_app',
                                       }]);
 
 Route::resource('/usuarios', 'UsuariosController');
+Route::resource('compras', 'ComprasController', ['only' => ['index', 'store']]);
 Route::resource('/ubicaciones', 'UbicacionesController');
 Route::resource('ubicaciones.informacion', 'InformacionUbicacionesController');
 
@@ -40,11 +41,12 @@ Route::post('ubicaciones/{ubicaciones}/postales/{postales}', [
   'uses' => 'PostalesController@update',
 ]);
 
-Route::get('/compras', ['as' => 'compras.index', 'uses' => 'ComprasController@index']);
-Route::post('/compras', ['as'         => 'compras.store',
-                         'uses'       => 'ComprasController@store']);
-
 Route::group(['prefix' => '/administrar'], function() {
+  Route::get('/compras', [
+    'as'   => 'administrar.compras',
+    'uses' => 'AdministradorController@compras',
+  ]);
+
   Route::get('/ubicaciones', [
     'as'   => 'administrar.ubicaciones',
     'uses' => 'AdministradorController@ubicaciones'
