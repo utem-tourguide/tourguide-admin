@@ -9210,6 +9210,1224 @@ return jQuery;
 }));
 
 /*!
+ * jQuery Form Plugin
+ * version: 3.46.0-2013.11.21
+ * Requires jQuery v1.5 or later
+ * Copyright (c) 2013 M. Alsup
+ * Examples and documentation at: http://malsup.com/jquery/form/
+ * Project repository: https://github.com/malsup/form
+ * Dual licensed under the MIT and GPL licenses.
+ * https://github.com/malsup/form#copyright-and-license
+ */
+/*global ActiveXObject */
+
+// AMD support
+(function (factory) {
+    if (typeof define === 'function' && define.amd) {
+        // using AMD; register as anon module
+        define(['jquery'], factory);
+    } else {
+        // no AMD; invoke directly
+        factory( (typeof(jQuery) != 'undefined') ? jQuery : window.Zepto );
+    }
+}
+
+(function($) {
+"use strict";
+
+/*
+    Usage Note:
+    -----------
+    Do not use both ajaxSubmit and ajaxForm on the same form.  These
+    functions are mutually exclusive.  Use ajaxSubmit if you want
+    to bind your own submit handler to the form.  For example,
+
+    $(document).ready(function() {
+        $('#myForm').on('submit', function(e) {
+            e.preventDefault(); // <-- important
+            $(this).ajaxSubmit({
+                target: '#output'
+            });
+        });
+    });
+
+    Use ajaxForm when you want the plugin to manage all the event binding
+    for you.  For example,
+
+    $(document).ready(function() {
+        $('#myForm').ajaxForm({
+            target: '#output'
+        });
+    });
+
+    You can also use ajaxForm with delegation (requires jQuery v1.7+), so the
+    form does not have to exist when you invoke ajaxForm:
+
+    $('#myForm').ajaxForm({
+        delegation: true,
+        target: '#output'
+    });
+
+    When using ajaxForm, the ajaxSubmit function will be invoked for you
+    at the appropriate time.
+*/
+
+/**
+ * Feature detection
+ */
+var feature = {};
+feature.fileapi = $("<input type='file'/>").get(0).files !== undefined;
+feature.formdata = window.FormData !== undefined;
+
+var hasProp = !!$.fn.prop;
+
+// attr2 uses prop when it can but checks the return type for
+// an expected string.  this accounts for the case where a form 
+// contains inputs with names like "action" or "method"; in those
+// cases "prop" returns the element
+$.fn.attr2 = function() {
+    if ( ! hasProp )
+        return this.attr.apply(this, arguments);
+    var val = this.prop.apply(this, arguments);
+    if ( ( val && val.jquery ) || typeof val === 'string' )
+        return val;
+    return this.attr.apply(this, arguments);
+};
+
+/**
+ * ajaxSubmit() provides a mechanism for immediately submitting
+ * an HTML form using AJAX.
+ */
+$.fn.ajaxSubmit = function(options) {
+    /*jshint scripturl:true */
+
+    // fast fail if nothing selected (http://dev.jquery.com/ticket/2752)
+    if (!this.length) {
+        log('ajaxSubmit: skipping submit process - no element selected');
+        return this;
+    }
+
+    var method, action, url, $form = this;
+
+    if (typeof options == 'function') {
+        options = { success: options };
+    }
+    else if ( options === undefined ) {
+        options = {};
+    }
+
+    method = options.type || this.attr2('method');
+    action = options.url  || this.attr2('action');
+
+    url = (typeof action === 'string') ? $.trim(action) : '';
+    url = url || window.location.href || '';
+    if (url) {
+        // clean url (don't include hash vaue)
+        url = (url.match(/^([^#]+)/)||[])[1];
+    }
+
+    options = $.extend(true, {
+        url:  url,
+        success: $.ajaxSettings.success,
+        type: method || $.ajaxSettings.type,
+        iframeSrc: /^https/i.test(window.location.href || '') ? 'javascript:false' : 'about:blank'
+    }, options);
+
+    // hook for manipulating the form data before it is extracted;
+    // convenient for use with rich editors like tinyMCE or FCKEditor
+    var veto = {};
+    this.trigger('form-pre-serialize', [this, options, veto]);
+    if (veto.veto) {
+        log('ajaxSubmit: submit vetoed via form-pre-serialize trigger');
+        return this;
+    }
+
+    // provide opportunity to alter form data before it is serialized
+    if (options.beforeSerialize && options.beforeSerialize(this, options) === false) {
+        log('ajaxSubmit: submit aborted via beforeSerialize callback');
+        return this;
+    }
+
+    var traditional = options.traditional;
+    if ( traditional === undefined ) {
+        traditional = $.ajaxSettings.traditional;
+    }
+
+    var elements = [];
+    var qx, a = this.formToArray(options.semantic, elements);
+    if (options.data) {
+        options.extraData = options.data;
+        qx = $.param(options.data, traditional);
+    }
+
+    // give pre-submit callback an opportunity to abort the submit
+    if (options.beforeSubmit && options.beforeSubmit(a, this, options) === false) {
+        log('ajaxSubmit: submit aborted via beforeSubmit callback');
+        return this;
+    }
+
+    // fire vetoable 'validate' event
+    this.trigger('form-submit-validate', [a, this, options, veto]);
+    if (veto.veto) {
+        log('ajaxSubmit: submit vetoed via form-submit-validate trigger');
+        return this;
+    }
+
+    var q = $.param(a, traditional);
+    if (qx) {
+        q = ( q ? (q + '&' + qx) : qx );
+    }
+    if (options.type.toUpperCase() == 'GET') {
+        options.url += (options.url.indexOf('?') >= 0 ? '&' : '?') + q;
+        options.data = null;  // data is null for 'get'
+    }
+    else {
+        options.data = q; // data is the query string for 'post'
+    }
+
+    var callbacks = [];
+    if (options.resetForm) {
+        callbacks.push(function() { $form.resetForm(); });
+    }
+    if (options.clearForm) {
+        callbacks.push(function() { $form.clearForm(options.includeHidden); });
+    }
+
+    // perform a load on the target only if dataType is not provided
+    if (!options.dataType && options.target) {
+        var oldSuccess = options.success || function(){};
+        callbacks.push(function(data) {
+            var fn = options.replaceTarget ? 'replaceWith' : 'html';
+            $(options.target)[fn](data).each(oldSuccess, arguments);
+        });
+    }
+    else if (options.success) {
+        callbacks.push(options.success);
+    }
+
+    options.success = function(data, status, xhr) { // jQuery 1.4+ passes xhr as 3rd arg
+        var context = options.context || this ;    // jQuery 1.4+ supports scope context
+        for (var i=0, max=callbacks.length; i < max; i++) {
+            callbacks[i].apply(context, [data, status, xhr || $form, $form]);
+        }
+    };
+
+    if (options.error) {
+        var oldError = options.error;
+        options.error = function(xhr, status, error) {
+            var context = options.context || this;
+            oldError.apply(context, [xhr, status, error, $form]);
+        };
+    }
+
+     if (options.complete) {
+        var oldComplete = options.complete;
+        options.complete = function(xhr, status) {
+            var context = options.context || this;
+            oldComplete.apply(context, [xhr, status, $form]);
+        };
+    }
+
+    // are there files to upload?
+
+    // [value] (issue #113), also see comment:
+    // https://github.com/malsup/form/commit/588306aedba1de01388032d5f42a60159eea9228#commitcomment-2180219
+    var fileInputs = $('input[type=file]:enabled', this).filter(function() { return $(this).val() !== ''; });
+
+    var hasFileInputs = fileInputs.length > 0;
+    var mp = 'multipart/form-data';
+    var multipart = ($form.attr('enctype') == mp || $form.attr('encoding') == mp);
+
+    var fileAPI = feature.fileapi && feature.formdata;
+    log("fileAPI :" + fileAPI);
+    var shouldUseFrame = (hasFileInputs || multipart) && !fileAPI;
+
+    var jqxhr;
+
+    // options.iframe allows user to force iframe mode
+    // 06-NOV-09: now defaulting to iframe mode if file input is detected
+    if (options.iframe !== false && (options.iframe || shouldUseFrame)) {
+        // hack to fix Safari hang (thanks to Tim Molendijk for this)
+        // see:  http://groups.google.com/group/jquery-dev/browse_thread/thread/36395b7ab510dd5d
+        if (options.closeKeepAlive) {
+            $.get(options.closeKeepAlive, function() {
+                jqxhr = fileUploadIframe(a);
+            });
+        }
+        else {
+            jqxhr = fileUploadIframe(a);
+        }
+    }
+    else if ((hasFileInputs || multipart) && fileAPI) {
+        jqxhr = fileUploadXhr(a);
+    }
+    else {
+        jqxhr = $.ajax(options);
+    }
+
+    $form.removeData('jqxhr').data('jqxhr', jqxhr);
+
+    // clear element array
+    for (var k=0; k < elements.length; k++)
+        elements[k] = null;
+
+    // fire 'notify' event
+    this.trigger('form-submit-notify', [this, options]);
+    return this;
+
+    // utility fn for deep serialization
+    function deepSerialize(extraData){
+        var serialized = $.param(extraData, options.traditional).split('&');
+        var len = serialized.length;
+        var result = [];
+        var i, part;
+        for (i=0; i < len; i++) {
+            // #252; undo param space replacement
+            serialized[i] = serialized[i].replace(/\+/g,' ');
+            part = serialized[i].split('=');
+            // #278; use array instead of object storage, favoring array serializations
+            result.push([decodeURIComponent(part[0]), decodeURIComponent(part[1])]);
+        }
+        return result;
+    }
+
+     // XMLHttpRequest Level 2 file uploads (big hat tip to francois2metz)
+    function fileUploadXhr(a) {
+        var formdata = new FormData();
+
+        for (var i=0; i < a.length; i++) {
+            formdata.append(a[i].name, a[i].value);
+        }
+
+        if (options.extraData) {
+            var serializedData = deepSerialize(options.extraData);
+            for (i=0; i < serializedData.length; i++)
+                if (serializedData[i])
+                    formdata.append(serializedData[i][0], serializedData[i][1]);
+        }
+
+        options.data = null;
+
+        var s = $.extend(true, {}, $.ajaxSettings, options, {
+            contentType: false,
+            processData: false,
+            cache: false,
+            type: method || 'POST'
+        });
+
+        if (options.uploadProgress) {
+            // workaround because jqXHR does not expose upload property
+            s.xhr = function() {
+                var xhr = $.ajaxSettings.xhr();
+                if (xhr.upload) {
+                    xhr.upload.addEventListener('progress', function(event) {
+                        var percent = 0;
+                        var position = event.loaded || event.position; /*event.position is deprecated*/
+                        var total = event.total;
+                        if (event.lengthComputable) {
+                            percent = Math.ceil(position / total * 100);
+                        }
+                        options.uploadProgress(event, position, total, percent);
+                    }, false);
+                }
+                return xhr;
+            };
+        }
+
+        s.data = null;
+        var beforeSend = s.beforeSend;
+        s.beforeSend = function(xhr, o) {
+            //Send FormData() provided by user
+            if (options.formData)
+                o.data = options.formData;
+            else
+                o.data = formdata;
+            if(beforeSend)
+                beforeSend.call(this, xhr, o);
+        };
+        return $.ajax(s);
+    }
+
+    // private function for handling file uploads (hat tip to YAHOO!)
+    function fileUploadIframe(a) {
+        var form = $form[0], el, i, s, g, id, $io, io, xhr, sub, n, timedOut, timeoutHandle;
+        var deferred = $.Deferred();
+
+        // #341
+        deferred.abort = function(status) {
+            xhr.abort(status);
+        };
+
+        if (a) {
+            // ensure that every serialized input is still enabled
+            for (i=0; i < elements.length; i++) {
+                el = $(elements[i]);
+                if ( hasProp )
+                    el.prop('disabled', false);
+                else
+                    el.removeAttr('disabled');
+            }
+        }
+
+        s = $.extend(true, {}, $.ajaxSettings, options);
+        s.context = s.context || s;
+        id = 'jqFormIO' + (new Date().getTime());
+        if (s.iframeTarget) {
+            $io = $(s.iframeTarget);
+            n = $io.attr2('name');
+            if (!n)
+                 $io.attr2('name', id);
+            else
+                id = n;
+        }
+        else {
+            $io = $('<iframe name="' + id + '" src="'+ s.iframeSrc +'" />');
+            $io.css({ position: 'absolute', top: '-1000px', left: '-1000px' });
+        }
+        io = $io[0];
+
+
+        xhr = { // mock object
+            aborted: 0,
+            responseText: null,
+            responseXML: null,
+            status: 0,
+            statusText: 'n/a',
+            getAllResponseHeaders: function() {},
+            getResponseHeader: function() {},
+            setRequestHeader: function() {},
+            abort: function(status) {
+                var e = (status === 'timeout' ? 'timeout' : 'aborted');
+                log('aborting upload... ' + e);
+                this.aborted = 1;
+
+                try { // #214, #257
+                    if (io.contentWindow.document.execCommand) {
+                        io.contentWindow.document.execCommand('Stop');
+                    }
+                }
+                catch(ignore) {}
+
+                $io.attr('src', s.iframeSrc); // abort op in progress
+                xhr.error = e;
+                if (s.error)
+                    s.error.call(s.context, xhr, e, status);
+                if (g)
+                    $.event.trigger("ajaxError", [xhr, s, e]);
+                if (s.complete)
+                    s.complete.call(s.context, xhr, e);
+            }
+        };
+
+        g = s.global;
+        // trigger ajax global events so that activity/block indicators work like normal
+        if (g && 0 === $.active++) {
+            $.event.trigger("ajaxStart");
+        }
+        if (g) {
+            $.event.trigger("ajaxSend", [xhr, s]);
+        }
+
+        if (s.beforeSend && s.beforeSend.call(s.context, xhr, s) === false) {
+            if (s.global) {
+                $.active--;
+            }
+            deferred.reject();
+            return deferred;
+        }
+        if (xhr.aborted) {
+            deferred.reject();
+            return deferred;
+        }
+
+        // add submitting element to data if we know it
+        sub = form.clk;
+        if (sub) {
+            n = sub.name;
+            if (n && !sub.disabled) {
+                s.extraData = s.extraData || {};
+                s.extraData[n] = sub.value;
+                if (sub.type == "image") {
+                    s.extraData[n+'.x'] = form.clk_x;
+                    s.extraData[n+'.y'] = form.clk_y;
+                }
+            }
+        }
+
+        var CLIENT_TIMEOUT_ABORT = 1;
+        var SERVER_ABORT = 2;
+                
+        function getDoc(frame) {
+            /* it looks like contentWindow or contentDocument do not
+             * carry the protocol property in ie8, when running under ssl
+             * frame.document is the only valid response document, since
+             * the protocol is know but not on the other two objects. strange?
+             * "Same origin policy" http://en.wikipedia.org/wiki/Same_origin_policy
+             */
+            
+            var doc = null;
+            
+            // IE8 cascading access check
+            try {
+                if (frame.contentWindow) {
+                    doc = frame.contentWindow.document;
+                }
+            } catch(err) {
+                // IE8 access denied under ssl & missing protocol
+                log('cannot get iframe.contentWindow document: ' + err);
+            }
+
+            if (doc) { // successful getting content
+                return doc;
+            }
+
+            try { // simply checking may throw in ie8 under ssl or mismatched protocol
+                doc = frame.contentDocument ? frame.contentDocument : frame.document;
+            } catch(err) {
+                // last attempt
+                log('cannot get iframe.contentDocument: ' + err);
+                doc = frame.document;
+            }
+            return doc;
+        }
+
+        // Rails CSRF hack (thanks to Yvan Barthelemy)
+        var csrf_token = $('meta[name=csrf-token]').attr('content');
+        var csrf_param = $('meta[name=csrf-param]').attr('content');
+        if (csrf_param && csrf_token) {
+            s.extraData = s.extraData || {};
+            s.extraData[csrf_param] = csrf_token;
+        }
+
+        // take a breath so that pending repaints get some cpu time before the upload starts
+        function doSubmit() {
+            // make sure form attrs are set
+            var t = $form.attr2('target'), a = $form.attr2('action');
+
+            // update form attrs in IE friendly way
+            form.setAttribute('target',id);
+            if (!method || /post/i.test(method) ) {
+                form.setAttribute('method', 'POST');
+            }
+            if (a != s.url) {
+                form.setAttribute('action', s.url);
+            }
+
+            // ie borks in some cases when setting encoding
+            if (! s.skipEncodingOverride && (!method || /post/i.test(method))) {
+                $form.attr({
+                    encoding: 'multipart/form-data',
+                    enctype:  'multipart/form-data'
+                });
+            }
+
+            // support timout
+            if (s.timeout) {
+                timeoutHandle = setTimeout(function() { timedOut = true; cb(CLIENT_TIMEOUT_ABORT); }, s.timeout);
+            }
+
+            // look for server aborts
+            function checkState() {
+                try {
+                    var state = getDoc(io).readyState;
+                    log('state = ' + state);
+                    if (state && state.toLowerCase() == 'uninitialized')
+                        setTimeout(checkState,50);
+                }
+                catch(e) {
+                    log('Server abort: ' , e, ' (', e.name, ')');
+                    cb(SERVER_ABORT);
+                    if (timeoutHandle)
+                        clearTimeout(timeoutHandle);
+                    timeoutHandle = undefined;
+                }
+            }
+
+            // add "extra" data to form if provided in options
+            var extraInputs = [];
+            try {
+                if (s.extraData) {
+                    for (var n in s.extraData) {
+                        if (s.extraData.hasOwnProperty(n)) {
+                           // if using the $.param format that allows for multiple values with the same name
+                           if($.isPlainObject(s.extraData[n]) && s.extraData[n].hasOwnProperty('name') && s.extraData[n].hasOwnProperty('value')) {
+                               extraInputs.push(
+                               $('<input type="hidden" name="'+s.extraData[n].name+'">').val(s.extraData[n].value)
+                                   .appendTo(form)[0]);
+                           } else {
+                               extraInputs.push(
+                               $('<input type="hidden" name="'+n+'">').val(s.extraData[n])
+                                   .appendTo(form)[0]);
+                           }
+                        }
+                    }
+                }
+
+                if (!s.iframeTarget) {
+                    // add iframe to doc and submit the form
+                    $io.appendTo('body');
+                }
+                if (io.attachEvent)
+                    io.attachEvent('onload', cb);
+                else
+                    io.addEventListener('load', cb, false);
+                setTimeout(checkState,15);
+
+                try {
+                    form.submit();
+                } catch(err) {
+                    // just in case form has element with name/id of 'submit'
+                    var submitFn = document.createElement('form').submit;
+                    submitFn.apply(form);
+                }
+            }
+            finally {
+                // reset attrs and remove "extra" input elements
+                form.setAttribute('action',a);
+                if(t) {
+                    form.setAttribute('target', t);
+                } else {
+                    $form.removeAttr('target');
+                }
+                $(extraInputs).remove();
+            }
+        }
+
+        if (s.forceSync) {
+            doSubmit();
+        }
+        else {
+            setTimeout(doSubmit, 10); // this lets dom updates render
+        }
+
+        var data, doc, domCheckCount = 50, callbackProcessed;
+
+        function cb(e) {
+            if (xhr.aborted || callbackProcessed) {
+                return;
+            }
+            
+            doc = getDoc(io);
+            if(!doc) {
+                log('cannot access response document');
+                e = SERVER_ABORT;
+            }
+            if (e === CLIENT_TIMEOUT_ABORT && xhr) {
+                xhr.abort('timeout');
+                deferred.reject(xhr, 'timeout');
+                return;
+            }
+            else if (e == SERVER_ABORT && xhr) {
+                xhr.abort('server abort');
+                deferred.reject(xhr, 'error', 'server abort');
+                return;
+            }
+
+            if (!doc || doc.location.href == s.iframeSrc) {
+                // response not received yet
+                if (!timedOut)
+                    return;
+            }
+            if (io.detachEvent)
+                io.detachEvent('onload', cb);
+            else
+                io.removeEventListener('load', cb, false);
+
+            var status = 'success', errMsg;
+            try {
+                if (timedOut) {
+                    throw 'timeout';
+                }
+
+                var isXml = s.dataType == 'xml' || doc.XMLDocument || $.isXMLDoc(doc);
+                log('isXml='+isXml);
+                if (!isXml && window.opera && (doc.body === null || !doc.body.innerHTML)) {
+                    if (--domCheckCount) {
+                        // in some browsers (Opera) the iframe DOM is not always traversable when
+                        // the onload callback fires, so we loop a bit to accommodate
+                        log('requeing onLoad callback, DOM not available');
+                        setTimeout(cb, 250);
+                        return;
+                    }
+                    // let this fall through because server response could be an empty document
+                    //log('Could not access iframe DOM after mutiple tries.');
+                    //throw 'DOMException: not available';
+                }
+
+                //log('response detected');
+                var docRoot = doc.body ? doc.body : doc.documentElement;
+                xhr.responseText = docRoot ? docRoot.innerHTML : null;
+                xhr.responseXML = doc.XMLDocument ? doc.XMLDocument : doc;
+                if (isXml)
+                    s.dataType = 'xml';
+                xhr.getResponseHeader = function(header){
+                    var headers = {'content-type': s.dataType};
+                    return headers[header.toLowerCase()];
+                };
+                // support for XHR 'status' & 'statusText' emulation :
+                if (docRoot) {
+                    xhr.status = Number( docRoot.getAttribute('status') ) || xhr.status;
+                    xhr.statusText = docRoot.getAttribute('statusText') || xhr.statusText;
+                }
+
+                var dt = (s.dataType || '').toLowerCase();
+                var scr = /(json|script|text)/.test(dt);
+                if (scr || s.textarea) {
+                    // see if user embedded response in textarea
+                    var ta = doc.getElementsByTagName('textarea')[0];
+                    if (ta) {
+                        xhr.responseText = ta.value;
+                        // support for XHR 'status' & 'statusText' emulation :
+                        xhr.status = Number( ta.getAttribute('status') ) || xhr.status;
+                        xhr.statusText = ta.getAttribute('statusText') || xhr.statusText;
+                    }
+                    else if (scr) {
+                        // account for browsers injecting pre around json response
+                        var pre = doc.getElementsByTagName('pre')[0];
+                        var b = doc.getElementsByTagName('body')[0];
+                        if (pre) {
+                            xhr.responseText = pre.textContent ? pre.textContent : pre.innerText;
+                        }
+                        else if (b) {
+                            xhr.responseText = b.textContent ? b.textContent : b.innerText;
+                        }
+                    }
+                }
+                else if (dt == 'xml' && !xhr.responseXML && xhr.responseText) {
+                    xhr.responseXML = toXml(xhr.responseText);
+                }
+
+                try {
+                    data = httpData(xhr, dt, s);
+                }
+                catch (err) {
+                    status = 'parsererror';
+                    xhr.error = errMsg = (err || status);
+                }
+            }
+            catch (err) {
+                log('error caught: ',err);
+                status = 'error';
+                xhr.error = errMsg = (err || status);
+            }
+
+            if (xhr.aborted) {
+                log('upload aborted');
+                status = null;
+            }
+
+            if (xhr.status) { // we've set xhr.status
+                status = (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) ? 'success' : 'error';
+            }
+
+            // ordering of these callbacks/triggers is odd, but that's how $.ajax does it
+            if (status === 'success') {
+                if (s.success)
+                    s.success.call(s.context, data, 'success', xhr);
+                deferred.resolve(xhr.responseText, 'success', xhr);
+                if (g)
+                    $.event.trigger("ajaxSuccess", [xhr, s]);
+            }
+            else if (status) {
+                if (errMsg === undefined)
+                    errMsg = xhr.statusText;
+                if (s.error)
+                    s.error.call(s.context, xhr, status, errMsg);
+                deferred.reject(xhr, 'error', errMsg);
+                if (g)
+                    $.event.trigger("ajaxError", [xhr, s, errMsg]);
+            }
+
+            if (g)
+                $.event.trigger("ajaxComplete", [xhr, s]);
+
+            if (g && ! --$.active) {
+                $.event.trigger("ajaxStop");
+            }
+
+            if (s.complete)
+                s.complete.call(s.context, xhr, status);
+
+            callbackProcessed = true;
+            if (s.timeout)
+                clearTimeout(timeoutHandle);
+
+            // clean up
+            setTimeout(function() {
+                if (!s.iframeTarget)
+                    $io.remove();
+                else  //adding else to clean up existing iframe response.
+                    $io.attr('src', s.iframeSrc);
+                xhr.responseXML = null;
+            }, 100);
+        }
+
+        var toXml = $.parseXML || function(s, doc) { // use parseXML if available (jQuery 1.5+)
+            if (window.ActiveXObject) {
+                doc = new ActiveXObject('Microsoft.XMLDOM');
+                doc.async = 'false';
+                doc.loadXML(s);
+            }
+            else {
+                doc = (new DOMParser()).parseFromString(s, 'text/xml');
+            }
+            return (doc && doc.documentElement && doc.documentElement.nodeName != 'parsererror') ? doc : null;
+        };
+        var parseJSON = $.parseJSON || function(s) {
+            /*jslint evil:true */
+            return window['eval']('(' + s + ')');
+        };
+
+        var httpData = function( xhr, type, s ) { // mostly lifted from jq1.4.4
+
+            var ct = xhr.getResponseHeader('content-type') || '',
+                xml = type === 'xml' || !type && ct.indexOf('xml') >= 0,
+                data = xml ? xhr.responseXML : xhr.responseText;
+
+            if (xml && data.documentElement.nodeName === 'parsererror') {
+                if ($.error)
+                    $.error('parsererror');
+            }
+            if (s && s.dataFilter) {
+                data = s.dataFilter(data, type);
+            }
+            if (typeof data === 'string') {
+                if (type === 'json' || !type && ct.indexOf('json') >= 0) {
+                    data = parseJSON(data);
+                } else if (type === "script" || !type && ct.indexOf("javascript") >= 0) {
+                    $.globalEval(data);
+                }
+            }
+            return data;
+        };
+
+        return deferred;
+    }
+};
+
+/**
+ * ajaxForm() provides a mechanism for fully automating form submission.
+ *
+ * The advantages of using this method instead of ajaxSubmit() are:
+ *
+ * 1: This method will include coordinates for <input type="image" /> elements (if the element
+ *    is used to submit the form).
+ * 2. This method will include the submit element's name/value data (for the element that was
+ *    used to submit the form).
+ * 3. This method binds the submit() method to the form for you.
+ *
+ * The options argument for ajaxForm works exactly as it does for ajaxSubmit.  ajaxForm merely
+ * passes the options argument along after properly binding events for submit elements and
+ * the form itself.
+ */
+$.fn.ajaxForm = function(options) {
+    options = options || {};
+    options.delegation = options.delegation && $.isFunction($.fn.on);
+
+    // in jQuery 1.3+ we can fix mistakes with the ready state
+    if (!options.delegation && this.length === 0) {
+        var o = { s: this.selector, c: this.context };
+        if (!$.isReady && o.s) {
+            log('DOM not ready, queuing ajaxForm');
+            $(function() {
+                $(o.s,o.c).ajaxForm(options);
+            });
+            return this;
+        }
+        // is your DOM ready?  http://docs.jquery.com/Tutorials:Introducing_$(document).ready()
+        log('terminating; zero elements found by selector' + ($.isReady ? '' : ' (DOM not ready)'));
+        return this;
+    }
+
+    if ( options.delegation ) {
+        $(document)
+            .off('submit.form-plugin', this.selector, doAjaxSubmit)
+            .off('click.form-plugin', this.selector, captureSubmittingElement)
+            .on('submit.form-plugin', this.selector, options, doAjaxSubmit)
+            .on('click.form-plugin', this.selector, options, captureSubmittingElement);
+        return this;
+    }
+
+    return this.ajaxFormUnbind()
+        .bind('submit.form-plugin', options, doAjaxSubmit)
+        .bind('click.form-plugin', options, captureSubmittingElement);
+};
+
+// private event handlers
+function doAjaxSubmit(e) {
+    /*jshint validthis:true */
+    var options = e.data;
+    if (!e.isDefaultPrevented()) { // if event has been canceled, don't proceed
+        e.preventDefault();
+        $(e.target).ajaxSubmit(options); // #365
+    }
+}
+
+function captureSubmittingElement(e) {
+    /*jshint validthis:true */
+    var target = e.target;
+    var $el = $(target);
+    if (!($el.is("[type=submit],[type=image]"))) {
+        // is this a child element of the submit el?  (ex: a span within a button)
+        var t = $el.closest('[type=submit]');
+        if (t.length === 0) {
+            return;
+        }
+        target = t[0];
+    }
+    var form = this;
+    form.clk = target;
+    if (target.type == 'image') {
+        if (e.offsetX !== undefined) {
+            form.clk_x = e.offsetX;
+            form.clk_y = e.offsetY;
+        } else if (typeof $.fn.offset == 'function') {
+            var offset = $el.offset();
+            form.clk_x = e.pageX - offset.left;
+            form.clk_y = e.pageY - offset.top;
+        } else {
+            form.clk_x = e.pageX - target.offsetLeft;
+            form.clk_y = e.pageY - target.offsetTop;
+        }
+    }
+    // clear form vars
+    setTimeout(function() { form.clk = form.clk_x = form.clk_y = null; }, 100);
+}
+
+
+// ajaxFormUnbind unbinds the event handlers that were bound by ajaxForm
+$.fn.ajaxFormUnbind = function() {
+    return this.unbind('submit.form-plugin click.form-plugin');
+};
+
+/**
+ * formToArray() gathers form element data into an array of objects that can
+ * be passed to any of the following ajax functions: $.get, $.post, or load.
+ * Each object in the array has both a 'name' and 'value' property.  An example of
+ * an array for a simple login form might be:
+ *
+ * [ { name: 'username', value: 'jresig' }, { name: 'password', value: 'secret' } ]
+ *
+ * It is this array that is passed to pre-submit callback functions provided to the
+ * ajaxSubmit() and ajaxForm() methods.
+ */
+$.fn.formToArray = function(semantic, elements) {
+    var a = [];
+    if (this.length === 0) {
+        return a;
+    }
+
+    var form = this[0];
+    var els = semantic ? form.getElementsByTagName('*') : form.elements;
+    if (!els) {
+        return a;
+    }
+
+    var i,j,n,v,el,max,jmax;
+    for(i=0, max=els.length; i < max; i++) {
+        el = els[i];
+        n = el.name;
+        if (!n || el.disabled) {
+            continue;
+        }
+
+        if (semantic && form.clk && el.type == "image") {
+            // handle image inputs on the fly when semantic == true
+            if(form.clk == el) {
+                a.push({name: n, value: $(el).val(), type: el.type });
+                a.push({name: n+'.x', value: form.clk_x}, {name: n+'.y', value: form.clk_y});
+            }
+            continue;
+        }
+
+        v = $.fieldValue(el, true);
+        if (v && v.constructor == Array) {
+            if (elements)
+                elements.push(el);
+            for(j=0, jmax=v.length; j < jmax; j++) {
+                a.push({name: n, value: v[j]});
+            }
+        }
+        else if (feature.fileapi && el.type == 'file') {
+            if (elements)
+                elements.push(el);
+            var files = el.files;
+            if (files.length) {
+                for (j=0; j < files.length; j++) {
+                    a.push({name: n, value: files[j], type: el.type});
+                }
+            }
+            else {
+                // #180
+                a.push({ name: n, value: '', type: el.type });
+            }
+        }
+        else if (v !== null && typeof v != 'undefined') {
+            if (elements)
+                elements.push(el);
+            a.push({name: n, value: v, type: el.type, required: el.required});
+        }
+    }
+
+    if (!semantic && form.clk) {
+        // input type=='image' are not found in elements array! handle it here
+        var $input = $(form.clk), input = $input[0];
+        n = input.name;
+        if (n && !input.disabled && input.type == 'image') {
+            a.push({name: n, value: $input.val()});
+            a.push({name: n+'.x', value: form.clk_x}, {name: n+'.y', value: form.clk_y});
+        }
+    }
+    return a;
+};
+
+/**
+ * Serializes form data into a 'submittable' string. This method will return a string
+ * in the format: name1=value1&amp;name2=value2
+ */
+$.fn.formSerialize = function(semantic) {
+    //hand off to jQuery.param for proper encoding
+    return $.param(this.formToArray(semantic));
+};
+
+/**
+ * Serializes all field elements in the jQuery object into a query string.
+ * This method will return a string in the format: name1=value1&amp;name2=value2
+ */
+$.fn.fieldSerialize = function(successful) {
+    var a = [];
+    this.each(function() {
+        var n = this.name;
+        if (!n) {
+            return;
+        }
+        var v = $.fieldValue(this, successful);
+        if (v && v.constructor == Array) {
+            for (var i=0,max=v.length; i < max; i++) {
+                a.push({name: n, value: v[i]});
+            }
+        }
+        else if (v !== null && typeof v != 'undefined') {
+            a.push({name: this.name, value: v});
+        }
+    });
+    //hand off to jQuery.param for proper encoding
+    return $.param(a);
+};
+
+/**
+ * Returns the value(s) of the element in the matched set.  For example, consider the following form:
+ *
+ *  <form><fieldset>
+ *      <input name="A" type="text" />
+ *      <input name="A" type="text" />
+ *      <input name="B" type="checkbox" value="B1" />
+ *      <input name="B" type="checkbox" value="B2"/>
+ *      <input name="C" type="radio" value="C1" />
+ *      <input name="C" type="radio" value="C2" />
+ *  </fieldset></form>
+ *
+ *  var v = $('input[type=text]').fieldValue();
+ *  // if no values are entered into the text inputs
+ *  v == ['','']
+ *  // if values entered into the text inputs are 'foo' and 'bar'
+ *  v == ['foo','bar']
+ *
+ *  var v = $('input[type=checkbox]').fieldValue();
+ *  // if neither checkbox is checked
+ *  v === undefined
+ *  // if both checkboxes are checked
+ *  v == ['B1', 'B2']
+ *
+ *  var v = $('input[type=radio]').fieldValue();
+ *  // if neither radio is checked
+ *  v === undefined
+ *  // if first radio is checked
+ *  v == ['C1']
+ *
+ * The successful argument controls whether or not the field element must be 'successful'
+ * (per http://www.w3.org/TR/html4/interact/forms.html#successful-controls).
+ * The default value of the successful argument is true.  If this value is false the value(s)
+ * for each element is returned.
+ *
+ * Note: This method *always* returns an array.  If no valid value can be determined the
+ *    array will be empty, otherwise it will contain one or more values.
+ */
+$.fn.fieldValue = function(successful) {
+    for (var val=[], i=0, max=this.length; i < max; i++) {
+        var el = this[i];
+        var v = $.fieldValue(el, successful);
+        if (v === null || typeof v == 'undefined' || (v.constructor == Array && !v.length)) {
+            continue;
+        }
+        if (v.constructor == Array)
+            $.merge(val, v);
+        else
+            val.push(v);
+    }
+    return val;
+};
+
+/**
+ * Returns the value of the field element.
+ */
+$.fieldValue = function(el, successful) {
+    var n = el.name, t = el.type, tag = el.tagName.toLowerCase();
+    if (successful === undefined) {
+        successful = true;
+    }
+
+    if (successful && (!n || el.disabled || t == 'reset' || t == 'button' ||
+        (t == 'checkbox' || t == 'radio') && !el.checked ||
+        (t == 'submit' || t == 'image') && el.form && el.form.clk != el ||
+        tag == 'select' && el.selectedIndex == -1)) {
+            return null;
+    }
+
+    if (tag == 'select') {
+        var index = el.selectedIndex;
+        if (index < 0) {
+            return null;
+        }
+        var a = [], ops = el.options;
+        var one = (t == 'select-one');
+        var max = (one ? index+1 : ops.length);
+        for(var i=(one ? index : 0); i < max; i++) {
+            var op = ops[i];
+            if (op.selected) {
+                var v = op.value;
+                if (!v) { // extra pain for IE...
+                    v = (op.attributes && op.attributes['value'] && !(op.attributes['value'].specified)) ? op.text : op.value;
+                }
+                if (one) {
+                    return v;
+                }
+                a.push(v);
+            }
+        }
+        return a;
+    }
+    return $(el).val();
+};
+
+/**
+ * Clears the form data.  Takes the following actions on the form's input fields:
+ *  - input text fields will have their 'value' property set to the empty string
+ *  - select elements will have their 'selectedIndex' property set to -1
+ *  - checkbox and radio inputs will have their 'checked' property set to false
+ *  - inputs of type submit, button, reset, and hidden will *not* be effected
+ *  - button elements will *not* be effected
+ */
+$.fn.clearForm = function(includeHidden) {
+    return this.each(function() {
+        $('input,select,textarea', this).clearFields(includeHidden);
+    });
+};
+
+/**
+ * Clears the selected form elements.
+ */
+$.fn.clearFields = $.fn.clearInputs = function(includeHidden) {
+    var re = /^(?:color|date|datetime|email|month|number|password|range|search|tel|text|time|url|week)$/i; // 'hidden' is not in this list
+    return this.each(function() {
+        var t = this.type, tag = this.tagName.toLowerCase();
+        if (re.test(t) || tag == 'textarea') {
+            this.value = '';
+        }
+        else if (t == 'checkbox' || t == 'radio') {
+            this.checked = false;
+        }
+        else if (tag == 'select') {
+            this.selectedIndex = -1;
+        }
+		else if (t == "file") {
+			if (/MSIE/.test(navigator.userAgent)) {
+				$(this).replaceWith($(this).clone(true));
+			} else {
+				$(this).val('');
+			}
+		}
+        else if (includeHidden) {
+            // includeHidden can be the value true, or it can be a selector string
+            // indicating a special test; for example:
+            //  $('#myForm').clearForm('.special:hidden')
+            // the above would clean hidden inputs that have the class of 'special'
+            if ( (includeHidden === true && /hidden/.test(t)) ||
+                 (typeof includeHidden == 'string' && $(this).is(includeHidden)) )
+                this.value = '';
+        }
+    });
+};
+
+/**
+ * Resets the form data.  Causes all form elements to be reset to their original value.
+ */
+$.fn.resetForm = function() {
+    return this.each(function() {
+        // guard against an input with the name of 'reset'
+        // note that IE reports the reset function as an 'object'
+        if (typeof this.reset == 'function' || (typeof this.reset == 'object' && !this.reset.nodeType)) {
+            this.reset();
+        }
+    });
+};
+
+/**
+ * Enables or disables any matching elements.
+ */
+$.fn.enable = function(b) {
+    if (b === undefined) {
+        b = true;
+    }
+    return this.each(function() {
+        this.disabled = !b;
+    });
+};
+
+/**
+ * Checks/unchecks any matching checkboxes or radio buttons and
+ * selects/deselects and matching option elements.
+ */
+$.fn.selected = function(select) {
+    if (select === undefined) {
+        select = true;
+    }
+    return this.each(function() {
+        var t = this.type;
+        if (t == 'checkbox' || t == 'radio') {
+            this.checked = select;
+        }
+        else if (this.tagName.toLowerCase() == 'option') {
+            var $sel = $(this).parent('select');
+            if (select && $sel[0] && $sel[0].type == 'select-one') {
+                // deselect all other options
+                $sel.find('option').selected(false);
+            }
+            this.selected = select;
+        }
+    });
+};
+
+// expose debug var
+$.fn.ajaxSubmit.debug = false;
+
+// helper fn for console logging
+function log() {
+    if (!$.fn.ajaxSubmit.debug)
+        return;
+    var msg = '[jquery.form] ' + Array.prototype.join.call(arguments,'');
+    if (window.console && window.console.log) {
+        window.console.log(msg);
+    }
+    else if (window.opera && window.opera.postError) {
+        window.opera.postError(msg);
+    }
+}
+
+}));
+
+
+/*!
  * Bootstrap v3.3.5 (http://getbootstrap.com)
  * Copyright 2011-2015 Twitter, Inc.
  * Licensed under the MIT license
@@ -11572,5 +12790,1301 @@ if (typeof jQuery === 'undefined') {
   })
 
 }(jQuery);
+
+/* global define */
+
+/* ================================================
+ * Make use of Bootstrap's modal more monkey-friendly.
+ *
+ * For Bootstrap 3.
+ *
+ * javanoob@hotmail.com
+ *
+ * https://github.com/nakupanda/bootstrap3-dialog
+ *
+ * Licensed under The MIT License.
+ * ================================================ */
+(function(root, factory) {
+
+    "use strict";
+
+    // CommonJS module is defined
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = factory(require('jquery'), require('bootstrap'));
+    }
+    // AMD module is defined
+    else if (typeof define === "function" && define.amd) {
+        define("bootstrap-dialog", ["jquery"], function($) {
+            return factory($);
+        });
+    } else {
+        // planted over the root!
+        root.BootstrapDialog = factory(root.jQuery);
+    }
+
+}(this, function($) {
+
+    "use strict";
+
+    /* ================================================
+     * Definition of BootstrapDialogModal.
+     * Extend Bootstrap Modal and override some functions.
+     * BootstrapDialogModal === Modified Modal.
+     * ================================================ */
+    var Modal = $.fn.modal.Constructor;
+    var BootstrapDialogModal = function(element, options) {
+        Modal.call(this, element, options);
+    };
+    BootstrapDialogModal.getModalVersion = function() {
+        var version = null;
+        if (typeof $.fn.modal.Constructor.VERSION === 'undefined') {
+            version = 'v3.1';
+        } else if (/3\.2\.\d+/.test($.fn.modal.Constructor.VERSION)) {
+            version = 'v3.2';
+        } else if (/3\.3\.[1,2]/.test($.fn.modal.Constructor.VERSION)) {
+            version = 'v3.3';  // v3.3.1, v3.3.2
+        } else {
+            version = 'v3.3.4';
+        }
+
+        return version;
+    };
+    BootstrapDialogModal.ORIGINAL_BODY_PADDING = $('body').css('padding-right') || 0;
+    BootstrapDialogModal.METHODS_TO_OVERRIDE = {};
+    BootstrapDialogModal.METHODS_TO_OVERRIDE['v3.1'] = {};
+    BootstrapDialogModal.METHODS_TO_OVERRIDE['v3.2'] = {
+        hide: function(e) {
+            if (e) {
+                e.preventDefault();
+            }
+            e = $.Event('hide.bs.modal');
+
+            this.$element.trigger(e);
+
+            if (!this.isShown || e.isDefaultPrevented()) {
+                return;
+            }
+
+            this.isShown = false;
+
+            // Remove css class 'modal-open' when the last opened dialog is closing.
+            var openedDialogs = this.getGlobalOpenedDialogs();
+            if (openedDialogs.length === 0) {
+                this.$body.removeClass('modal-open');
+            }
+
+            this.resetScrollbar();
+            this.escape();
+
+            $(document).off('focusin.bs.modal');
+
+            this.$element
+            .removeClass('in')
+            .attr('aria-hidden', true)
+            .off('click.dismiss.bs.modal');
+
+            $.support.transition && this.$element.hasClass('fade') ?
+            this.$element
+            .one('bsTransitionEnd', $.proxy(this.hideModal, this))
+            .emulateTransitionEnd(300) :
+            this.hideModal();
+        }
+    };
+    BootstrapDialogModal.METHODS_TO_OVERRIDE['v3.3'] = {
+        /**
+         * Overrided.
+         * 
+         * @returns {undefined}
+         */
+        setScrollbar: function() {
+            var bodyPad = BootstrapDialogModal.ORIGINAL_BODY_PADDING;
+            if (this.bodyIsOverflowing) {
+                this.$body.css('padding-right', bodyPad + this.scrollbarWidth);
+            }
+        },
+        /**
+         * Overrided.
+         * 
+         * @returns {undefined}
+         */
+        resetScrollbar: function() {
+            var openedDialogs = this.getGlobalOpenedDialogs();
+            if (openedDialogs.length === 0) {
+                this.$body.css('padding-right', BootstrapDialogModal.ORIGINAL_BODY_PADDING);
+            }
+        },
+        /**
+         * Overrided.
+         * 
+         * @returns {undefined}
+         */
+        hideModal: function() {
+            this.$element.hide();
+            this.backdrop($.proxy(function() {
+                var openedDialogs = this.getGlobalOpenedDialogs();
+                if (openedDialogs.length === 0) {
+                    this.$body.removeClass('modal-open');
+                }
+                this.resetAdjustments();
+                this.resetScrollbar();
+                this.$element.trigger('hidden.bs.modal');
+            }, this));
+        }
+    };
+    BootstrapDialogModal.METHODS_TO_OVERRIDE['v3.3.4'] = $.extend({}, BootstrapDialogModal.METHODS_TO_OVERRIDE['v3.3']);
+    BootstrapDialogModal.prototype = {
+        constructor: BootstrapDialogModal,
+        /**
+         * New function, to get the dialogs that opened by BootstrapDialog.
+         * 
+         * @returns {undefined}
+         */
+        getGlobalOpenedDialogs: function() {
+            var openedDialogs = [];
+            $.each(BootstrapDialog.dialogs, function(id, dialogInstance) {
+                if (dialogInstance.isRealized() && dialogInstance.isOpened()) {
+                    openedDialogs.push(dialogInstance);
+                }
+            });
+
+            return openedDialogs;
+        }
+    };
+
+    // Add compatible methods.
+    BootstrapDialogModal.prototype = $.extend(BootstrapDialogModal.prototype, Modal.prototype, BootstrapDialogModal.METHODS_TO_OVERRIDE[BootstrapDialogModal.getModalVersion()]);
+
+    /* ================================================
+     * Definition of BootstrapDialog.
+     * ================================================ */
+    var BootstrapDialog = function(options) {
+        this.defaultOptions = $.extend(true, {
+            id: BootstrapDialog.newGuid(),
+            buttons: [],
+            data: {},
+            onshow: null,
+            onshown: null,
+            onhide: null,
+            onhidden: null
+        }, BootstrapDialog.defaultOptions);
+        this.indexedButtons = {};
+        this.registeredButtonHotkeys = {};
+        this.draggableData = {
+            isMouseDown: false,
+            mouseOffset: {}
+        };
+        this.realized = false;
+        this.opened = false;
+        this.initOptions(options);
+        this.holdThisInstance();
+    };
+
+    BootstrapDialog.BootstrapDialogModal = BootstrapDialogModal;
+
+    /**
+     *  Some constants.
+     */
+    BootstrapDialog.NAMESPACE = 'bootstrap-dialog';
+    BootstrapDialog.TYPE_DEFAULT = 'type-default';
+    BootstrapDialog.TYPE_INFO = 'type-info';
+    BootstrapDialog.TYPE_PRIMARY = 'type-primary';
+    BootstrapDialog.TYPE_SUCCESS = 'type-success';
+    BootstrapDialog.TYPE_WARNING = 'type-warning';
+    BootstrapDialog.TYPE_DANGER = 'type-danger';
+    BootstrapDialog.DEFAULT_TEXTS = {};
+    BootstrapDialog.DEFAULT_TEXTS[BootstrapDialog.TYPE_DEFAULT] = 'Information';
+    BootstrapDialog.DEFAULT_TEXTS[BootstrapDialog.TYPE_INFO] = 'Information';
+    BootstrapDialog.DEFAULT_TEXTS[BootstrapDialog.TYPE_PRIMARY] = 'Information';
+    BootstrapDialog.DEFAULT_TEXTS[BootstrapDialog.TYPE_SUCCESS] = 'Success';
+    BootstrapDialog.DEFAULT_TEXTS[BootstrapDialog.TYPE_WARNING] = 'Warning';
+    BootstrapDialog.DEFAULT_TEXTS[BootstrapDialog.TYPE_DANGER] = 'Danger';
+    BootstrapDialog.DEFAULT_TEXTS['OK'] = 'OK';
+    BootstrapDialog.DEFAULT_TEXTS['CANCEL'] = 'Cancel';
+    BootstrapDialog.DEFAULT_TEXTS['CONFIRM'] = 'Confirmation';
+    BootstrapDialog.SIZE_NORMAL = 'size-normal';
+    BootstrapDialog.SIZE_SMALL = 'size-small';
+    BootstrapDialog.SIZE_WIDE = 'size-wide';    // size-wide is equal to modal-lg
+    BootstrapDialog.SIZE_LARGE = 'size-large';
+    BootstrapDialog.BUTTON_SIZES = {};
+    BootstrapDialog.BUTTON_SIZES[BootstrapDialog.SIZE_NORMAL] = '';
+    BootstrapDialog.BUTTON_SIZES[BootstrapDialog.SIZE_SMALL] = '';
+    BootstrapDialog.BUTTON_SIZES[BootstrapDialog.SIZE_WIDE] = '';
+    BootstrapDialog.BUTTON_SIZES[BootstrapDialog.SIZE_LARGE] = 'btn-lg';
+    BootstrapDialog.ICON_SPINNER = 'glyphicon glyphicon-asterisk';
+
+    /**
+     * Default options.
+     */
+    BootstrapDialog.defaultOptions = {
+        type: BootstrapDialog.TYPE_PRIMARY,
+        size: BootstrapDialog.SIZE_NORMAL,
+        cssClass: '',
+        title: null,
+        message: null,
+        nl2br: true,
+        closable: true,
+        closeByBackdrop: true,
+        closeByKeyboard: true,
+        spinicon: BootstrapDialog.ICON_SPINNER,
+        autodestroy: true,
+        draggable: false,
+        animate: true,
+        description: '',
+        tabindex: -1
+    };
+
+    /**
+     * Config default options.
+     */
+    BootstrapDialog.configDefaultOptions = function(options) {
+        BootstrapDialog.defaultOptions = $.extend(true, BootstrapDialog.defaultOptions, options);
+    };
+
+    /**
+     * Open / Close all created dialogs all at once.
+     */
+    BootstrapDialog.dialogs = {};
+    BootstrapDialog.openAll = function() {
+        $.each(BootstrapDialog.dialogs, function(id, dialogInstance) {
+            dialogInstance.open();
+        });
+    };
+    BootstrapDialog.closeAll = function() {
+        $.each(BootstrapDialog.dialogs, function(id, dialogInstance) {
+            dialogInstance.close();
+        });
+    };
+
+    /**
+     * Move focus to next visible dialog.
+     */
+    BootstrapDialog.moveFocus = function() {
+        var lastDialogInstance = null;
+        $.each(BootstrapDialog.dialogs, function(id, dialogInstance) {
+            lastDialogInstance = dialogInstance;
+        });
+        if (lastDialogInstance !== null && lastDialogInstance.isRealized()) {
+            lastDialogInstance.getModal().focus();
+        }
+    };
+
+    BootstrapDialog.METHODS_TO_OVERRIDE = {};
+    BootstrapDialog.METHODS_TO_OVERRIDE['v3.1'] = {
+        handleModalBackdropEvent: function() {
+            this.getModal().on('click', {dialog: this}, function(event) {
+                event.target === this && event.data.dialog.isClosable() && event.data.dialog.canCloseByBackdrop() && event.data.dialog.close();
+            });
+
+            return this;
+        },
+        /**
+         * To make multiple opened dialogs look better.
+         * 
+         * Will be removed in later version, after Bootstrap Modal >= 3.3.0, updating z-index is unnecessary.
+         */
+        updateZIndex: function() {
+            var zIndexBackdrop = 1040;
+            var zIndexModal = 1050;
+            var dialogCount = 0;
+            $.each(BootstrapDialog.dialogs, function(dialogId, dialogInstance) {
+                dialogCount++;
+            });
+            var $modal = this.getModal();
+            var $backdrop = $modal.data('bs.modal').$backdrop;
+            $modal.css('z-index', zIndexModal + (dialogCount - 1) * 20);
+            $backdrop.css('z-index', zIndexBackdrop + (dialogCount - 1) * 20);
+
+            return this;
+        },
+        open: function() {
+            !this.isRealized() && this.realize();
+            this.getModal().modal('show');
+            this.updateZIndex();
+
+            return this;
+        }
+    };
+    BootstrapDialog.METHODS_TO_OVERRIDE['v3.2'] = {
+        handleModalBackdropEvent: BootstrapDialog.METHODS_TO_OVERRIDE['v3.1']['handleModalBackdropEvent'],
+        updateZIndex: BootstrapDialog.METHODS_TO_OVERRIDE['v3.1']['updateZIndex'],
+        open: BootstrapDialog.METHODS_TO_OVERRIDE['v3.1']['open']
+    };
+    BootstrapDialog.METHODS_TO_OVERRIDE['v3.3'] = {};
+    BootstrapDialog.METHODS_TO_OVERRIDE['v3.3.4'] = $.extend({}, BootstrapDialog.METHODS_TO_OVERRIDE['v3.1']);
+    BootstrapDialog.prototype = {
+        constructor: BootstrapDialog,
+        initOptions: function(options) {
+            this.options = $.extend(true, this.defaultOptions, options);
+
+            return this;
+        },
+        holdThisInstance: function() {
+            BootstrapDialog.dialogs[this.getId()] = this;
+
+            return this;
+        },
+        initModalStuff: function() {
+            this.setModal(this.createModal())
+            .setModalDialog(this.createModalDialog())
+            .setModalContent(this.createModalContent())
+            .setModalHeader(this.createModalHeader())
+            .setModalBody(this.createModalBody())
+            .setModalFooter(this.createModalFooter());
+
+            this.getModal().append(this.getModalDialog());
+            this.getModalDialog().append(this.getModalContent());
+            this.getModalContent()
+            .append(this.getModalHeader())
+            .append(this.getModalBody())
+            .append(this.getModalFooter());
+
+            return this;
+        },
+        createModal: function() {
+            var $modal = $('<div class="modal" role="dialog" aria-hidden="true"></div>');
+            $modal.prop('id', this.getId());
+            $modal.attr('aria-labelledby', this.getId() + '_title');
+
+            return $modal;
+        },
+        getModal: function() {
+            return this.$modal;
+        },
+        setModal: function($modal) {
+            this.$modal = $modal;
+
+            return this;
+        },
+        createModalDialog: function() {
+            return $('<div class="modal-dialog"></div>');
+        },
+        getModalDialog: function() {
+            return this.$modalDialog;
+        },
+        setModalDialog: function($modalDialog) {
+            this.$modalDialog = $modalDialog;
+
+            return this;
+        },
+        createModalContent: function() {
+            return $('<div class="modal-content"></div>');
+        },
+        getModalContent: function() {
+            return this.$modalContent;
+        },
+        setModalContent: function($modalContent) {
+            this.$modalContent = $modalContent;
+
+            return this;
+        },
+        createModalHeader: function() {
+            return $('<div class="modal-header"></div>');
+        },
+        getModalHeader: function() {
+            return this.$modalHeader;
+        },
+        setModalHeader: function($modalHeader) {
+            this.$modalHeader = $modalHeader;
+
+            return this;
+        },
+        createModalBody: function() {
+            return $('<div class="modal-body"></div>');
+        },
+        getModalBody: function() {
+            return this.$modalBody;
+        },
+        setModalBody: function($modalBody) {
+            this.$modalBody = $modalBody;
+
+            return this;
+        },
+        createModalFooter: function() {
+            return $('<div class="modal-footer"></div>');
+        },
+        getModalFooter: function() {
+            return this.$modalFooter;
+        },
+        setModalFooter: function($modalFooter) {
+            this.$modalFooter = $modalFooter;
+
+            return this;
+        },
+        createDynamicContent: function(rawContent) {
+            var content = null;
+            if (typeof rawContent === 'function') {
+                content = rawContent.call(rawContent, this);
+            } else {
+                content = rawContent;
+            }
+            if (typeof content === 'string') {
+                content = this.formatStringContent(content);
+            }
+
+            return content;
+        },
+        formatStringContent: function(content) {
+            if (this.options.nl2br) {
+                return content.replace(/\r\n/g, '<br />').replace(/[\r\n]/g, '<br />');
+            }
+
+            return content;
+        },
+        setData: function(key, value) {
+            this.options.data[key] = value;
+
+            return this;
+        },
+        getData: function(key) {
+            return this.options.data[key];
+        },
+        setId: function(id) {
+            this.options.id = id;
+
+            return this;
+        },
+        getId: function() {
+            return this.options.id;
+        },
+        getType: function() {
+            return this.options.type;
+        },
+        setType: function(type) {
+            this.options.type = type;
+            this.updateType();
+
+            return this;
+        },
+        updateType: function() {
+            if (this.isRealized()) {
+                var types = [BootstrapDialog.TYPE_DEFAULT,
+                    BootstrapDialog.TYPE_INFO,
+                    BootstrapDialog.TYPE_PRIMARY,
+                    BootstrapDialog.TYPE_SUCCESS,
+                    BootstrapDialog.TYPE_WARNING,
+                    BootstrapDialog.TYPE_DANGER];
+
+                this.getModal().removeClass(types.join(' ')).addClass(this.getType());
+            }
+
+            return this;
+        },
+        getSize: function() {
+            return this.options.size;
+        },
+        setSize: function(size) {
+            this.options.size = size;
+            this.updateSize();
+
+            return this;
+        },
+        updateSize: function() {
+            if (this.isRealized()) {
+                var dialog = this;
+
+                // Dialog size
+                this.getModal().removeClass(BootstrapDialog.SIZE_NORMAL)
+                .removeClass(BootstrapDialog.SIZE_SMALL)
+                .removeClass(BootstrapDialog.SIZE_WIDE)
+                .removeClass(BootstrapDialog.SIZE_LARGE);
+                this.getModal().addClass(this.getSize());
+
+                // Smaller dialog.
+                this.getModalDialog().removeClass('modal-sm');
+                if (this.getSize() === BootstrapDialog.SIZE_SMALL) {
+                    this.getModalDialog().addClass('modal-sm');
+                }
+
+                // Wider dialog.
+                this.getModalDialog().removeClass('modal-lg');
+                if (this.getSize() === BootstrapDialog.SIZE_WIDE) {
+                    this.getModalDialog().addClass('modal-lg');
+                }
+
+                // Button size
+                $.each(this.options.buttons, function(index, button) {
+                    var $button = dialog.getButton(button.id);
+                    var buttonSizes = ['btn-lg', 'btn-sm', 'btn-xs'];
+                    var sizeClassSpecified = false;
+                    if (typeof button['cssClass'] === 'string') {
+                        var btnClasses = button['cssClass'].split(' ');
+                        $.each(btnClasses, function(index, btnClass) {
+                            if ($.inArray(btnClass, buttonSizes) !== -1) {
+                                sizeClassSpecified = true;
+                            }
+                        });
+                    }
+                    if (!sizeClassSpecified) {
+                        $button.removeClass(buttonSizes.join(' '));
+                        $button.addClass(dialog.getButtonSize());
+                    }
+                });
+            }
+
+            return this;
+        },
+        getCssClass: function() {
+            return this.options.cssClass;
+        },
+        setCssClass: function(cssClass) {
+            this.options.cssClass = cssClass;
+
+            return this;
+        },
+        getTitle: function() {
+            return this.options.title;
+        },
+        setTitle: function(title) {
+            this.options.title = title;
+            this.updateTitle();
+
+            return this;
+        },
+        updateTitle: function() {
+            if (this.isRealized()) {
+                var title = this.getTitle() !== null ? this.createDynamicContent(this.getTitle()) : this.getDefaultText();
+                this.getModalHeader().find('.' + this.getNamespace('title')).html('').append(title).prop('id', this.getId() + '_title');
+            }
+
+            return this;
+        },
+        getMessage: function() {
+            return this.options.message;
+        },
+        setMessage: function(message) {
+            this.options.message = message;
+            this.updateMessage();
+
+            return this;
+        },
+        updateMessage: function() {
+            if (this.isRealized()) {
+                var message = this.createDynamicContent(this.getMessage());
+                this.getModalBody().find('.' + this.getNamespace('message')).html('').append(message);
+            }
+
+            return this;
+        },
+        isClosable: function() {
+            return this.options.closable;
+        },
+        setClosable: function(closable) {
+            this.options.closable = closable;
+            this.updateClosable();
+
+            return this;
+        },
+        setCloseByBackdrop: function(closeByBackdrop) {
+            this.options.closeByBackdrop = closeByBackdrop;
+
+            return this;
+        },
+        canCloseByBackdrop: function() {
+            return this.options.closeByBackdrop;
+        },
+        setCloseByKeyboard: function(closeByKeyboard) {
+            this.options.closeByKeyboard = closeByKeyboard;
+
+            return this;
+        },
+        canCloseByKeyboard: function() {
+            return this.options.closeByKeyboard;
+        },
+        isAnimate: function() {
+            return this.options.animate;
+        },
+        setAnimate: function(animate) {
+            this.options.animate = animate;
+
+            return this;
+        },
+        updateAnimate: function() {
+            if (this.isRealized()) {
+                this.getModal().toggleClass('fade', this.isAnimate());
+            }
+
+            return this;
+        },
+        getSpinicon: function() {
+            return this.options.spinicon;
+        },
+        setSpinicon: function(spinicon) {
+            this.options.spinicon = spinicon;
+
+            return this;
+        },
+        addButton: function(button) {
+            this.options.buttons.push(button);
+
+            return this;
+        },
+        addButtons: function(buttons) {
+            var that = this;
+            $.each(buttons, function(index, button) {
+                that.addButton(button);
+            });
+
+            return this;
+        },
+        getButtons: function() {
+            return this.options.buttons;
+        },
+        setButtons: function(buttons) {
+            this.options.buttons = buttons;
+            this.updateButtons();
+
+            return this;
+        },
+        /**
+         * If there is id provided for a button option, it will be in dialog.indexedButtons list.
+         *
+         * In that case you can use dialog.getButton(id) to find the button.
+         *
+         * @param {type} id
+         * @returns {undefined}
+         */
+        getButton: function(id) {
+            if (typeof this.indexedButtons[id] !== 'undefined') {
+                return this.indexedButtons[id];
+            }
+
+            return null;
+        },
+        getButtonSize: function() {
+            if (typeof BootstrapDialog.BUTTON_SIZES[this.getSize()] !== 'undefined') {
+                return BootstrapDialog.BUTTON_SIZES[this.getSize()];
+            }
+
+            return '';
+        },
+        updateButtons: function() {
+            if (this.isRealized()) {
+                if (this.getButtons().length === 0) {
+                    this.getModalFooter().hide();
+                } else {
+                    this.getModalFooter().show().find('.' + this.getNamespace('footer')).html('').append(this.createFooterButtons());
+                }
+            }
+
+            return this;
+        },
+        isAutodestroy: function() {
+            return this.options.autodestroy;
+        },
+        setAutodestroy: function(autodestroy) {
+            this.options.autodestroy = autodestroy;
+        },
+        getDescription: function() {
+            return this.options.description;
+        },
+        setDescription: function(description) {
+            this.options.description = description;
+
+            return this;
+        },
+        setTabindex: function(tabindex) {
+            this.options.tabindex = tabindex;
+
+            return this;
+        },
+        getTabindex: function() {
+            return this.options.tabindex;
+        },
+        updateTabindex: function() {
+            if (this.isRealized()) {
+                this.getModal().attr('tabindex', this.getTabindex());
+            }
+
+            return this;
+        },
+        getDefaultText: function() {
+            return BootstrapDialog.DEFAULT_TEXTS[this.getType()];
+        },
+        getNamespace: function(name) {
+            return BootstrapDialog.NAMESPACE + '-' + name;
+        },
+        createHeaderContent: function() {
+            var $container = $('<div></div>');
+            $container.addClass(this.getNamespace('header'));
+
+            // title
+            $container.append(this.createTitleContent());
+
+            // Close button
+            $container.prepend(this.createCloseButton());
+
+            return $container;
+        },
+        createTitleContent: function() {
+            var $title = $('<div></div>');
+            $title.addClass(this.getNamespace('title'));
+
+            return $title;
+        },
+        createCloseButton: function() {
+            var $container = $('<div></div>');
+            $container.addClass(this.getNamespace('close-button'));
+            var $icon = $('<button class="close">&times;</button>');
+            $container.append($icon);
+            $container.on('click', {dialog: this}, function(event) {
+                event.data.dialog.close();
+            });
+
+            return $container;
+        },
+        createBodyContent: function() {
+            var $container = $('<div></div>');
+            $container.addClass(this.getNamespace('body'));
+
+            // Message
+            $container.append(this.createMessageContent());
+
+            return $container;
+        },
+        createMessageContent: function() {
+            var $message = $('<div></div>');
+            $message.addClass(this.getNamespace('message'));
+
+            return $message;
+        },
+        createFooterContent: function() {
+            var $container = $('<div></div>');
+            $container.addClass(this.getNamespace('footer'));
+
+            return $container;
+        },
+        createFooterButtons: function() {
+            var that = this;
+            var $container = $('<div></div>');
+            $container.addClass(this.getNamespace('footer-buttons'));
+            this.indexedButtons = {};
+            $.each(this.options.buttons, function(index, button) {
+                if (!button.id) {
+                    button.id = BootstrapDialog.newGuid();
+                }
+                var $button = that.createButton(button);
+                that.indexedButtons[button.id] = $button;
+                $container.append($button);
+            });
+
+            return $container;
+        },
+        createButton: function(button) {
+            var $button = $('<button class="btn"></button>');
+            $button.prop('id', button.id);
+            $button.data('button', button);
+
+            // Icon
+            if (typeof button.icon !== 'undefined' && $.trim(button.icon) !== '') {
+                $button.append(this.createButtonIcon(button.icon));
+            }
+
+            // Label
+            if (typeof button.label !== 'undefined') {
+                $button.append(button.label);
+            }
+
+            // Css class
+            if (typeof button.cssClass !== 'undefined' && $.trim(button.cssClass) !== '') {
+                $button.addClass(button.cssClass);
+            } else {
+                $button.addClass('btn-default');
+            }
+
+            // Hotkey
+            if (typeof button.hotkey !== 'undefined') {
+                this.registeredButtonHotkeys[button.hotkey] = $button;
+            }
+
+            // Button on click
+            $button.on('click', {dialog: this, $button: $button, button: button}, function(event) {
+                var dialog = event.data.dialog;
+                var $button = event.data.$button;
+                var button = $button.data('button');
+                if (typeof button.action === 'function') {
+                    button.action.call($button, dialog, event);
+                }
+
+                if (button.autospin) {
+                    $button.toggleSpin(true);
+                }
+            });
+
+            // Dynamically add extra functions to $button
+            this.enhanceButton($button);
+
+            return $button;
+        },
+        /**
+         * Dynamically add extra functions to $button
+         *
+         * Using '$this' to reference 'this' is just for better readability.
+         *
+         * @param {type} $button
+         * @returns {_L13.BootstrapDialog.prototype}
+         */
+        enhanceButton: function($button) {
+            $button.dialog = this;
+
+            // Enable / Disable
+            $button.toggleEnable = function(enable) {
+                var $this = this;
+                if (typeof enable !== 'undefined') {
+                    $this.prop("disabled", !enable).toggleClass('disabled', !enable);
+                } else {
+                    $this.prop("disabled", !$this.prop("disabled"));
+                }
+
+                return $this;
+            };
+            $button.enable = function() {
+                var $this = this;
+                $this.toggleEnable(true);
+
+                return $this;
+            };
+            $button.disable = function() {
+                var $this = this;
+                $this.toggleEnable(false);
+
+                return $this;
+            };
+
+            // Icon spinning, helpful for indicating ajax loading status.
+            $button.toggleSpin = function(spin) {
+                var $this = this;
+                var dialog = $this.dialog;
+                var $icon = $this.find('.' + dialog.getNamespace('button-icon'));
+                if (typeof spin === 'undefined') {
+                    spin = !($button.find('.icon-spin').length > 0);
+                }
+                if (spin) {
+                    $icon.hide();
+                    $button.prepend(dialog.createButtonIcon(dialog.getSpinicon()).addClass('icon-spin'));
+                } else {
+                    $icon.show();
+                    $button.find('.icon-spin').remove();
+                }
+
+                return $this;
+            };
+            $button.spin = function() {
+                var $this = this;
+                $this.toggleSpin(true);
+
+                return $this;
+            };
+            $button.stopSpin = function() {
+                var $this = this;
+                $this.toggleSpin(false);
+
+                return $this;
+            };
+
+            return this;
+        },
+        createButtonIcon: function(icon) {
+            var $icon = $('<span></span>');
+            $icon.addClass(this.getNamespace('button-icon')).addClass(icon);
+
+            return $icon;
+        },
+        /**
+         * Invoke this only after the dialog is realized.
+         *
+         * @param {type} enable
+         * @returns {undefined}
+         */
+        enableButtons: function(enable) {
+            $.each(this.indexedButtons, function(id, $button) {
+                $button.toggleEnable(enable);
+            });
+
+            return this;
+        },
+        /**
+         * Invoke this only after the dialog is realized.
+         *
+         * @returns {undefined}
+         */
+        updateClosable: function() {
+            if (this.isRealized()) {
+                // Close button
+                this.getModalHeader().find('.' + this.getNamespace('close-button')).toggle(this.isClosable());
+            }
+
+            return this;
+        },
+        /**
+         * Set handler for modal event 'show.bs.modal'.
+         * This is a setter!
+         */
+        onShow: function(onshow) {
+            this.options.onshow = onshow;
+
+            return this;
+        },
+        /**
+         * Set handler for modal event 'shown.bs.modal'.
+         * This is a setter!
+         */
+        onShown: function(onshown) {
+            this.options.onshown = onshown;
+
+            return this;
+        },
+        /**
+         * Set handler for modal event 'hide.bs.modal'.
+         * This is a setter!
+         */
+        onHide: function(onhide) {
+            this.options.onhide = onhide;
+
+            return this;
+        },
+        /**
+         * Set handler for modal event 'hidden.bs.modal'.
+         * This is a setter!
+         */
+        onHidden: function(onhidden) {
+            this.options.onhidden = onhidden;
+
+            return this;
+        },
+        isRealized: function() {
+            return this.realized;
+        },
+        setRealized: function(realized) {
+            this.realized = realized;
+
+            return this;
+        },
+        isOpened: function() {
+            return this.opened;
+        },
+        setOpened: function(opened) {
+            this.opened = opened;
+
+            return this;
+        },
+        handleModalEvents: function() {
+            this.getModal().on('show.bs.modal', {dialog: this}, function(event) {
+                var dialog = event.data.dialog;
+                dialog.setOpened(true);
+                if (dialog.isModalEvent(event) && typeof dialog.options.onshow === 'function') {
+                    var openIt = dialog.options.onshow(dialog);
+                    if (openIt === false) {
+                        dialog.setOpened(false);
+                    }
+
+                    return openIt;
+                }
+            });
+            this.getModal().on('shown.bs.modal', {dialog: this}, function(event) {
+                var dialog = event.data.dialog;
+                dialog.isModalEvent(event) && typeof dialog.options.onshown === 'function' && dialog.options.onshown(dialog);
+            });
+            this.getModal().on('hide.bs.modal', {dialog: this}, function(event) {
+                var dialog = event.data.dialog;
+                dialog.setOpened(false);
+                if (dialog.isModalEvent(event) && typeof dialog.options.onhide === 'function') {
+                    var hideIt = dialog.options.onhide(dialog);
+                    if (hideIt === false) {
+                        dialog.setOpened(true);
+                    }
+
+                    return hideIt;
+                }
+            });
+            this.getModal().on('hidden.bs.modal', {dialog: this}, function(event) {
+                var dialog = event.data.dialog;
+                dialog.isModalEvent(event) && typeof dialog.options.onhidden === 'function' && dialog.options.onhidden(dialog);
+                if (dialog.isAutodestroy()) {
+                    delete BootstrapDialog.dialogs[dialog.getId()];
+                    $(this).remove();
+                }
+                BootstrapDialog.moveFocus();
+            });
+
+            // Backdrop, I did't find a way to change bs3 backdrop option after the dialog is popped up, so here's a new wheel.
+            this.handleModalBackdropEvent();
+
+            // ESC key support
+            this.getModal().on('keyup', {dialog: this}, function(event) {
+                event.which === 27 && event.data.dialog.isClosable() && event.data.dialog.canCloseByKeyboard() && event.data.dialog.close();
+            });
+
+            // Button hotkey
+            this.getModal().on('keyup', {dialog: this}, function(event) {
+                var dialog = event.data.dialog;
+                if (typeof dialog.registeredButtonHotkeys[event.which] !== 'undefined') {
+                    var $button = $(dialog.registeredButtonHotkeys[event.which]);
+                    !$button.prop('disabled') && $button.focus().trigger('click');
+                }
+            });
+
+            return this;
+        },
+        handleModalBackdropEvent: function() {
+            this.getModal().on('click', {dialog: this}, function(event) {
+                $(event.target).hasClass('modal-backdrop') && event.data.dialog.isClosable() && event.data.dialog.canCloseByBackdrop() && event.data.dialog.close();
+            });
+
+            return this;
+        },
+        isModalEvent: function(event) {
+            return typeof event.namespace !== 'undefined' && event.namespace === 'bs.modal';
+        },
+        makeModalDraggable: function() {
+            if (this.options.draggable) {
+                this.getModalHeader().addClass(this.getNamespace('draggable')).on('mousedown', {dialog: this}, function(event) {
+                    var dialog = event.data.dialog;
+                    dialog.draggableData.isMouseDown = true;
+                    var dialogOffset = dialog.getModalDialog().offset();
+                    dialog.draggableData.mouseOffset = {
+                        top: event.clientY - dialogOffset.top,
+                        left: event.clientX - dialogOffset.left
+                    };
+                });
+                this.getModal().on('mouseup mouseleave', {dialog: this}, function(event) {
+                    event.data.dialog.draggableData.isMouseDown = false;
+                });
+                $('body').on('mousemove', {dialog: this}, function(event) {
+                    var dialog = event.data.dialog;
+                    if (!dialog.draggableData.isMouseDown) {
+                        return;
+                    }
+                    dialog.getModalDialog().offset({
+                        top: event.clientY - dialog.draggableData.mouseOffset.top,
+                        left: event.clientX - dialog.draggableData.mouseOffset.left
+                    });
+                });
+            }
+
+            return this;
+        },
+        realize: function() {
+            this.initModalStuff();
+            this.getModal().addClass(BootstrapDialog.NAMESPACE)
+            .addClass(this.getCssClass());
+            this.updateSize();
+            if (this.getDescription()) {
+                this.getModal().attr('aria-describedby', this.getDescription());
+            }
+            this.getModalFooter().append(this.createFooterContent());
+            this.getModalHeader().append(this.createHeaderContent());
+            this.getModalBody().append(this.createBodyContent());
+            this.getModal().data('bs.modal', new BootstrapDialogModal(this.getModal(), {
+                backdrop: 'static',
+                keyboard: false,
+                show: false
+            }));
+            this.makeModalDraggable();
+            this.handleModalEvents();
+            this.setRealized(true);
+            this.updateButtons();
+            this.updateType();
+            this.updateTitle();
+            this.updateMessage();
+            this.updateClosable();
+            this.updateAnimate();
+            this.updateSize();
+            this.updateTabindex();
+
+            return this;
+        },
+        open: function() {
+            !this.isRealized() && this.realize();
+            this.getModal().modal('show');
+
+            return this;
+        },
+        close: function() {
+            this.getModal().modal('hide');
+
+            return this;
+        }
+    };
+
+    // Add compatible methods.
+    BootstrapDialog.prototype = $.extend(BootstrapDialog.prototype, BootstrapDialog.METHODS_TO_OVERRIDE[BootstrapDialogModal.getModalVersion()]);
+
+    /**
+     * RFC4122 version 4 compliant unique id creator.
+     *
+     * Added by https://github.com/tufanbarisyildirim/
+     *
+     *  @returns {String}
+     */
+    BootstrapDialog.newGuid = function() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    };
+
+    /* ================================================
+     * For lazy people
+     * ================================================ */
+
+    /**
+     * Shortcut function: show
+     *
+     * @param {type} options
+     * @returns the created dialog instance
+     */
+    BootstrapDialog.show = function(options) {
+        return new BootstrapDialog(options).open();
+    };
+
+    /**
+     * Alert window
+     *
+     * @returns the created dialog instance
+     */
+    BootstrapDialog.alert = function() {
+        var options = {};
+        var defaultOptions = {
+            type: BootstrapDialog.TYPE_PRIMARY,
+            title: null,
+            message: null,
+            closable: false,
+            draggable: false,
+            buttonLabel: BootstrapDialog.DEFAULT_TEXTS.OK,
+            callback: null
+        };
+
+        if (typeof arguments[0] === 'object' && arguments[0].constructor === {}.constructor) {
+            options = $.extend(true, defaultOptions, arguments[0]);
+        } else {
+            options = $.extend(true, defaultOptions, {
+                message: arguments[0],
+                callback: typeof arguments[1] !== 'undefined' ? arguments[1] : null
+            });
+        }
+
+        return new BootstrapDialog({
+            type: options.type,
+            title: options.title,
+            message: options.message,
+            closable: options.closable,
+            draggable: options.draggable,
+            data: {
+                callback: options.callback
+            },
+            onhide: function(dialog) {
+                !dialog.getData('btnClicked') && dialog.isClosable() && typeof dialog.getData('callback') === 'function' && dialog.getData('callback')(false);
+            },
+            buttons: [{
+                    label: options.buttonLabel,
+                    action: function(dialog) {
+                        dialog.setData('btnClicked', true);
+                        typeof dialog.getData('callback') === 'function' && dialog.getData('callback')(true);
+                        dialog.close();
+                    }
+                }]
+        }).open();
+    };
+
+    /**
+     * Confirm window
+     *
+     * @returns the created dialog instance
+     */
+    BootstrapDialog.confirm = function() {
+        var options = {};
+        var defaultOptions = {
+            type: BootstrapDialog.TYPE_PRIMARY,
+            title: null,
+            message: null,
+            closable: false,
+            draggable: false,
+            btnCancelLabel: BootstrapDialog.DEFAULT_TEXTS.CANCEL,
+            btnOKLabel: BootstrapDialog.DEFAULT_TEXTS.OK,
+            btnOKClass: null,
+            callback: null
+        };
+        if (typeof arguments[0] === 'object' && arguments[0].constructor === {}.constructor) {
+            options = $.extend(true, defaultOptions, arguments[0]);
+        } else {
+            options = $.extend(true, defaultOptions, {
+                message: arguments[0],
+                closable: false,
+                buttonLabel: BootstrapDialog.DEFAULT_TEXTS.OK,
+                callback: typeof arguments[1] !== 'undefined' ? arguments[1] : null
+            });
+        }
+        if (options.btnOKClass === null) {
+            options.btnOKClass = ['btn', options.type.split('-')[1]].join('-');
+        }
+
+        return new BootstrapDialog({
+            type: options.type,
+            title: options.title,
+            message: options.message,
+            closable: options.closable,
+            draggable: options.draggable,
+            data: {
+                callback: options.callback
+            },
+            buttons: [{
+                    label: options.btnCancelLabel,
+                    action: function(dialog) {
+                        typeof dialog.getData('callback') === 'function' && dialog.getData('callback')(false);
+                        dialog.close();
+                    }
+                }, {
+                    label: options.btnOKLabel,
+                    cssClass: options.btnOKClass,
+                    action: function(dialog) {
+                        typeof dialog.getData('callback') === 'function' && dialog.getData('callback')(true);
+                        dialog.close();
+                    }
+                }]
+        }).open();
+    };
+
+    /**
+     * Warning window
+     *
+     * @param {type} message
+     * @returns the created dialog instance
+     */
+    BootstrapDialog.warning = function(message, callback) {
+        return new BootstrapDialog({
+            type: BootstrapDialog.TYPE_WARNING,
+            message: message
+        }).open();
+    };
+
+    /**
+     * Danger window
+     *
+     * @param {type} message
+     * @returns the created dialog instance
+     */
+    BootstrapDialog.danger = function(message, callback) {
+        return new BootstrapDialog({
+            type: BootstrapDialog.TYPE_DANGER,
+            message: message
+        }).open();
+    };
+
+    /**
+     * Success window
+     *
+     * @param {type} message
+     * @returns the created dialog instance
+     */
+    BootstrapDialog.success = function(message, callback) {
+        return new BootstrapDialog({
+            type: BootstrapDialog.TYPE_SUCCESS,
+            message: message
+        }).open();
+    };
+
+    return BootstrapDialog;
+
+}));
 
 //# sourceMappingURL=app.js.map
