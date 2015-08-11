@@ -6028,8 +6028,14 @@ footer {
   height: 1.5em; }
 
 /** Estilos generales */
+body {
+  background: #F4F6FD; }
+
 .btn {
   margin-right: 0.5em; }
+
+.input-group-addon {
+  min-width: 5em; }
 
 /** Estilos de administrador de postales */
 #postalImagen {
