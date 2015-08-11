@@ -16,23 +16,23 @@
       </div>
 
       <div class="col-sm-12 col-md-4">
-        {!! Form::open(['id' => 'filtros']) !!}
+        <form id="filtros">
           <div class="form-group">
             <div class="input-group">
               <div class="input-group-addon">Desde</div>
-              {!! Form::input('date', 'desde', $fecha_desde->toDateString(), ['class' => 'form-control']) !!}
+              <input type='date' name='desde' value='{{ $fecha_desde->toDateString() }}' class='form-control'>
             </div>
           </div>
 
           <div class="form-group">
             <div class="input-group">
               <div class="input-group-addon">Hasta</div>
-              {!! Form::input('date', 'hasta', $fecha_hasta->toDateString(), ['class' => 'form-control']) !!}
+              <input type='date' name='hasta' value='{{ $fecha_hasta->toDateString() }}' class='form-control'>
             </div>
           </div>
 
           {!! Form::submit('Actualizar', ['class' => 'btn btn-primary']) !!}
-          {!! Form::close() !!}
+          </form>
 
         </div>
       </div>
