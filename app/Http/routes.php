@@ -41,6 +41,11 @@ Route::post('ubicaciones/{ubicaciones}/postales/{postales}', [
 ]);
 
 Route::group(['prefix' => '/administrar'], function() {
+  Route::get('/usuarios', [
+    'as'   => 'administrar.usuarios',
+    'uses' => 'AdministradorController@usuarios'
+  ]);
+
   Route::get('/ubicaciones', [
     'as'   => 'administrar.ubicaciones',
     'uses' => 'AdministradorController@ubicaciones'
@@ -56,8 +61,4 @@ Route::group(['prefix' => '/administrar'], function() {
     'uses' => 'AdministradorController@postales',
   ]);
 
-  Route::get('/usuarios', [
-    'as'   => 'administrar.usuarios',
-    'uses' => 'AdministradorController@usuarios'
-  ]);
 });
