@@ -1,8 +1,11 @@
 <?php namespace TourGuide\Http\Controllers;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use TourGuide\Models\Compra;
+use TourGuide\Models\UbicacionTuristica;
 use TourGuide\Plotters\ComprasPlotter;
 
 class ComprasController extends Controller {
@@ -18,18 +21,18 @@ class ComprasController extends Controller {
    * formato YYYY-MM-DD.
    *
    * @param  Request $peticion
+   *
    * @return Response
    */
   public function index(Request $peticion) {
-    $fecha_desde = new Carbon($peticion->get('desde'));
-    $fecha_hasta = new Carbon($peticion->get('hasta'));
-    $compras = Compra::where('created_at', '>=', $fecha_desde->toDateString())
-                     ->where('created_at', '<=', $fecha_hasta->toDateString())
-                     ->get();
-
-    return with(new ComprasPlotter($compras))->getData();
+    return with(new ComprasPlotter($this->obtenerCompras($peticion)))->getData();
   }
 
+  /**
+   * @param Request $request
+   *
+   * @return Response
+   */
   public function store(Request $request) {
     if ( ! $request->has(['usuario_id', 'postal_id'])) {
       return response('', 422);
@@ -39,6 +42,28 @@ class ComprasController extends Controller {
     $compra->save();
 
     return response($compra, 201);
+  }
+
+  /**
+   * @param Request $peticion
+   *
+   * @return Collection
+   */
+  private function obtenerCompras($peticion) {
+    $fecha_desde  = new Carbon($peticion->get('desde'));
+    $fecha_hasta  = new Carbon($peticion->get('hasta'));
+    $ubicacion_id = $peticion->get('ubicacion_id');
+
+    $compras_query = Compra::where('created_at', '>=', $fecha_desde->toDateString())
+                           ->where('created_at', '<=', $fecha_hasta->toDateString());
+
+    if ($ubicacion_id && $ubicacion_id != 0) {
+      $ubicacion = UbicacionTuristica::find($ubicacion_id);
+      $postales_ids = $ubicacion->postales->map(function($postal) { return $postal->id; });
+      $compras_query = $compras_query->whereIn('postal_id', $postales_ids);
+    }
+
+    return $compras_query->get();
   }
 
 }

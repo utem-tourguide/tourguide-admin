@@ -1,13 +1,15 @@
 <?php namespace TourGuide\Http\Controllers;
 
 use Carbon\Carbon;
+use Illuminate\Http\Response;
 use TourGuide\Models\UbicacionTuristica;
 
 class AdministradorController extends Controller {
 
   public function compras() {
     $datos = ['fecha_desde' => with(new Carbon)->startOfYear(),
-              'fecha_hasta' => with(new Carbon)->endOfYear()];
+              'fecha_hasta' => with(new Carbon)->endOfYear(),
+              'ubicaciones' => $this->construirSelectDeUbicaciones()];
 
     return view('compras.index', $datos);
   }
@@ -28,7 +30,8 @@ class AdministradorController extends Controller {
    * Muestra la página para administrar postales
    *
    * @param  int $ubicacion_id
-   * @return Respose
+   *
+   * @return Response
    */
   public function postales($ubicacion_id) {
     $datos = ['ubicacion' => UbicacionTuristica::find($ubicacion_id)];
@@ -38,6 +41,18 @@ class AdministradorController extends Controller {
 
   public function usuarios(){
   	return view('usuarios.index');
+  }
+
+  /**
+   * @return array
+   */
+  private function construirSelectDeUbicaciones() {
+    $ubicaciones = [0 => 'Todas'];
+    UbicacionTuristica::all()->each(function($ubicacion) use (&$ubicaciones) {
+      $ubicaciones[$ubicacion->id] = "$ubicacion->nombre, $ubicacion->localizacion";
+    });
+
+    return $ubicaciones;
   }
 
 }

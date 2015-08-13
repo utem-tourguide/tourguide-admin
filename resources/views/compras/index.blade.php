@@ -19,6 +19,12 @@
         <form id="filtros">
           <div class="form-group">
             <div class="input-group">
+              <div class="input-group-addon">Ubicación</div>
+              {!! Form::select('ubicacion_id', $ubicaciones, null, ['class' => 'form-control']) !!}
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="input-group">
               <div class="input-group-addon">Desde</div>
               <input type='date' name='desde' value='{{ $fecha_desde->toDateString() }}' class='form-control'>
             </div>
