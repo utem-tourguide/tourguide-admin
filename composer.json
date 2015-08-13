@@ -22,7 +22,8 @@
 			"database"
 		],
 		"psr-4": {
-			"TourGuide\\": "app/"
+			"TourGuide\\": "app/",
+			"spec\\TourGuide\\": "spec/"
 		}
 	},
 	"autoload-dev": {
