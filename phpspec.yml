@@ -1,4 +1,5 @@
 formatter.name: nyan.cat
+bootstrap: spec/Support/bootstrap.php
 
 suites:
     main:
