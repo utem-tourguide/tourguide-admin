@@ -68,4 +68,8 @@ class Usuario extends Model {
     return $version_cifrada === $this->contrasena_cifrada;
   }
 
+  public function nombre_completo() {
+    return $this->nombre . ' ' . $this->apellido;
+  }
+
 }

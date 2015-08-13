@@ -7,4 +7,8 @@ class UbicacionTuristica extends Model {
   protected $table = 'ubicaciones_turisticas';
   protected $fillable = ['nombre', 'localizacion'];
 
+  public function postales() {
+    return $this->hasMany('TourGuide\Models\Postal', 'ubicacion_id');
+  }
+
 }
