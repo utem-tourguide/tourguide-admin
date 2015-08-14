@@ -4,14 +4,8 @@ Route::get('/', ['as' => 'login', 'uses' => 'SesionesController@index']);
 Route::resource('sesiones', 'SesionesController', ['only' => 'store']);
 Route::get('sesiones', ['as' => 'sesiones.destroy', 'uses' => 'SesionesController@destroy']);
 
-Route::get('/dashboard', ['as'   => 'dashboard',
-                          'uses' => function() {
-                                      return 'Proximamente...';
-                                    }]);
-Route::get('/obtener-app', ['as'   => 'obtener_app',
-                            'uses' => function() {
-                                        return 'Proximamente...';
-                                      }]);
+Route::get('/dashboard', ['as' => 'dashboard',   'uses' => 'DashboardController@index']);
+Route::get('/android',   ['as' => 'obtener_app', 'uses' => 'DashboardController@android']);
 
 Route::resource('usuarios', 'UsuariosController');
 Route::resource('compras', 'ComprasController', ['only' => ['index', 'store']]);
