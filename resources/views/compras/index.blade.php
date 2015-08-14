@@ -37,6 +37,12 @@
             </div>
           </div>
 
+          <p>
+            <small>
+              * La gráfica solo mostrará los meses que en los que se hayan realizado compras.
+            </small>
+          </p>
+
           {!! Form::submit('Actualizar', ['class' => 'btn btn-primary']) !!}
           </form>
 
