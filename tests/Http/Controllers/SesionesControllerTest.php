@@ -1,12 +1,12 @@
-<?php namespace tests\Http\Controllers;
+<?php namespace tests\TourGuide\Http\Controllers;
 
 use Hash;
-use TestCase;
+use Illuminate\Foundation\Testing\WithoutMiddleware;
+use tests\TourGuide\Support\ControllerTestCase;
 use TourGuide\Models\Usuario;
 use TourGuide\Tests\CustomAssertions;
-use Illuminate\Foundation\Testing\WithoutMiddleware;
 
-class SesionesControllerTest extends TestCase {
+class SesionesControllerTest extends ControllerTestCase {
 
   use WithoutMiddleware;
   use CustomAssertions;
@@ -44,28 +44,6 @@ class SesionesControllerTest extends TestCase {
 
     $this->assertRedirectedToRoute('login');
     $this->assertFalse($this->app['session.store']->has('usuario_id'));
-  }
-
-  /**
-   * @test
-   */
-  public function intentar_iniciar_sesion_como_no_administrador() {
-    Usuario::create([
-      'email'              => 'no-admin@tourguide.com',
-      'contrasena_cifrada' => Hash::make('no-admin'),
-      'nombre'             => 'No administrador',
-      'apellido'           => '',
-      'idioma'             => 'es',
-      'rol_id'             => 2,
-    ]);
-
-    $this->route('POST', 'sesiones.store', [
-      'email'      => 'no-admin@tourguide.com',
-      'contrasena' => 'no-admin',
-    ]);
-
-    $this->assertNotRedirectedToRoute('dashboard');
-    $this->assertSessionHas('usuario_id');
   }
 
   /**

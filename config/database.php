@@ -19,7 +19,7 @@ return [
     ],
     'sqlite_testing' => [
       'driver'   => 'sqlite',
-      'database' => ':memory:',
+      'database' => base_path('testing.sqlite'),
     ],
     'sqlite_acceptance' => [
       'driver'   => 'sqlite',

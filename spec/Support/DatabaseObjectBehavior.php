@@ -7,7 +7,11 @@ class DatabaseObjectBehavior extends LaravelObjectBehavior {
   public function let() {
     parent::let();
 
-    Artisan::call('migrate');
+    copy(base_path('.db_base.sqlite'), base_path('testing.sqlite'));
+  }
+
+  public function letGo() {
+    unlink(base_path('testing.sqlite'));
   }
 
 }
