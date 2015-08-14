@@ -5,5 +5,8 @@ default:
 
     Behat\MinkExtension:
       default_session: laravel
-      base_url: http://localhost:8000
+      javascript_session: selenium2
+      base_url: http://localhost
       laravel: ~
+      selenium2:
+        browser: chrome
