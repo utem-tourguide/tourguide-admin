@@ -1,5 +1,6 @@
 <?php namespace tests\Http\Controllers;
 
+use Hash;
 use TestCase;
 use TourGuide\Models\Usuario;
 use TourGuide\Tests\CustomAssertions;
@@ -23,7 +24,7 @@ class SesionesControllerTest extends TestCase {
    * @test
    */
   public function iniciar_sesion_correctamente() {
-    $this->route('POST', 'login', [
+    $this->route('POST', 'sesiones.store', [
       'email'      => 'admin@tourguide.com',
       'contrasena' => 'admin',
     ]);
@@ -36,7 +37,7 @@ class SesionesControllerTest extends TestCase {
    * @test
    */
   public function iniciar_sesion_erroneamente() {
-    $this->route('POST', 'login', [
+    $this->route('POST', 'sesiones.store', [
       'email'      => 'usuario@invalido.com',
       'contrasena' => 'invalida',
     ]);
@@ -51,14 +52,14 @@ class SesionesControllerTest extends TestCase {
   public function intentar_iniciar_sesion_como_no_administrador() {
     Usuario::create([
       'email'              => 'no-admin@tourguide.com',
-      'contrasena_cifrada' => Usuario::cifrarContrasena('no-admin'),
+      'contrasena_cifrada' => Hash::make('no-admin'),
       'nombre'             => 'No administrador',
       'apellido'           => '',
       'idioma'             => 'es',
       'rol_id'             => 2,
     ]);
 
-    $this->route('POST', 'login', [
+    $this->route('POST', 'sesiones.store', [
       'email'      => 'no-admin@tourguide.com',
       'contrasena' => 'no-admin',
     ]);
@@ -71,7 +72,7 @@ class SesionesControllerTest extends TestCase {
    * @test
    */
   public function cerrar_sesion() {
-    $this->route('GET', 'sesiones.salir');
+    $this->route('GET', 'sesiones.destroy');
 
     $this->assertRedirectedToRoute('login');
     $this->assertFalse($this->app['session.store']->has('usuario_id'));
@@ -85,7 +86,7 @@ class SesionesControllerTest extends TestCase {
              'contrasena' => 'admin'];
     $headers = ['HTTP_Accept' => 'application/json'];
     $response = $this->route('POST',
-                             'login',
+                             'sesiones.store',
                              [],
                              $data,
                              [],
@@ -105,7 +106,7 @@ class SesionesControllerTest extends TestCase {
              'contrasena' => 'no-admin'];
     $headers = ['HTTP_Accept' => 'application/json'];
     $response = $this->route('POST',
-      'login',
+      'sesiones.store',
       [],
       $data,
       [],
