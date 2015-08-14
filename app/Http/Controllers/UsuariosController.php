@@ -6,7 +6,7 @@ use TourGuide\Http\Requests;
 use TourGuide\Models\Usuario;
 use TourGuide\Http\Controllers\Controller;
 
-class UsuariosController extends Controller {
+class UsuariosController extends RecursoController {
 
   private $atributos_de_usuario = ['email',
                                    'contrasena',

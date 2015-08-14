@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use TourGuide\Models\InformacionUbicacion;
 
-class InformacionUbicacionesController extends Controller {
+class InformacionUbicacionesController extends RecursoController {
 
   /**
    * Devuelve las entradas de información de una ubicación

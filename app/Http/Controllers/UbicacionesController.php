@@ -8,7 +8,7 @@ use TourGuide\Http\Requests;
 use TourGuide\Models\UbicacionTuristica;
 use TourGuide\Http\Controllers\Controller;
 
-class UbicacionesController extends Controller {
+class UbicacionesController extends RecursoController {
 
   /**
    * Lista las ubicaciones turísticas

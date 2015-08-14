@@ -9,7 +9,7 @@ use TourGuide\Http\Controllers\Controller;
 /**
  * Controlador de sesiones
  */
-class SesionesController extends Controller {
+class SesionesController extends RecursoController {
 
   /**
    * Muestra el formulario de inicio de sesión.

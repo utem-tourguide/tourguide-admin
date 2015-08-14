@@ -5,7 +5,7 @@ use Illuminate\Http\Response;
 use TourGuide\Http\Requests;
 use TourGuide\Models\Postal;
 
-class PostalesController extends Controller {
+class PostalesController extends RecursoController {
 
   /**
    * Muestra una lista de postales.

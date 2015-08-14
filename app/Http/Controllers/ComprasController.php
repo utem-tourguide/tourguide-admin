@@ -8,7 +8,7 @@ use TourGuide\Models\Compra;
 use TourGuide\Models\UbicacionTuristica;
 use TourGuide\Plotters\ComprasPlotter;
 
-class ComprasController extends Controller {
+class ComprasController extends RecursoController {
 
   /**
    * Devuelve la lista de compras de postales de una ubicación.
