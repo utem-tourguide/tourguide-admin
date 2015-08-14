@@ -14,8 +14,10 @@
 Route::group(['prefix' => '/sesiones'], function() {
   Route::get('/entrar', ['as'   => 'sesiones.entrar',
                          'uses' => 'SesionesController@index']);
-  Route::post('/entrar', ['as'   => 'sesiones.crear',
-                          'uses' => 'SesionesController@entrar']);
+
+  Route::post('/entrar', ['as'         => 'sesiones.crear',
+                          'uses'       => 'SesionesController@entrar',
+                          'middleware' => 'csrf']);
 
   Route::get('/salir', ['as'   => 'sesiones.salir',
                         'uses' => 'SesionesController@salir']);
@@ -30,9 +32,9 @@ Route::get('/obtener-app', ['as'   => 'obtener_app',
                                         return 'Proximamente...';
                                       }]);
 
-Route::resource('/usuarios', 'UsuariosController');
+Route::resource('usuarios', 'UsuariosController');
 Route::resource('compras', 'ComprasController', ['only' => ['index', 'store']]);
-Route::resource('/ubicaciones', 'UbicacionesController');
+Route::resource('ubicaciones', 'UbicacionesController');
 Route::resource('ubicaciones.informacion', 'InformacionUbicacionesController');
 
 Route::resource('ubicaciones.postales', 'PostalesController', ['except' => 'update']);
