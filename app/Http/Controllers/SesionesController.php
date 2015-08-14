@@ -1,5 +1,6 @@
 <?php namespace TourGuide\Http\Controllers;
 
+use Illuminate\Http\Response;
 use Input;
 use Session;
 use Illuminate\Http\Request;
@@ -28,7 +29,7 @@ class SesionesController extends RecursoController {
    *
    * @return Response
    */
-  public function entrar(Request $request) {
+  public function store(Request $request) {
     $usuario = Usuario::whereEmail( Input::get('email') )->first();
     if ($usuario && $usuario->verificarContrasena( Input::get('contrasena') )) {
       Session::put('usuario_id', $usuario->id);
@@ -43,9 +44,10 @@ class SesionesController extends RecursoController {
    *
    * @return Response
    */
-  public function salir() {
+  public function destroy() {
     Session::flush();
-    return redirect()->route('sesiones.entrar');
+
+    return redirect()->route('login');
   }
 
   /**
@@ -85,7 +87,7 @@ class SesionesController extends RecursoController {
       return response('Unauthorized', 401);
     } else {
       return redirect()
-        ->route('sesiones.entrar')
+        ->route('login')
         ->with('error', 'Usuario o contraseña incorrectos.');
     }
   }

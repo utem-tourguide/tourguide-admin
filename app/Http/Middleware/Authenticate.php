@@ -17,7 +17,7 @@ class Authenticate {
       // La petición sigue adelante...
       return $next($request);
     } else {
-      return redirect()->route('sesiones.entrar');
+      return redirect()->route('login');
     }
   }
 

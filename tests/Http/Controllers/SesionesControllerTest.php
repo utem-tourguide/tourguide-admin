@@ -14,7 +14,7 @@ class SesionesControllerTest extends TestCase {
    * @test
    */
   public function formulario_para_iniciar_sesion() {
-    $this->route('GET', 'sesiones.entrar');
+    $this->route('GET', 'login');
 
     $this->assertResponseOk();
   }
@@ -23,7 +23,7 @@ class SesionesControllerTest extends TestCase {
    * @test
    */
   public function iniciar_sesion_correctamente() {
-    $this->route('POST', 'sesiones.entrar', [
+    $this->route('POST', 'login', [
       'email'      => 'admin@tourguide.com',
       'contrasena' => 'admin',
     ]);
@@ -36,12 +36,12 @@ class SesionesControllerTest extends TestCase {
    * @test
    */
   public function iniciar_sesion_erroneamente() {
-    $this->route('POST', 'sesiones.entrar', [
+    $this->route('POST', 'login', [
       'email'      => 'usuario@invalido.com',
       'contrasena' => 'invalida',
     ]);
 
-    $this->assertRedirectedToRoute('sesiones.entrar');
+    $this->assertRedirectedToRoute('login');
     $this->assertFalse($this->app['session.store']->has('usuario_id'));
   }
 
@@ -58,7 +58,7 @@ class SesionesControllerTest extends TestCase {
       'rol_id'             => 2,
     ]);
 
-    $this->route('POST', 'sesiones.entrar', [
+    $this->route('POST', 'login', [
       'email'      => 'no-admin@tourguide.com',
       'contrasena' => 'no-admin',
     ]);
@@ -73,7 +73,7 @@ class SesionesControllerTest extends TestCase {
   public function cerrar_sesion() {
     $this->route('GET', 'sesiones.salir');
 
-    $this->assertRedirectedToRoute('sesiones.entrar');
+    $this->assertRedirectedToRoute('login');
     $this->assertFalse($this->app['session.store']->has('usuario_id'));
   }
 
@@ -85,7 +85,7 @@ class SesionesControllerTest extends TestCase {
              'contrasena' => 'admin'];
     $headers = ['HTTP_Accept' => 'application/json'];
     $response = $this->route('POST',
-                             'sesiones.entrar',
+                             'login',
                              [],
                              $data,
                              [],
@@ -105,7 +105,7 @@ class SesionesControllerTest extends TestCase {
              'contrasena' => 'no-admin'];
     $headers = ['HTTP_Accept' => 'application/json'];
     $response = $this->route('POST',
-      'sesiones.entrar',
+      'login',
       [],
       $data,
       [],

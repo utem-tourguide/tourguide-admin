@@ -42,7 +42,7 @@ class FeatureContext extends MinkContext {
    * @Given /^(?:que )?(.*) inicia sesión$/
    */
   public function iniciar_sesion($email) {
-    $this->visitar_url(route( 'sesiones.entrar' ));
+    $this->visitar_url(route( 'login' ));
     $this->escribir_en_campo($email, 'email');
     $this->escribir_en_campo('admin', 'contrasena');
     $this->hacer_clic('Entrar');
