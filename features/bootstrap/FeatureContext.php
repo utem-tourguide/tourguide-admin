@@ -8,25 +8,31 @@ use Behat\Mink\Exception\ElementNotFoundException;
 class FeatureContext extends MinkContext {
 
   /**
-   * @BeforeScenario
+   * Reinicializa la base de datos para pruebas de integración a partir de una copia base de la
+   * misma.
+   *
+   * @AfterScenario
    */
-  public function preparar_bd() {
-    DB::beginTransaction();
+  public function reinicializar_bd() {
+    $origen  = base_path('.db_base.sqlite');
+    $destino = base_path('acceptance.sqlite');
+
+    if (file_exists($destino)) unlink($destino);
+    copy($origen, $destino);
   }
 
   /**
-   * @AfterScenario
+   * @AfterStep @javascript
    */
-  public function rollback_bd() {
-    DB::rollback();
+  public function esperar_ajax() {
+    $this->getSession()->wait(5000, '(0 === jQuery.active)');
   }
 
   /**
    * @Given /^(?:que )?visita la página (?:para|de) (.*)$/
    */
   public function visitar_pagina($pagina) {
-    $regexp = $this->obtener_url_para_pagina($pagina);
-    $this->visitar_url($this->convertir_regexp_a_url($regexp));
+    $this->visitar_url($this->obtener_url_para_pagina($pagina));
   }
 
   /**
@@ -79,27 +85,30 @@ class FeatureContext extends MinkContext {
   }
 
   /**
-   * @When /^registra a (\S+) como (\S+)$/
+   * @When /^registra a (\S+) con contraseña "(\S+)" como (\S+)$/
    */
-  public function registrar_usuario_via_formulario($email, $rol) {
-    $this->visitar_url(route( 'usuarios.create' ));
+  public function registrar_usuario_via_formulario($email, $contraseña, $rol) {
+    $this->hacer_clic('Nuevo usuario');
+    sleep(1);
+
     $this->escribir_en_campo($email, 'email');
-    $this->escribir_en_campo('admin', 'contrasena');
-    $this->escribir_en_campo('admin', 'confirmar_contrasena');
+    $this->escribir_en_campo($contraseña, 'contrasena');
+    $this->escribir_en_campo($contraseña, 'contrasena_confirmation');
     $this->escribir_en_campo('Usuario', 'nombre');
     $this->escribir_en_campo('de prueba', 'apellido');
     $this->seleccionar_en_campo('Español', 'idioma');
     $this->seleccionar_en_campo($this->obtener_rol_id($rol), 'rol_id');
 
     $this->hacer_clic('Guardar');
+    sleep(1);
   }
 
   /**
    * @Then /^debería estar en la página (?:para|del) (.*)$/
    */
   public function verificar_pagina($pagina) {
-    $url_regexp = $this->obtener_url_para_pagina($pagina);
-    $this->assertUrlRegExp($url_regexp);
+    $current_url = $this->getSession()->getCurrentUrl();
+    PHPUnit::assertEquals($this->obtener_url_para_pagina($pagina), $current_url);
   }
 
   /**
@@ -165,23 +174,13 @@ class FeatureContext extends MinkContext {
    */
   private function obtener_url_para_pagina($pagina) {
     $paginas = [
-      'dashboard'            => "/^\/dashboard$/",
-      'iniciar sesión'       => "/^\/$/",
-      'obtener el app móvil' => "/^\/android$/",
-      'administrar usuarios' => "/^\/usuarios/",
+      'dashboard'            => route('dashboard'),
+      'iniciar sesión'       => route('login'),
+      'obtener el app móvil' => route('obtener_app'),
+      'administrar usuarios' => route('administrar.usuarios'),
     ];
 
     return $paginas[$pagina];
-  }
-
-  /**
-   * Convierte una regexp que representa una url en una simple cadena de texto.
-   *
-   * @param  regexp $regexp
-   * @return string
-   */
-  private function convertir_regexp_a_url($regexp) {
-    return preg_replace("/\^|\\\|\$/", '', trim($regexp, '/'));
   }
 
   /**
