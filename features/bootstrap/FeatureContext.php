@@ -8,10 +8,19 @@ use Behat\Mink\Exception\ElementNotFoundException;
 class FeatureContext extends MinkContext {
 
   /**
+   * @AfterSuite
+   */
+  public static function eliminar_bd() {
+    $bd = base_path('acceptance.sqlite');
+
+    if (file_exists($bd)) unlink($bd);
+  }
+
+  /**
    * Reinicializa la base de datos para pruebas de integración a partir de una copia base de la
    * misma.
    *
-   * @AfterScenario
+   * @BeforeScenario
    */
   public function reinicializar_bd() {
     $origen  = base_path('.db_base.sqlite');
