@@ -6,7 +6,7 @@ use Illuminate\Contracts\Bus\SelfHandling;
 class RunTests extends Command implements SelfHandling {
 
   protected $name = 'test';
-  protected $description = 'Corre las suites de pruebas.';
+  protected $description = 'Corre las suites de pruebas';
 
   /**
    * Ejecuta las diversas suites que componen las pruebas de la aplicación.

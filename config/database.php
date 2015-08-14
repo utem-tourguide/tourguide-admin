@@ -24,6 +24,10 @@ return [
     'sqlite_acceptance' => [
       'driver'   => 'sqlite',
       'database' => base_path('acceptance.sqlite'),
+    ],
+    'sqlite_base' => [
+      'driver'   => 'sqlite',
+      'database' => base_path('.db_base.sqlite'),
     ]
   ],
 
