@@ -11,8 +11,14 @@ class FeatureContext extends MinkContext {
    * @BeforeScenario
    */
   public function preparar_bd() {
-    Artisan::call('migrate');
-    Artisan::call('db:seed');
+    DB::beginTransaction();
+  }
+
+  /**
+   * @AfterScenario
+   */
+  public function rollback_bd() {
+    DB::rollback();
   }
 
   /**
@@ -31,20 +37,20 @@ class FeatureContext extends MinkContext {
   }
 
   /**
-   * @Given /^(?:que )?(.*) se registra como (.*) y accede$/
+   * @Given /^(?:que )?(.*) se registra como (.*) con contraseña "(.*)" y accede$/
    */
-  public function registrar_y_acceder($email, $rol) {
-    $this->registrar_usuario($email, 'admin', $rol);
-    $this->iniciar_sesion($email);
+  public function registrar_y_acceder($email, $contraseña, $rol) {
+    $this->registrar_usuario($email, $contraseña, $rol);
+    $this->iniciar_sesion($email, $contraseña);
   }
 
   /**
-   * @Given /^(?:que )?(.*) inicia sesión$/
+   * @Given /^(?:que )?(.*) inicia sesión con contraseña "(.*)"$/
    */
-  public function iniciar_sesion($email) {
+  public function iniciar_sesion($email, $contraseña) {
     $this->visitar_url(route( 'login' ));
     $this->escribir_en_campo($email, 'email');
-    $this->escribir_en_campo('admin', 'contrasena');
+    $this->escribir_en_campo($contraseña, 'contrasena');
     $this->hacer_clic('Entrar');
   }
 
@@ -140,14 +146,15 @@ class FeatureContext extends MinkContext {
    * @return TourGuide\Models\Usuario;
    */
   private function registrar_usuario($email, $contrasena, $rol) {
-    return Usuario::create([
+    $usuario = new Usuario([
       'email'      => $email,
       'contrasena' => $contrasena,
       'nombre'     => 'Usuario',
       'apellido'   => 'de pruebas',
       'idioma'     => 'es',
-      'rol_id'     => $this->obtener_rol_id($rol),
     ]);
+    $usuario->rol_id = $this->obtener_rol_id($rol);
+    $usuario->save();
   }
 
   /**
@@ -159,8 +166,8 @@ class FeatureContext extends MinkContext {
   private function obtener_url_para_pagina($pagina) {
     $paginas = [
       'dashboard'            => "/^\/dashboard$/",
-      'iniciar sesión'       => "/^\/sesiones\/entrar$/",
-      'obtener el app móvil' => "/^\/obtener-app$/",
+      'iniciar sesión'       => "/^\/$/",
+      'obtener el app móvil' => "/^\/android$/",
       'administrar usuarios' => "/^\/usuarios/",
     ];
 
