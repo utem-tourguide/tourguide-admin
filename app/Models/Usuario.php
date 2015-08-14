@@ -53,8 +53,7 @@ class Usuario extends Model {
    * @return boolean
    */
   public function verificarContrasena($contrasena) {
-    $version_cifrada = crypt($contrasena, $this->contrasena_cifrada);
-    return $version_cifrada === $this->contrasena_cifrada;
+    return Hash::check($contrasena, $this->attributes['contrasena_cifrada']);
   }
 
   public function nombre_completo() {
