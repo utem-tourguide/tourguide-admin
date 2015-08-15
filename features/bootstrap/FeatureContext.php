@@ -1,9 +1,9 @@
 <?php
 
-use TourGuide\Models\Usuario;
-use PHPUnit_Framework_Assert as PHPUnit;
-use Behat\MinkExtension\Context\MinkContext;
 use Behat\Mink\Exception\ElementNotFoundException;
+use Behat\MinkExtension\Context\MinkContext;
+use PHPUnit_Framework_Assert as PHPUnit;
+use TourGuide\Models\Usuario;
 
 class FeatureContext extends MinkContext {
 
@@ -70,6 +70,28 @@ class FeatureContext extends MinkContext {
   }
 
   /**
+   * Registra un usuario en la aplicación.
+   *
+   * @param  string $email
+   * @param  string $contrasena
+   * @param  string $rol
+   * @return TourGuide\Models\Usuario;
+   *
+   * @Given /^que (.*) está registrado con contraseña "(.*)" como (.*)$/
+   */
+  public function registrar_usuario($email, $contrasena, $rol) {
+    $usuario = new Usuario([
+                             'email'      => $email,
+                             'contrasena' => $contrasena,
+                             'nombre'     => 'Usuario',
+                             'apellido'   => 'de pruebas',
+                             'idioma'     => 'es',
+                           ]);
+    $usuario->rol_id = $this->obtener_rol_id($rol);
+    $usuario->save();
+  }
+
+  /**
    * @When /^escribo "(.*)" en el campo "(.*)"$/
    */
   public function escribir_en_campo($valor, $campo) {
@@ -113,6 +135,27 @@ class FeatureContext extends MinkContext {
   }
 
   /**
+   * @When /^elimina a (.*)$/
+   */
+  public function eliminar_usuario($email) {
+    $usuario = Usuario::whereEmail($email)->first();
+
+    $pagina = $this->getSession()->getPage();
+    $fila = $pagina->find('css', "tr[data-id=$usuario->id]");
+    if ( ! $fila) throw new RuntimeException("El usuario $email no está en la página.");
+
+    $boton_eliminar = $fila->findButton('Eliminar');
+    if ($boton_eliminar) {
+      $boton_eliminar->click();
+      sleep(1);
+      $pagina->find('css', '.modal-footer .btn-danger')->click();
+      sleep(1);
+    } else {
+      throw new ElementNotFoundException($this->getSession());
+    }
+  }
+
+  /**
    * @Then /^debería estar en la página (?:para|del) (.*)$/
    */
   public function verificar_pagina($pagina) {
@@ -153,26 +196,6 @@ class FeatureContext extends MinkContext {
     }
 
     return $elemento;
-  }
-
-  /**
-   * Registra un usuario en la aplicación.
-   *
-   * @param  string $email
-   * @param  string $contrasena
-   * @param  string $rol
-   * @return TourGuide\Models\Usuario;
-   */
-  private function registrar_usuario($email, $contrasena, $rol) {
-    $usuario = new Usuario([
-      'email'      => $email,
-      'contrasena' => $contrasena,
-      'nombre'     => 'Usuario',
-      'apellido'   => 'de pruebas',
-      'idioma'     => 'es',
-    ]);
-    $usuario->rol_id = $this->obtener_rol_id($rol);
-    $usuario->save();
   }
 
   /**
