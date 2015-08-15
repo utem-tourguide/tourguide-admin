@@ -1,6 +1,7 @@
 <?php namespace TourGuide\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Input;
 use TourGuide\Http\Requests;
 use TourGuide\Models\Usuario;
@@ -72,17 +73,15 @@ class UsuariosController extends RecursoController {
   /**
    * Actualiza el usuario específicado en la base de datos.
    *
-   * @param  int  $id
+   * @param Request $peticion
+   * @param int     $id
+   *
    * @return Response
    */
-  public function update($id) {
+  public function update(Request $peticion, $id) {
     $usuario = Usuario::find($id);
-    $usuario->update(['nombre'     => Input::get('nombre'),
-                        'apellido'   => Input::get('apellido'),
-                        'email'      => Input::get('email'),
-                        'contraseña' => Input::get('contraseña'),
-                        'idioma'     => Input::get('idioma')]);
-    $usuario->save();
+    $usuario->rol_id = $peticion->get('rol_id');
+    $usuario->update($peticion->except(['rol_id', '_token']));
 
     return $usuario;
   }

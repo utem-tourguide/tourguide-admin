@@ -1,5 +1,6 @@
 <?php
 
+use Behat\Mink\Element\Element;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\MinkExtension\Context\MinkContext;
 use PHPUnit_Framework_Assert as PHPUnit;
@@ -46,6 +47,8 @@ class FeatureContext extends MinkContext {
 
   /**
    * @Given /^(?:que )?visita "(\S+)"$/
+   *
+   * @param string $url
    */
   public function visitar_url($url) {
     $this->getSession()->visit($url);
@@ -100,7 +103,7 @@ class FeatureContext extends MinkContext {
   }
 
   /**
-   * @When /^selecciono (\S)+ en (\S)+$/
+   * @When /^selecciona (.*) en (.*)$/
    */
   public function seleccionar_en_campo($valor, $campo) {
     $pagina = $this->getSession()->getPage();
@@ -108,7 +111,7 @@ class FeatureContext extends MinkContext {
   }
 
   /**
-   * @When /^hago clic en "(.*)"$/
+   * @When /^hace clic en "(.*)"$/
    */
   public function hacer_clic($locator) {
     $elemento = $this->encontrar_cliqueable($locator);
@@ -136,23 +139,43 @@ class FeatureContext extends MinkContext {
 
   /**
    * @When /^elimina a (.*)$/
+   *
+   * @param $email
+   *
+   * @throws ElementNotFoundException
    */
   public function eliminar_usuario($email) {
-    $usuario = Usuario::whereEmail($email)->first();
-
-    $pagina = $this->getSession()->getPage();
-    $fila = $pagina->find('css', "tr[data-id=$usuario->id]");
-    if ( ! $fila) throw new RuntimeException("El usuario $email no está en la página.");
+    $fila = $this->obtener_fila_de_tabla_para_usuario($email);
 
     $boton_eliminar = $fila->findButton('Eliminar');
     if ($boton_eliminar) {
       $boton_eliminar->click();
       sleep(1);
-      $pagina->find('css', '.modal-footer .btn-danger')->click();
+      $this->getSession()->getPage()->find('css', '.modal-footer .btn-danger')->click();
       sleep(1);
     } else {
       throw new ElementNotFoundException($this->getSession());
     }
+  }
+
+  /**
+   * @When /^(?:que )?comienza a editar los datos de (.*)$/
+   *
+   * @param string $email
+   */
+  public function comenzar_edicion_datos_de_usuario($email) {
+    sleep(1);
+    $fila = $this->obtener_fila_de_tabla_para_usuario($email);
+
+    $fila->findButton('Modificar')->click();
+    sleep(1);
+  }
+
+  /**
+   * @When /^espera (\d+) segundos?$/
+   */
+  public function esperaSegundo($segundos) {
+    sleep($segundos);
   }
 
   /**
@@ -184,7 +207,7 @@ class FeatureContext extends MinkContext {
    * el elemento no es encontrado.
    *
    * @param  string $locator
-   * @return Behat\Mink\Element
+   * @return Element
    * @throws Behat\Mink\Exception\ElementNotFoundException
    */
   private function encontrar_cliqueable($locator) {
@@ -223,6 +246,24 @@ class FeatureContext extends MinkContext {
    */
   private function obtener_rol_id($rol) {
     return constant('ROL_' . strtoupper( str_singular($rol)));
+  }
+
+  /**
+   * @param string $email
+   *
+   * @return \Behat\Mink\Element\NodeElement|mixed|null
+   */
+  private function obtener_fila_de_tabla_para_usuario($email) {
+    try {
+      $usuario = Usuario::whereEmail($email)->first();
+      $pagina = $this->getSession()->getPage();
+      $fila = $pagina->find('css', "tr[data-id=$usuario->id]");
+
+      return $fila;
+    } catch (Exception $e) {
+      throw new RuntimeException("El usuario $email no está en la página.");
+    }
+
   }
 
 }
