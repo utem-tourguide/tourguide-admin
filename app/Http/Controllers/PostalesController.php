@@ -51,38 +51,6 @@ class PostalesController extends RecursoController {
   }
 
   /**
-   * Muestra el formulario para editar una postal en la base de datos.
-   *
-   * @param  int $ubicacion_id
-   * @param  int $id
-   *
-   * @return Response
-   */
-  public function edit($ubicacion_id, $id) {
-    $datos = ['postal' => Postal::findOrFail($id)];
-
-    return view('ubicaciones.postales.create', $datos);
-  }
-
-  /**
-   * Actualiza una postal almacenada en la base de datos.
-   *
-   * @param  Request $peticion
-   * @param  int     $ubicacion_id
-   * @param  int     $id
-   *
-   * @return Response
-   */
-  public function update(Request $peticion, $ubicacion_id, $id) {
-    $postal = Postal::findOrFail($id);
-    $postal->update($peticion->all());
-
-    if ($peticion->hasFile('imagen')) $postal->guardarImagen($peticion->file('imagen'));
-
-    return $postal;
-  }
-
-  /**
    * Remueve la postal específicada de la base de datos.
    *
    * @param  int $ubicacion_id

@@ -35,6 +35,7 @@
                           '{{ route('ubicaciones.postales.index', [$ubicacion->id]) }}',
                           $('#postales'),
                           ['id']);
+   crud.modificarRecursos = false;
 
    crud.agregarAtributoGenerado('Precio', function(recurso) {
      return '$' + recurso.precio;
