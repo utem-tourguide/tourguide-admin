@@ -3,6 +3,7 @@ function CRUDRecurso(recurso, baseUrl, tabla, atributos) {
   this.baseUrl = baseUrl;
   this.tabla = tabla;
   this.atributos = atributos;
+  this.modificarRecursos = true;
 
   this.atributosGenerados = {};
   this.accionesPersonalizadas = {};
@@ -83,11 +84,15 @@ CRUDRecurso.prototype.crearCeldaAcciones = function(recurso) {
 
   this.renderizarAccionesPersonalizadas(recurso, columna);
 
-  $(document.createElement('button'))
-    .text('Modificar')
-    .addClass('btn btn-default')
-    .on('click', function() { self.mostrarDialogoEditar(recurso.id); })
-    .appendTo(columna);
+  if (this.modificarRecursos) {
+    $(document.createElement('button'))
+      .text('Modificar')
+      .addClass('btn btn-default')
+      .on('click', function () {
+        self.mostrarDialogoEditar(recurso.id);
+      })
+      .appendTo(columna);
+  }
 
   $(document.createElement('button'))
     .text('Eliminar')
