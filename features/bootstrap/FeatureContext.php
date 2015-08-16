@@ -4,7 +4,9 @@ use Behat\Mink\Element\Element;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\MinkExtension\Context\MinkContext;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use PHPUnit_Framework_Assert as PHPUnit;
+use TourGuide\Models\Postal;
 use TourGuide\Models\UbicacionTuristica;
 use TourGuide\Models\Usuario;
 
@@ -168,6 +170,30 @@ class FeatureContext extends MinkContext {
   }
 
   /**
+   * @When /^registra una postal$/
+   */
+  public function registrar_postal_via_formulario() {
+    $this->hacer_clic('Nueva postal');
+    sleep(1);
+
+    $this->escribir_en_campo('0.99', 'precio');
+    $this->hacer_clic('Guardar');
+    sleep(1);
+  }
+
+  /**
+   * @When /^que hay una postal para (.+) con precio \$([0-9]+.?[0-9]*)$/
+   *
+   * @param string $ubicacion
+   * @param int    $precio
+   */
+  public function registrar_postal($ubicacion, $precio) {
+    $ubicacion = $this->encontrar_ubicacion($ubicacion);
+    Postal::create(['precio'       => $precio,
+                    'ubicacion_id' => $ubicacion->id]);
+  }
+
+  /**
    * @When /^elimina a (.*)$/
    *
    * @param $email
@@ -184,8 +210,16 @@ class FeatureContext extends MinkContext {
    * @param string $ubicacion
    */
   public function eliminar_ubicacion($ubicacion) {
-    $this->eliminar_recurso(UbicacionTuristica::whereNombre($ubicacion)->first());
+    $this->eliminar_recurso($this->encontrar_ubicacion($ubicacion));
+  }
 
+  /**
+   * @When /^elimina la postal #([0-9]+)$/
+   *
+   * @param string $postal_id
+   */
+  public function eliminar_postal($postal_id) {
+    $this->eliminar_recurso(Postal::findOrFail($postal_id));
   }
 
   /**
@@ -203,7 +237,16 @@ class FeatureContext extends MinkContext {
    * @param string $ubicacion
    */
   public function comenzar_edicion_de_ubicacion($ubicacion) {
-    $this->comenzar_edicion_de_recurso(UbicacionTuristica::whereNombre($ubicacion)->first());
+    $this->comenzar_edicion_de_recurso($this->encontrar_ubicacion($ubicacion));
+  }
+
+  /**
+   * @When /^que comienza a editar la postal \#(\d+)$/
+   */
+  public function comenzar_edicion_de_postal($postal) {
+    $recurso = new stdClass();
+    $recurso->id = $postal;
+    $this->comenzar_edicion_de_recurso($recurso);
   }
 
   /**
@@ -238,11 +281,43 @@ class FeatureContext extends MinkContext {
   }
 
   /**
-   * @Then /^(?:el|la) (.*) de la (.*) debería ser "(.*)"$/
+   * @Then /^debería haber ([0-9]+) postal(?:es)? guardadas? para (.+)?$/
+   *
+   * @param string $cantidad
+   * @param string $ubicacion
+   */
+  public function verificar_postales_guardadas($cantidad, $ubicacion) {
+    $ubicacion = $this->encontrar_ubicacion($ubicacion);
+
+    PHPUnit::assertEquals($cantidad, $ubicacion->postales()->count());
+  }
+
+  /**
+   * @Then /^(?:el|la) (.*) de la ubicación (.*) debería ser (.*)$/
+   *
+   * @param string $atributo
+   * @param string $ubicacion
+   * @param string $valor
    */
   public function verificar_atributo_de_ubicacion($atributo, $ubicacion, $valor) {
-    $ubicacion = UbicacionTuristica::whereNombre($ubicacion)->first();
-    PHPUnit::assertEquals($valor, $ubicacion->{str_slug($atributo)});
+    $ubicacion = $this->encontrar_ubicacion($ubicacion);
+    $this->verificar_atributo_de_recurso($atributo, $valor, $ubicacion);
+  }
+
+  /**
+   * @Then /^(?:el|la) (.*) de la postal \#(\d+) de (.*) debería ser "(.*)"$/
+   *
+   * @param string $atributo
+   * @param string $postal_id
+   * @param string $ubicacion_nombre
+   * @param string $valor
+   *
+   * @internal param Postal $postal
+   * @internal param UbicacionTuristica $ubicacion
+   */
+  public function verificar_atributo_de_postal($atributo, $postal_id, $ubicacion_nombre, $valor) {
+    $postal = $this->encontrar_ubicacion($ubicacion_nombre)->postales()->findOrFail($postal_id);
+    $this->verificar_atributo_de_recurso($atributo, $valor, $postal);
   }
 
   /**
@@ -281,14 +356,29 @@ class FeatureContext extends MinkContext {
    */
   private function obtener_url_para_pagina($pagina) {
     $paginas = [
-      'dashboard'               => route('dashboard'),
-      'iniciar sesión'          => route('login'),
-      'obtener el app móvil'    => route('obtener_app'),
-      'administrar usuarios'    => route('administrar.usuarios'),
-      'administrar ubicaciones' => route('administrar.ubicaciones'),
+      'dashboard'                          => route('dashboard'),
+      'iniciar sesión'                     => route('login'),
+      'obtener el app móvil'               => route('obtener_app'),
+      'administrar usuarios'               => route('administrar.usuarios'),
+      'administrar ubicaciones'            => route('administrar.ubicaciones'),
     ];
 
-    return $paginas[$pagina];
+    return isset($paginas[$pagina]) ? $paginas[$pagina] : $this->obtener_url_dinamica($pagina);
+  }
+
+  /**
+   * @param string $pagina
+   *
+   * @return string
+   */
+  private function obtener_url_dinamica($pagina) {
+    $coincidencias = [];
+    switch (true) {
+      case preg_match("/^administrar postales de (.*)$/", $pagina, $coincidencias):
+        return route('administrar.ubicaciones.postales', [
+          $this->encontrar_ubicacion($coincidencias[1])->id
+        ]);
+    }
   }
 
   /**
@@ -334,6 +424,17 @@ class FeatureContext extends MinkContext {
     sleep(1);
     $this->getSession()->getPage()->find('css', '.modal-footer .btn-danger')->click();
     sleep(1);
+  }
+
+  private function verificar_atributo_de_recurso($atributo, $valor, $recurso) {
+    PHPUnit::assertEquals($valor, $recurso->{str_slug($atributo, '_')});
+  }
+
+  private function encontrar_ubicacion($nombre) {
+    $ubicacion = UbicacionTuristica::whereNombre($nombre)->first();
+    if ( ! $ubicacion) throw new ModelNotFoundException("Ubicación \"$nombre\" no encontrada.");
+
+    return $ubicacion;
   }
 
 }

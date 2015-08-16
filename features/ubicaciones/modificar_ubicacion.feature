@@ -11,4 +11,4 @@ Característica: Modificar ubicación
     Cuando que comienza a editar la ubicación La campana
     Y escribe "Colima, Colima" en el campo "Localización"
     Y hace clic en "Guardar"
-    Entonces la localización de la La campana debería ser "Manzanillo, Colima"
+    Entonces la localización de la ubicación La campana debería ser Manzanillo, Colima
