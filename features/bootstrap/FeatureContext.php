@@ -3,7 +3,9 @@
 use Behat\Mink\Element\Element;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\MinkExtension\Context\MinkContext;
+use Illuminate\Database\Eloquent\Model;
 use PHPUnit_Framework_Assert as PHPUnit;
+use TourGuide\Models\UbicacionTuristica;
 use TourGuide\Models\Usuario;
 
 class FeatureContext extends MinkContext {
@@ -95,7 +97,18 @@ class FeatureContext extends MinkContext {
   }
 
   /**
-   * @When /^escribo "(.*)" en el campo "(.*)"$/
+   * @Given /^que está registrada la ubicación (.*) en (.*)$/
+   *
+   * @param string $ubicacion
+   * @param string $localizacion
+   */
+  public function registrar_ubicacion($ubicacion, $localizacion) {
+    UbicacionTuristica::create(['nombre'       => $ubicacion,
+                                'localizacion' => $localizacion]);
+  }
+
+  /**
+   * @When /^escribe "(.*)" en el campo "(.*)"$/
    */
   public function escribir_en_campo($valor, $campo) {
     $pagina = $this->getSession()->getPage();
@@ -138,6 +151,23 @@ class FeatureContext extends MinkContext {
   }
 
   /**
+   * @When /^registra la ubicación "(.*)" en (.*)$/
+   *
+   * @param string $ubicacion
+   * @param string $localizacion
+   */
+  public function registrar_ubicacion_via_formulario($ubicacion, $localizacion) {
+    $this->hacer_clic('Nueva ubicación');
+    sleep(1);
+
+    $this->escribir_en_campo($ubicacion, 'nombre');
+    $this->escribir_en_campo($localizacion, 'localizacion');
+
+    $this->hacer_clic('Guardar');
+    sleep(1);
+  }
+
+  /**
    * @When /^elimina a (.*)$/
    *
    * @param $email
@@ -145,17 +175,17 @@ class FeatureContext extends MinkContext {
    * @throws ElementNotFoundException
    */
   public function eliminar_usuario($email) {
-    $fila = $this->obtener_fila_de_tabla_para_usuario($email);
+    $this->eliminar_recurso(Usuario::whereEmail($email)->first());
+  }
 
-    $boton_eliminar = $fila->findButton('Eliminar');
-    if ($boton_eliminar) {
-      $boton_eliminar->click();
-      sleep(1);
-      $this->getSession()->getPage()->find('css', '.modal-footer .btn-danger')->click();
-      sleep(1);
-    } else {
-      throw new ElementNotFoundException($this->getSession());
-    }
+  /**
+   * @When /^elimina la ubicación (.*)$/
+   *
+   * @param string $ubicacion
+   */
+  public function eliminar_ubicacion($ubicacion) {
+    $this->eliminar_recurso(UbicacionTuristica::whereNombre($ubicacion)->first());
+
   }
 
   /**
@@ -164,17 +194,22 @@ class FeatureContext extends MinkContext {
    * @param string $email
    */
   public function comenzar_edicion_datos_de_usuario($email) {
-    sleep(1);
-    $fila = $this->obtener_fila_de_tabla_para_usuario($email);
+    $this->comenzar_edicion_de_recurso(Usuario::whereEmail($email)->first());
+  }
 
-    $fila->findButton('Modificar')->click();
-    sleep(1);
+  /**
+   * @When /^(?:que )?comienza a editar la ubicación (.*)$/
+   *
+   * @param string $ubicacion
+   */
+  public function comenzar_edicion_de_ubicacion($ubicacion) {
+    $this->comenzar_edicion_de_recurso(UbicacionTuristica::whereNombre($ubicacion)->first());
   }
 
   /**
    * @When /^espera (\d+) segundos?$/
    */
-  public function esperaSegundo($segundos) {
+  public function esperar_segundos($segundos) {
     sleep($segundos);
   }
 
@@ -200,6 +235,23 @@ class FeatureContext extends MinkContext {
     $rol_id = $this->obtener_rol_id($rol);
 
     PHPUnit::assertEquals($cantidad, Usuario::whereRolId($rol_id)->count());
+  }
+
+  /**
+   * @Then /^(?:el|la) (.*) de la (.*) debería ser "(.*)"$/
+   */
+  public function verificar_atributo_de_ubicacion($atributo, $ubicacion, $valor) {
+    $ubicacion = UbicacionTuristica::whereNombre($ubicacion)->first();
+    PHPUnit::assertEquals($valor, $ubicacion->{str_slug($atributo)});
+  }
+
+  /**
+   * @Then /^debería haber (\d+) ubicaci(?:ón|ones) guardadas?$/
+   *
+   * @param int $cantidad
+   */
+  public function verificar_ubicaciones_guardadas($cantidad) {
+    PHPUnit::assertEquals($cantidad, UbicacionTuristica::count());
   }
 
   /**
@@ -229,10 +281,11 @@ class FeatureContext extends MinkContext {
    */
   private function obtener_url_para_pagina($pagina) {
     $paginas = [
-      'dashboard'            => route('dashboard'),
-      'iniciar sesión'       => route('login'),
-      'obtener el app móvil' => route('obtener_app'),
-      'administrar usuarios' => route('administrar.usuarios'),
+      'dashboard'               => route('dashboard'),
+      'iniciar sesión'          => route('login'),
+      'obtener el app móvil'    => route('obtener_app'),
+      'administrar usuarios'    => route('administrar.usuarios'),
+      'administrar ubicaciones' => route('administrar.ubicaciones'),
     ];
 
     return $paginas[$pagina];
@@ -249,21 +302,38 @@ class FeatureContext extends MinkContext {
   }
 
   /**
-   * @param string $email
+   * @param Model $recurso
+   */
+  private function comenzar_edicion_de_recurso($recurso) {
+    sleep(1);
+    $fila = $this->obtener_fila_de_tabla_para_recurso($recurso);
+    $fila->findButton('Modificar')->click();
+    sleep(1);
+  }
+
+  /**
+   * @param Model $recurso
    *
    * @return \Behat\Mink\Element\NodeElement|mixed|null
    */
-  private function obtener_fila_de_tabla_para_usuario($email) {
-    try {
-      $usuario = Usuario::whereEmail($email)->first();
-      $pagina = $this->getSession()->getPage();
-      $fila = $pagina->find('css', "tr[data-id=$usuario->id]");
+  private function obtener_fila_de_tabla_para_recurso($recurso) {
+    $pagina = $this->getSession()->getPage();
+    $fila = $pagina->find('css', "tr[data-id=$recurso->id]");
+    if ( ! $fila) throw new RuntimeException("El recurso específicado no está en la página.");
 
-      return $fila;
-    } catch (Exception $e) {
-      throw new RuntimeException("El usuario $email no está en la página.");
-    }
+    return $fila;
+  }
 
+  /**
+   * @param Model $recurso
+   */
+  private function eliminar_recurso($recurso) {
+    sleep(1);
+    $fila = $this->obtener_fila_de_tabla_para_recurso($recurso);
+    $fila->findButton('Eliminar')->click();
+    sleep(1);
+    $this->getSession()->getPage()->find('css', '.modal-footer .btn-danger')->click();
+    sleep(1);
   }
 
 }
