@@ -10,5 +10,5 @@ Característica: Crear nueva información de ubicación
   Escenario: Creando información en español y en inglés para La Campana
     Cuando registra "Es una zona arqueológica" como información de La Campana en español
     Cuando registra "It is an archeological zone" como información de La Campana en inglés
-    Entonces debería haber 1 una entrada de información para La Campana en español
-    Entonces debería haber 1 una entrada de información para La Campana en inglés
+    Entonces debería haber 1 entrada de información para La Campana en español
+    Entonces debería haber 1 entrada de información para La Campana en inglés
