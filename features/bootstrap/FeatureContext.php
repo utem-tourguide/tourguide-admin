@@ -1,16 +1,20 @@
 <?php
 
 use Behat\Mink\Element\Element;
+use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\MinkExtension\Context\MinkContext;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use PHPUnit_Framework_Assert as PHPUnit;
+use TourGuide\Models\InformacionUbicacion;
 use TourGuide\Models\Postal;
 use TourGuide\Models\UbicacionTuristica;
 use TourGuide\Models\Usuario;
 
 class FeatureContext extends MinkContext {
+
+  const TIEMPO_ESPERA = 600000; # microsegundos.
 
   /**
    * @AfterSuite
@@ -110,6 +114,18 @@ class FeatureContext extends MinkContext {
   }
 
   /**
+   * @Given /^que hay información en (.+) para (.+)$/
+   *
+   * @param string $idioma
+   * @param string $ubicacion
+   */
+  public function registrar_informacion($idioma, $ubicacion) {
+    InformacionUbicacion::create(['ubicacion_id' => $this->encontrar_ubicacion($ubicacion)->id,
+                                  'idioma'       => $this->clave_para_idioma($idioma),
+                                  'contenido'    => "Esta es información de prueba en $idioma."]);
+  }
+
+  /**
    * @When /^escribe "(.*)" en el campo "(.*)"$/
    */
   public function escribir_en_campo($valor, $campo) {
@@ -129,8 +145,7 @@ class FeatureContext extends MinkContext {
    * @When /^hace clic en "(.*)"$/
    */
   public function hacer_clic($locator) {
-    $elemento = $this->encontrar_cliqueable($locator);
-    $elemento->click();
+    $this->encontrar_cliqueable($locator)->click();
   }
 
   /**
@@ -138,7 +153,7 @@ class FeatureContext extends MinkContext {
    */
   public function registrar_usuario_via_formulario($email, $contraseña, $rol) {
     $this->hacer_clic('Nuevo usuario');
-    sleep(1);
+    usleep(self::TIEMPO_ESPERA);
 
     $this->escribir_en_campo($email, 'email');
     $this->escribir_en_campo($contraseña, 'contrasena');
@@ -149,7 +164,7 @@ class FeatureContext extends MinkContext {
     $this->seleccionar_en_campo($this->obtener_rol_id($rol), 'rol_id');
 
     $this->hacer_clic('Guardar');
-    sleep(1);
+    usleep(self::TIEMPO_ESPERA);
   }
 
   /**
@@ -160,13 +175,13 @@ class FeatureContext extends MinkContext {
    */
   public function registrar_ubicacion_via_formulario($ubicacion, $localizacion) {
     $this->hacer_clic('Nueva ubicación');
-    sleep(1);
+    usleep(self::TIEMPO_ESPERA);
 
     $this->escribir_en_campo($ubicacion, 'nombre');
     $this->escribir_en_campo($localizacion, 'localizacion');
 
     $this->hacer_clic('Guardar');
-    sleep(1);
+    usleep(self::TIEMPO_ESPERA);
   }
 
   /**
@@ -174,11 +189,11 @@ class FeatureContext extends MinkContext {
    */
   public function registrar_postal_via_formulario() {
     $this->hacer_clic('Nueva postal');
-    sleep(1);
+    usleep(self::TIEMPO_ESPERA);
 
     $this->escribir_en_campo('0.99', 'precio');
     $this->hacer_clic('Guardar');
-    sleep(1);
+    usleep(self::TIEMPO_ESPERA);
   }
 
   /**
@@ -191,6 +206,24 @@ class FeatureContext extends MinkContext {
     $ubicacion = $this->encontrar_ubicacion($ubicacion);
     Postal::create(['precio'       => $precio,
                     'ubicacion_id' => $ubicacion->id]);
+  }
+
+  /**
+   * @When /^registra "(.+)" como información de (.+) en (.+)$/
+   *
+   * @param string $informacion
+   * @param string $ubicacion
+   * @param string $idioma
+   */
+  public function registrar_informacion_de_ubicacion($informacion, $ubicacion, $idioma) {
+    $this->hacer_clic('Nueva entrada');
+    usleep(self::TIEMPO_ESPERA);
+
+    $this->escribir_en_campo($informacion, 'contenido');
+    $this->seleccionar_en_campo($this->clave_para_idioma($idioma), 'idioma');
+
+    $this->hacer_clic('Guardar');
+    usleep(self::TIEMPO_ESPERA);
   }
 
   /**
@@ -223,6 +256,20 @@ class FeatureContext extends MinkContext {
   }
 
   /**
+   * @When /^elimina la información en (.+) de (.+)$/
+   *
+   * @param string $idioma
+   * @param string $ubicacion
+   */
+  public function eliminar_informacion($idioma, $ubicacion) {
+    $informacion = $this->encontrar_ubicacion($ubicacion)
+                        ->informaciones()
+                        ->where('idioma', $this->clave_para_idioma($idioma))
+                        ->first();
+    $this->eliminar_recurso($informacion);
+  }
+
+  /**
    * @When /^(?:que )?comienza a editar los datos de (.*)$/
    *
    * @param string $email
@@ -247,6 +294,20 @@ class FeatureContext extends MinkContext {
     $recurso = new stdClass();
     $recurso->id = $postal;
     $this->comenzar_edicion_de_recurso($recurso);
+  }
+
+  /**
+   * @When /^que comienza a editar la información en (.+) de (.+)$/
+   *
+   * @param string $idioma
+   * @param string $ubicacion
+   */
+  public function comenzar_edicion_de_informacion($idioma, $ubicacion) {
+    $informacion = $this->encontrar_ubicacion($ubicacion)
+                        ->informaciones()
+                        ->where('idioma', $this->clave_para_idioma($idioma))
+                        ->first();
+    $this->comenzar_edicion_de_recurso($informacion);
   }
 
   /**
@@ -321,12 +382,42 @@ class FeatureContext extends MinkContext {
   }
 
   /**
+   * @Then /^la información en (.+) de (.+) debería ser "(.+)"$/
+   *
+   * @param string $idioma
+   * @param string $ubicacion
+   * @param string $contenido
+   */
+  public function verificar_informacion_de_ubicacion($idioma, $ubicacion, $contenido) {
+    $informacion = $this->encontrar_ubicacion($ubicacion)
+                        ->informaciones()
+                        ->where('idioma', $this->clave_para_idioma($idioma))
+                        ->first();
+
+    $this->verificar_atributo_de_recurso('contenido', $contenido, $informacion);
+  }
+
+  /**
    * @Then /^debería haber (\d+) ubicaci(?:ón|ones) guardadas?$/
    *
    * @param int $cantidad
    */
   public function verificar_ubicaciones_guardadas($cantidad) {
     PHPUnit::assertEquals($cantidad, UbicacionTuristica::count());
+  }
+
+  /**
+   * @When /^debería haber (\d+) entradas? de información para (.+) en (.+)$/
+   * @param int    $cantidad
+   * @param string $ubicacion
+   * @param string $idioma
+   */
+  public function verificar_cantidad_informacion($cantidad, $ubicacion, $idioma) {
+    $idioma = $this->clave_para_idioma($idioma);
+    $informaciones = $this->encontrar_ubicacion($ubicacion)->informaciones()
+                                                           ->whereIdioma($idioma);
+
+    PHPUnit::assertEquals($cantidad, $informaciones->count());
   }
 
   /**
@@ -373,11 +464,15 @@ class FeatureContext extends MinkContext {
    */
   private function obtener_url_dinamica($pagina) {
     $coincidencias = [];
+    $subrecurso_de_ubicacion = function($ruta, $ubicacion) {
+      return route($ruta, [$this->encontrar_ubicacion($ubicacion)->id]);
+    };
+
     switch (true) {
       case preg_match("/^administrar postales de (.*)$/", $pagina, $coincidencias):
-        return route('administrar.ubicaciones.postales', [
-          $this->encontrar_ubicacion($coincidencias[1])->id
-        ]);
+        return $subrecurso_de_ubicacion('administrar.ubicaciones.postales', $coincidencias[1]);
+      case preg_match("/^administrar la información de (.*)$/", $pagina, $coincidencias):
+        return $subrecurso_de_ubicacion('administrar.ubicaciones.informacion', $coincidencias[1]);
     }
   }
 
@@ -395,16 +490,17 @@ class FeatureContext extends MinkContext {
    * @param Model $recurso
    */
   private function comenzar_edicion_de_recurso($recurso) {
-    sleep(1);
+    usleep(self::TIEMPO_ESPERA);
     $fila = $this->obtener_fila_de_tabla_para_recurso($recurso);
     $fila->findButton('Modificar')->click();
-    sleep(1);
+    usleep(self::TIEMPO_ESPERA);
   }
 
   /**
    * @param Model $recurso
    *
-   * @return \Behat\Mink\Element\NodeElement|mixed|null
+   * @return NodeElement|mixed|null
+   * @throws ElementNotFoundException
    */
   private function obtener_fila_de_tabla_para_recurso($recurso) {
     $pagina = $this->getSession()->getPage();
@@ -421,20 +517,35 @@ class FeatureContext extends MinkContext {
     sleep(1);
     $fila = $this->obtener_fila_de_tabla_para_recurso($recurso);
     $fila->findButton('Eliminar')->click();
-    sleep(1);
+    usleep(self::TIEMPO_ESPERA);
     $this->getSession()->getPage()->find('css', '.modal-footer .btn-danger')->click();
-    sleep(1);
+    usleep(self::TIEMPO_ESPERA);
   }
 
   private function verificar_atributo_de_recurso($atributo, $valor, $recurso) {
+    usleep(self::TIEMPO_ESPERA); # Esperamos por si hay cambios que almacenar en la bd
     PHPUnit::assertEquals($valor, $recurso->{str_slug($atributo, '_')});
   }
 
+  /**
+   * @param string $nombre
+   *
+   * @return UbicacionTuristica
+   */
   private function encontrar_ubicacion($nombre) {
+    usleep(self::TIEMPO_ESPERA); # Esperamos por si hay cambios que almacenar en la bd
     $ubicacion = UbicacionTuristica::whereNombre($nombre)->first();
     if ( ! $ubicacion) throw new ModelNotFoundException("Ubicación \"$nombre\" no encontrada.");
 
     return $ubicacion;
+  }
+
+  private function clave_para_idioma($idioma) {
+    $claves = ['es' => 'español',
+               'en' => 'inglés',
+               'fr' => 'francés'];
+
+    return array_search($idioma, $claves);
   }
 
 }
