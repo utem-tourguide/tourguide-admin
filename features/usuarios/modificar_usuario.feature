@@ -11,6 +11,5 @@ Característica: Modificar un usuario
     Dado que comienza a editar los datos de juliolarumbe@example.com
     Cuando selecciona Turista en rol_id
     Y hace clic en "Guardar"
-    Y espera 1 segundo
     Entonces debería haber 1 administrador guardado
     Y debería haber 1 turista guardado

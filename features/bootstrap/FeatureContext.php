@@ -14,7 +14,7 @@ use TourGuide\Models\Usuario;
 
 class FeatureContext extends MinkContext {
 
-  const TIEMPO_ESPERA = 600000; # microsegundos.
+  const TIEMPO_ESPERA = 500000; # microsegundos.
 
   /**
    * @AfterSuite
@@ -336,6 +336,7 @@ class FeatureContext extends MinkContext {
    * @Then /^debería haber (\d+) (\S*) guardados?$/
    */
   public function verificar_usuarios_guardados($cantidad, $rol) {
+    usleep(self::TIEMPO_ESPERA);
     $rol_id = $this->obtener_rol_id($rol);
 
     PHPUnit::assertEquals($cantidad, Usuario::whereRolId($rol_id)->count());
