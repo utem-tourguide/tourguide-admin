@@ -80,7 +80,7 @@ class InformacionUbicacionesController extends RecursoController {
   public function update(Request $request, $ubicacion_id, $id) {
     $informacion = InformacionUbicacion::find($id);
     $informacion->update($request->all());
-    $informacion->save();
+
     return $informacion;
   }
 
@@ -94,6 +94,7 @@ class InformacionUbicacionesController extends RecursoController {
    */
   public function destroy($ubicacion_id, $id) {
     $informacion = InformacionUbicacion::find($id) ?: App::abort(404);
+
     return $informacion->delete() ? response('', 200) : response('', 500);
   }
 
