@@ -1,34 +1,32 @@
-<html>
-<head>
-  <title>Administrar postales - TourGuide</title>
-  <link rel="stylesheet" href="/css/styles.css">
-</head>
-<body>
-  <div class="container-fluid">
-    <h3>Administrar postales para {{ $ubicacion->nombre }}</h3>
+@extends('layouts.admin')
 
-    <p>
-      En esta página puedes administrar las postales almacenadas sobre la ubicación turística "{{ $ubicacion->nombre }}". Para añadir una postal, haz clic en <strong>Nueva postal</strong>. Para modificar o eliminar alguna postal, haz clic en el botón <strong>Modificar</strong> o <strong>Eliminar</strong> que corresponda.
-    </p>
+@section('title', 'Administrar postales')
 
-    <div class="well">
-      <button id="nuevaPostal" class="btn btn-primary">Nueva postal</button>
-    </div>
+@section('content')
+  <h3>Administrar postales para {{ $ubicacion->nombre }}</h3>
 
-    <div class="table-responsive">
-      <table id="postales" class="table table-striped table-condensed">
-        <tr>
-          <th>ID</th>
-          <th>Precio</th>
-          <th>Imagen</th>
-          <th>Acciones</th>
-        </tr>
-      </table>
-    </div>
+  <p>
+    En esta página puedes administrar las postales almacenadas sobre la ubicación turística "{{ $ubicacion->nombre }}". Para añadir una postal, haz clic en <strong>Nueva postal</strong>. Para modificar o eliminar alguna postal, haz clic en el botón <strong>Modificar</strong> o <strong>Eliminar</strong> que corresponda.
+  </p>
+
+  <div class="well">
+    <button id="nuevaPostal" class="btn btn-primary">Nueva postal</button>
   </div>
 
-  <script src="/js/app.js"></script>
-  <script src="/js/crud.js"></script>
+  <div class="table-responsive">
+    <table id="postales" class="table table-striped table-condensed" hidden>
+      <tr>
+        <th>ID</th>
+        <th>Precio</th>
+        <th>Imagen</th>
+        <th>Acciones</th>
+      </tr>
+    </table>
+  </div>
+@endsection
+
+@section('scripts')
+  @parent
   <script src="/js/image_previewer.js"></script>
   <script>
    crud = new CRUDRecurso('postal',
@@ -66,5 +64,4 @@
     previewer.render('#postalImagen');
    });
  </script>
-</body>
-</html>
+@endsection
