@@ -14,6 +14,15 @@
           <li>{!! link_to_route('administrar.ubicaciones', 'Ubicaciones turísticas') !!}</li>
         </ul>
       </nav>
+
+      <div id="usuario">
+        <strong>{{ Auth::user()->nombre_completo() }}</strong>
+        <strong>{{ ucfirst(Auth::user()->rol) }}</strong>
+        <p>
+          <span class="pull-left">Perfil</span>
+          {!! link_to_route('sesiones.destroy', 'Salir', [], ['class' => 'pull-right']) !!}
+        </p>
+      </div>
     </aside>
     <main class="col-md-10">
       @yield('content')

@@ -31,4 +31,15 @@ aside {
   nav {
     margin-top: 2em;
   }
+
+  #usuario {
+    position: absolute;
+    bottom: 1em;
+    left: 1em;
+    right: 1em;
+
+    strong {
+      display: block;
+    }
+  }
 }
