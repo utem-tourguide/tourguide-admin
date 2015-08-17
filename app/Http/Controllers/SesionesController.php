@@ -1,7 +1,7 @@
 <?php namespace TourGuide\Http\Controllers;
 
 use Illuminate\Http\Response;
-use Input;
+use Auth;
 use Session;
 use Illuminate\Http\Request;
 use TourGuide\Models\Usuario;
@@ -30,10 +30,10 @@ class SesionesController extends RecursoController {
    * @return Response
    */
   public function store(Request $request) {
-    $usuario = Usuario::whereEmail( Input::get('email') )->first();
-    if ($usuario && $usuario->verificarContrasena( Input::get('contrasena') )) {
-      Session::put('usuario_id', $usuario->id);
-      return $this->mostrarPaginaDeInicio($request, $usuario);
+    $credenciales = ['email'    => $request->get('email'),
+                     'password' => $request->get('contrasena')];
+    if (Auth::attempt($credenciales)) {
+      return $this->mostrarPaginaDeInicio($request, Auth::user());
     } else {
       return $this->mostrarUsuarioInvalido($request);
     }
@@ -45,7 +45,7 @@ class SesionesController extends RecursoController {
    * @return Response
    */
   public function destroy() {
-    Session::flush();
+    Auth::logout();
 
     return redirect()->route('login');
   }

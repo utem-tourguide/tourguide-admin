@@ -1,9 +1,9 @@
 <?php namespace tests\TourGuide\Http\Controllers;
 
+use Auth;
 use Hash;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use tests\TourGuide\Support\ControllerTestCase;
-use TourGuide\Models\Usuario;
 use TourGuide\Tests\CustomAssertions;
 
 class SesionesControllerTest extends ControllerTestCase {
@@ -30,7 +30,7 @@ class SesionesControllerTest extends ControllerTestCase {
     ]);
 
     $this->assertRedirectedToRoute('dashboard');
-    $this->assertSessionHas('usuario_id');
+    $this->assertTrue(Auth::check());
   }
 
   /**
@@ -43,7 +43,7 @@ class SesionesControllerTest extends ControllerTestCase {
     ]);
 
     $this->assertRedirectedToRoute('login');
-    $this->assertFalse($this->app['session.store']->has('usuario_id'));
+    $this->assertFalse(Auth::check());
   }
 
   /**
@@ -53,7 +53,7 @@ class SesionesControllerTest extends ControllerTestCase {
     $this->route('GET', 'sesiones.destroy');
 
     $this->assertRedirectedToRoute('login');
-    $this->assertFalse($this->app['session.store']->has('usuario_id'));
+    $this->assertFalse(Auth::check());
   }
 
   /**
