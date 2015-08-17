@@ -11,4 +11,8 @@ class UbicacionTuristica extends Model {
     return $this->hasMany('TourGuide\Models\Postal', 'ubicacion_id');
   }
 
+  public function informaciones() {
+    return $this->hasMany('TourGuide\Models\InformacionUbicacion', 'ubicacion_id');
+  }
+
 }
