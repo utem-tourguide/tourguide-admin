@@ -22,3 +22,13 @@ body { background: #F4F6FD; }
   margin: 0 auto;
   display: block;
 }
+
+aside {
+  height: 100vh;
+  padding: 1em !important;
+  border-right: 2px solid steelblue;
+
+  nav {
+    margin-top: 2em;
+  }
+}
