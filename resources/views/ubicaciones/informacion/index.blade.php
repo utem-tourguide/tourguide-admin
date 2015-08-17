@@ -20,7 +20,7 @@
     </div>
 
     <div class="table-responsive">
-      <table id="informacion" class="table table-striped table-condensed">
+      <table id="informacion" class="table table-striped table-condensed" hidden>
         <tr>
           <th>ID</th>
           <th>Información</th>
