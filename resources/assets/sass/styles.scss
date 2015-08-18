@@ -1,10 +1,9 @@
-@import "bootstrap";
+@import "darkly/bootstrap";
 @import "login";
 
 /** Estilos generales */
 
 body {
-  background: #F4F6FD;
   font-size: 9pt;
 }
 
@@ -29,7 +28,8 @@ body {
 aside {
   height: 100vh;
   padding: 1em !important;
-  border-right: 2px solid lightgray;
+  background: dimgrey;
+  opacity: 1;
 
   nav {
     margin-top: 2em;
