@@ -2,8 +2,9 @@
 
 use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use TourGuide\Contracts\Validable;
 
-class Postal extends Model {
+class Postal extends Model implements Validable {
 
   const IMAGENES_PATH = 'images/postales';
 
@@ -19,6 +20,17 @@ class Postal extends Model {
    */
   protected $fillable = ['precio',
                          'ubicacion_id'];
+
+  public static function reglasParaCrear() {
+    return [
+      'imagen' => 'required|max:5000|mimes:jpg,png,gif',
+      'precio' => 'required|numeric',
+    ];
+  }
+
+  public static function reglasParaActualizar() {
+    return [];
+  }
 
   /**
    * @return float

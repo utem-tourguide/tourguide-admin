@@ -32,6 +32,8 @@ class PostalesController extends RecursoController {
    * @return Response
    */
   public function store($ubicacion_id, Request $peticion) {
+    $this->validate($peticion, Postal::reglasParaCrear());
+
     $datos  = $peticion->all() + ['ubicacion_id' => $ubicacion_id];
     $postal = Postal::create($datos);
 

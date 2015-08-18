@@ -142,7 +142,7 @@ class FeatureContext extends MinkContext {
   }
 
   /**
-   * @When /^hace clic en "(.*)"$/
+   * @When /^(?:que )?hace clic en "(.*)"$/
    */
   public function hacer_clic($locator) {
     $this->encontrar_cliqueable($locator)->click();
