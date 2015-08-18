@@ -17,14 +17,16 @@ var paths = {
   jquery_form:     './vendor/bower_components/jquery-form/',
   chartjs:         './vendor/bower_components/Chart.js/',
   bootstrapDialog: './vendor/bower_components/bootstrap-dialog/',
-  bootswatch:      './vendor/bower_components/bootswatch/'
+  bootswatch:      './vendor/bower_components/bootswatch/',
+  animate:         './vendor/bower_components/animate.css/'
 };
 
 elixir(function(mix) {
     mix.sass('styles.scss',
              'public/css/',
              { includePaths: [paths.bootstrap + 'stylesheets/',
-                              paths.bootswatch] })
+                              paths.bootswatch,
+                              paths.animate] })
        .copy(paths.bootstrap + 'fonts/bootstrap/**', 'public/fonts/bootstrap')
        .scripts([paths.jquery + 'dist/jquery.js',
                  paths.jquery_form + 'jquery.form.js',
