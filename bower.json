@@ -20,6 +20,7 @@
     "bootstrap-sass-official": "~3.3.5",
     "bootstrap-dialog": "~1.34.5",
     "jquery-form": "~3.46.0",
-    "Chart.js": "~1.0.2"
+    "Chart.js": "~1.0.2",
+    "bootswatch": "~3.3.5+2"
   }
 }

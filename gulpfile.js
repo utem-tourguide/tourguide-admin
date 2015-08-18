@@ -16,13 +16,15 @@ var paths = {
   jquery:          './vendor/bower_components/jquery/',
   jquery_form:     './vendor/bower_components/jquery-form/',
   chartjs:         './vendor/bower_components/Chart.js/',
-  bootstrapDialog: './vendor/bower_components/bootstrap-dialog/'
+  bootstrapDialog: './vendor/bower_components/bootstrap-dialog/',
+  bootswatch:      './vendor/bower_components/bootswatch/'
 };
 
 elixir(function(mix) {
     mix.sass('styles.scss',
              'public/css/',
-             { includePaths: [paths.bootstrap + 'stylesheets/'] })
+             { includePaths: [paths.bootstrap + 'stylesheets/',
+                              paths.bootswatch] })
        .copy(paths.bootstrap + 'fonts/bootstrap/**', 'public/fonts/bootstrap')
        .scripts([paths.jquery + 'dist/jquery.js',
                  paths.jquery_form + 'jquery.form.js',
