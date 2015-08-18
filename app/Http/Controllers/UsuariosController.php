@@ -53,6 +53,8 @@ class UsuariosController extends RecursoController {
    * @return Response
    */
   public function store(Request $peticion) {
+    $this->validate($peticion, Usuario::$reglas);
+
     $usuario = new Usuario($peticion->only($this->atributos_de_usuario));
     $usuario->rol_id = $peticion->get('rol_id');
     $usuario->save();
@@ -79,6 +81,8 @@ class UsuariosController extends RecursoController {
    * @return Response
    */
   public function update(Request $peticion, $id) {
+    $this->validate($peticion, Usuario::$reglas);
+
     $usuario = Usuario::find($id);
     $usuario->rol_id = $peticion->get('rol_id');
     $usuario->update($peticion->except(['rol_id', '_token']));

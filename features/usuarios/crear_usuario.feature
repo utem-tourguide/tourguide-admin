@@ -16,3 +16,12 @@ Característica: Crear nuevo usuario
     Cuando registra a edgarlarios@turista.com con contraseña "edgar" como turista
     Entonces debería haber 1 turista guardado
     Y debería haber 1 administrador guardado
+
+  @javascript @validacion
+  Escenario: Creando un turista sin rellenar todos los campos
+    Cuando hace clic en "Nuevo usuario"
+    Y espera 1 segundo
+    Y hace clic en "Guardar"
+    Entonces debería haber 0 turistas guardados
+    Y debería haber 1 administrador guardado
+    Y debería ver "El campo email es obligatorio"

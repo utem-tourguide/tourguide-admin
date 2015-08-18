@@ -6,6 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Usuario extends Model implements Authenticatable {
 
+  public static $reglas = [
+    'email'      => 'required|email|unique:usuarios,email',
+    'contrasena' => 'sometimes|min:5|confirmed',
+    'nombre'     => 'required',
+    'apellido'   => 'required',
+    'idioma'     => 'required',
+    'rol_id'     => 'required|numeric',
+  ];
+
   protected $fillable = [
                          'email',
                          'contrasena',
