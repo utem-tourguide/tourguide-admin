@@ -23,7 +23,7 @@ class Postal extends Model implements Validable {
 
   public static function reglasParaCrear() {
     return [
-      'imagen' => 'required|max:5000|mimes:jpg,png,gif',
+      'imagen' => 'required|max:5000|mimes:jpg,jpeg,png,gif',
       'precio' => 'required|numeric',
     ];
   }

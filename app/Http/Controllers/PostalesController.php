@@ -37,6 +37,7 @@ class PostalesController extends RecursoController {
     $datos  = $peticion->all() + ['ubicacion_id' => $ubicacion_id];
     $postal = Postal::create($datos);
 
+
     if ($peticion->hasFile('imagen')) $postal->guardarImagen($peticion->file('imagen'));
 
     return $postal;
