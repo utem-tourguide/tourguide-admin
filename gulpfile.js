@@ -23,7 +23,7 @@ elixir(function(mix) {
     mix.sass('styles.scss',
              'public/css/',
              { includePaths: [paths.bootstrap + 'stylesheets/'] })
-       .copy(paths.bootstrap + 'fonts/bootstrap/**', 'public/fonts')
+       .copy(paths.bootstrap + 'fonts/bootstrap/**', 'public/fonts/bootstrap')
        .scripts([paths.jquery + 'dist/jquery.js',
                  paths.jquery_form + 'jquery.form.js',
                  paths.bootstrap + 'javascripts/bootstrap.js',
