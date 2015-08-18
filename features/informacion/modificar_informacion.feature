@@ -4,6 +4,7 @@ Característica: Modificar información de ubicación
   Antecedentes:
     Dado que está registrada la ubicación La Campana en Colima, Colima
     Y que hay información en español para La Campana
+    Y que admin@tourguide.com inicia sesión con contraseña "admin"
     Y que visita la página para administrar la información de La Campana
 
   @javascript
