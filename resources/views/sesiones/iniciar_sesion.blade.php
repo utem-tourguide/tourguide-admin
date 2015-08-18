@@ -11,7 +11,7 @@
     <div class="row">
 
       <div class="col-xs-12">
-        <img id="app-logo" src="{{ asset('images/tourguide-logo.jpg') }}">
+        <img id="app-logo" src="{{ asset('images/logo.png') }}">
 
         <div id="login_form" class="well well-lg">
           @if (Session::has( 'error' ))

@@ -81,24 +81,28 @@ CRUDRecurso.prototype.iniciarFilaRecurso = function(recurso, esNuevo) {
 CRUDRecurso.prototype.crearCeldaAcciones = function(recurso) {
   var self = this;
   var columna = $(document.createElement('td'));
+  var toolbar = $(document.createElement('div')).addClass('btn-group');
 
-  this.renderizarAccionesPersonalizadas(recurso, columna);
+  this.renderizarAccionesPersonalizadas(recurso, toolbar);
 
   if (this.modificarRecursos) {
     $(document.createElement('button'))
-      .text('Modificar')
-      .addClass('btn btn-default btn-sm')
+      .attr('title', 'Modificar')
+      .addClass('btn btn-primary btn-sm')
       .on('click', function () {
         self.mostrarDialogoEditar(recurso.id);
-      })
-      .appendTo(columna);
+      }).append($('<span class="glyphicon glyphicon-edit"></span>'))
+      .appendTo(toolbar);
   }
 
   $(document.createElement('button'))
-    .text('Eliminar')
-    .addClass('btn btn-default btn-sm')
+    .attr('title', 'Eliminar')
+    .addClass('btn btn-danger btn-sm')
     .on('click', function() { self.mostrarDialogoEliminar(recurso.id) })
-    .appendTo(columna);
+    .append($('<span class="glyphicon glyphicon-remove"></span>'))
+    .appendTo(toolbar);
+
+  toolbar.appendTo(columna);
 
   return columna;
 };
@@ -109,11 +113,18 @@ CRUDRecurso.prototype.renderizarAccionesPersonalizadas = function(recurso, colum
   var boton;
   for (var accion in this.accionesPersonalizadas) {
     boton = $(document.createElement('button'))
-      .text(accion)
-      .addClass('btn btn-default')
+      .addClass('btn btn-success btn-sm')
       .appendTo(columna);
 
-    boton.on('click', function() { self.accionesPersonalizadas[accion](recurso, self, boton) })
+    var icon = self.accionesPersonalizadas[accion][1];
+    if (icon) {
+      boton.attr('title', accion)
+           .append('<span class="glyphicon glyphicon-' + icon + '"></span>');
+    } else {
+      boton.text(accion);
+    }
+
+    boton.on('click', function() { self.accionesPersonalizadas[accion][0](recurso, self, boton) })
   }
 };
 
@@ -125,7 +136,7 @@ CRUDRecurso.prototype.mostrarDialogoNuevo = function() {
     buttons: [
       {
         label: 'Guardar',
-        cssClass: 'btn-primary',
+        cssClass: 'btn-primary btn-sm',
         action: function(dialogo) {
           self.guardarRecurso(null, function() {
             dialogo.close();
@@ -145,7 +156,7 @@ CRUDRecurso.prototype.mostrarDialogoEditar = function(id) {
     buttons: [
       {
         label: 'Guardar',
-        cssClass: 'btn-primary',
+        cssClass: 'btn-primary btn-sm',
         action: function(dialogo) {
           self.guardarRecurso(id, function() {
             dialogo.close();
@@ -165,7 +176,7 @@ CRUDRecurso.prototype.mostrarDialogoEliminar = function(id) {
     buttons: [
       {
         label: 'Eliminar',
-        cssClass: 'btn-danger',
+        cssClass: 'btn-danger btn-sm',
         action: function(dialogo) {
           self.eliminarRecurso(id, function() {
             dialogo.close();
@@ -224,8 +235,8 @@ CRUDRecurso.prototype.eliminarFila = function(id) {
   $('tr[data-id=' + id + ']').remove();
 };
 
-CRUDRecurso.prototype.agregarAccionPersonalizada = function(nombre, closure) {
-  this.accionesPersonalizadas[nombre] = closure;
+CRUDRecurso.prototype.agregarAccionPersonalizada = function(nombre, closure, glyphicon) {
+  this.accionesPersonalizadas[nombre] = [closure, glyphicon];
 };
 
 CRUDRecurso.prototype.agregarAtributoGenerado = function(nombre, closure) {

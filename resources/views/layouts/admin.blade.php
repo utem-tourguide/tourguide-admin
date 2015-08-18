@@ -3,8 +3,10 @@
 @section('body')
   <div class="row">
     <aside class="col-md-2">
-      <img id="logo" class="img-responsive" src="{{ asset('images/tourguide-logo.jpg') }}">
-      <h5>TourGuide</h5>
+      <div class="text-center">
+        <img id="logo" class="img-responsive center-block" src="{{ asset('images/logo.png') }}">
+        <h5>TourGuide</h5>
+      </div>
 
       <nav>
         <ul class="list-unstyled">

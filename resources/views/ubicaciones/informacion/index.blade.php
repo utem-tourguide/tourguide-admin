@@ -14,7 +14,7 @@
   </p>
 
   <div class="well">
-    <button id="nuevaInformacion" class="btn btn-primary">Nueva entrada</button>
+    <button id="nuevaInformacion" class="btn btn-primary btn-sm">Nueva entrada</button>
   </div>
 
   <div class="table-responsive">

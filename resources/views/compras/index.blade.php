@@ -40,7 +40,7 @@
           </small>
         </p>
 
-        {!! Form::submit('Actualizar', ['class' => 'btn btn-primary']) !!}
+        {!! Form::submit('Actualizar', ['class' => 'btn btn-primary btn-sm']) !!}
         </form>
 
       </div>

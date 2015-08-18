@@ -10,7 +10,7 @@
   </p>
 
   <div class="well">
-    <button id="nuevaPostal" class="btn btn-primary">Nueva postal</button>
+    <button id="nuevaPostal" class="btn btn-primary btn-sm">Nueva postal</button>
   </div>
 
   <div class="table-responsive">

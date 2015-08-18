@@ -6,10 +6,10 @@
   <h1>Administrar usuarios</h1>
 
   <div class="well well-sm">
-    <button id="nuevoUsuario" class="btn btn-primary">Nuevo usuario</button>
+    <button id="nuevoUsuario" class="btn btn-primary btn-sm">Nuevo usuario</button>
   </div>
 
-  <table id="usuarios" class="table table-striped table-bordered" hidden>
+  <table id="usuarios" class="table table-striped table-hover" hidden>
     <tr>
       <th>Id</th>
       <th>Nombre</th>
