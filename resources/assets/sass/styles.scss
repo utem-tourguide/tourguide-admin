@@ -12,6 +12,9 @@ body {
 
 .form-control { font-size: 1em; }
 .input-group-addon { min-width: 5em; }
+.has-error {
+  .form-control { background: #FFBFBF; }
+}
 
 /** Estilos de administrador de postales */
 #postalImagen { min-height: 5em; }

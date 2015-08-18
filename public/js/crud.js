@@ -189,7 +189,7 @@ CRUDRecurso.prototype.mostrarDialogoEliminar = function(id) {
 
 CRUDRecurso.prototype.guardarRecurso = function(id, callback) {
   var self = this;
-  $('#formulario').submit(function(e) {
+  $('#formulario').off('submit').on('submit', function(e) {
     e.preventDefault();
 
     var opciones = {
@@ -198,11 +198,58 @@ CRUDRecurso.prototype.guardarRecurso = function(id, callback) {
       success: function(recurso) {
         self.actualizarFila(recurso);
         callback && callback();
+      },
+      error: function(respuesta) {
+        switch (respuesta.status) {
+          case 422: self.mostrarErroresDeGuardado(respuesta.responseJSON);
+        }
       }
     };
 
     $(this).ajaxSubmit($.extend({}, opciones, id ? self.opciones.modificar: self.opciones.crear));
   }).submit();
+};
+
+CRUDRecurso.prototype.mostrarErroresDeGuardado = function(errores) {
+  var contenedor = $(document.createElement('div')).attr('id', 'errores')
+                                                   .addClass('alert alert-danger');
+
+  var formulario = $('#formulario');
+  this.mostrarMensajesDeError(errores, contenedor, formulario);
+  this.marcarCamposConErrorEnFormulario(formulario, errores);
+  this.doBounce(formulario, 3, '10px', 70);
+};
+
+CRUDRecurso.prototype.mostrarMensajesDeError = function(errores, contenedor, formulario) {
+  $('#errores').remove();
+
+  var error;
+  for (error in errores) {
+    errores[error].forEach(function(error) {
+      contenedor.append('<p>' + error + '</p>');
+    });
+  }
+
+  contenedor.insertBefore(formulario);
+};
+
+CRUDRecurso.prototype.marcarCamposConErrorEnFormulario = function(formulario, errores) {
+  $('.has-error').removeClass('has-error');
+
+  var nombre;
+  formulario.find('.form-control').each(function() {
+    nombre = $(this).attr('name');
+    if (errores[nombre]) {
+      $(this).parent().addClass('has-error');
+    }
+  });
+};
+
+CRUDRecurso.prototype.doBounce = function(element, times, distance, speed) {
+  for(var i = 0; i < times; i++) {
+    element.animate({marginTop: '-='+distance}, speed)
+      .animate({marginTop: '+='+distance}, speed);
+  }
 };
 
 CRUDRecurso.prototype.eliminarRecurso = function(id, callback) {
@@ -214,6 +261,9 @@ CRUDRecurso.prototype.eliminarRecurso = function(id, callback) {
     success: function() {
       self.eliminarFila(id);
       callback && callback();
+    },
+    error: function(errores) {
+      self.mostrarErroresDeGuardado(errores);
     }
   };
 
