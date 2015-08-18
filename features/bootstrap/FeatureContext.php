@@ -191,6 +191,9 @@ class FeatureContext extends MinkContext {
     $this->hacer_clic('Nueva postal');
     usleep(self::TIEMPO_ESPERA);
 
+    $imagen_path = base_path('features/support/broken.jpg');
+    $this->getSession()->getPage()->attachFileToField('imagen', $imagen_path);
+                                                      ;
     $this->escribir_en_campo('0.99', 'precio');
     $this->hacer_clic('Guardar');
     usleep(self::TIEMPO_ESPERA);
