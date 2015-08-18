@@ -22,7 +22,7 @@ class Usuario extends Model implements Authenticatable, Validable {
   public static function reglasParaCrear() {
     return [
       'email'      => 'required|email|unique:usuarios,email',
-      'contrasena' => 'sometimes|min:5|confirmed',
+      'contrasena' => 'required|min:5|confirmed',
       'nombre'     => 'required',
       'apellido'   => 'required',
       'idioma'     => 'required',
@@ -32,7 +32,8 @@ class Usuario extends Model implements Authenticatable, Validable {
 
   public static function reglasParaActualizar() {
     $reglas = self::reglasParaCrear();
-    $reglas['email'] = 'required|email';
+    $reglas['email']      = 'required|email';
+    $reglas['contrasena'] = 'sometimes|min:5|confirmed';
 
     return $reglas;
   }
