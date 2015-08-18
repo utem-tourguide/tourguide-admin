@@ -4,3 +4,4 @@
 *.sqlite
 *.fuse_hidden*
 /nbproject
+/public/images/postales

@@ -1,116 +1,109 @@
-<?php
-
-namespace TourGuide\Http\Controllers;
+<?php namespace TourGuide\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Input;
 use TourGuide\Http\Requests;
 use TourGuide\Models\Usuario;
 use TourGuide\Http\Controllers\Controller;
 
-class UsuariosController extends Controller {
+class UsuariosController extends RecursoController {
 
-    private $atributos_de_usuario = ['email',
-                                     'contrasena',
-                                     'nombre',
-                                     'apellido',
-                                     'idioma'];
+  private $atributos_de_usuario = ['email',
+                                   'contrasena',
+                                   'nombre',
+                                   'apellido',
+                                   'idioma'];
 
-    /**
-     * Muestra una lista de usuarios registrados en TourGuide.
-     *
-     * @return Response
-     */
-    public function index() {
-        $datos = [
-          'usuarios' => Usuario::paginate(15)
-        ];
-        return view('usuarios.index', $datos);
+  /**
+   * Muestra una lista de usuarios registrados en TourGuide.
+   *
+   * @return Response
+   */
+  public function index() {
+    return Usuario::all();
+  }
+
+  /**
+   * Muestra el formulario para crear un nuevo usuario.
+   *
+   * @return Response
+   */
+  public function create() {
+    return view('usuarios.create');
+  }
+
+  /**
+   * Muestra el formulario para editar un usuario registrado.
+   *
+   * @param  int $id
+   *
+   * @return Response
+   */
+  public function edit($id) {
+    $datos = ['usuario' => Usuario::find($id)];
+
+    return view('usuarios.create', $datos);
+  }
+
+  /**
+   * Almacena un nuevo usuario en la base de datos.
+   *
+   * @param  \Illuminate\Http\Request $peticion
+   * @return Response
+   */
+  public function store(Request $peticion) {
+    $this->validate($peticion, Usuario::reglasParaCrear());
+
+    $usuario = new Usuario($peticion->only($this->atributos_de_usuario));
+    $usuario->rol_id = $peticion->get('rol_id');
+    $usuario->save();
+
+    return $usuario;
+  }
+
+  /**
+   * Muestra un usuario específico.
+   *
+   * @param  int  $id
+   * @return Response
+   */
+  public function show($id) {
+    return Usuario::find($id) ?: error_404();
+  }
+
+  /**
+   * Actualiza el usuario específicado en la base de datos.
+   *
+   * @param Request $peticion
+   * @param int     $id
+   *
+   * @return Response
+   */
+  public function update(Request $peticion, $id) {
+    $this->validate($peticion, Usuario::reglasParaActualizar());
+
+    $usuario = Usuario::find($id);
+    $usuario->rol_id = $peticion->get('rol_id');
+    $usuario->update($peticion->except(['rol_id', '_token']));
+
+    return $usuario;
+  }
+
+  /**
+   * Remove the specified resource from storage.
+   *
+   * @param  int  $id
+   *
+   * @return Response
+   */
+  public function destroy($id) {
+    $usuario = Usuario::find($id);
+    if ($usuario) {
+      $usuario->delete();
+    } else {
+      return error_404();
     }
+  }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return Response
-     */
-    public function create()
-    {
-        $usuario = new Usuario;
-        $datos = ['usuario' => $usuario];
-        return view('usuarios.create', $datos);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
-    public function store(Request $request) {
-        $usuario = new Usuario($request->only($this->atributos_de_usuario));
-        $usuario->rol_id = $request->get('rol_id');
-        $usuario->save();
-
-        return redirect()->route('usuarios.index')->with('mensaje', 'Usuario Creado');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function edit($id)
-    {
-        $user = Usuario::findOrFail($id);
-        $datos = ['usuario' => $user];
-        return view('usuarios.edit', $datos);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function update($id)
-    {
-        $user = Usuario::findOrFail($id);
-        $user->update(
-            array('nombre' => Input::get('nombre'), 
-                  'apellido' => Input::get('apellido'), 
-                  'email' => Input::get('email'),
-                  'contraseña' => Input::get('contraseña'),
-                  'idioma' => Input::get('idioma'))
-        );     
-        $user->save();
-        
-        return redirect()->route('usuarios.index')->with('mensaje', 'Usuario Modificado');
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function destroy($id) {
-        $usuario = Usuario::find($id);
-        $usuario->delete();
-
-        $datos = [
-            'usuario' => $usuario
-        ];
-        return view('usuarios.destroy', $datos);
-    }
 }

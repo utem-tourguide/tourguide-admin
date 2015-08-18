@@ -14,7 +14,7 @@ class UsuariosSeeder extends Seeder {
   public function run() {
     Usuario::create([
       'email'              => 'admin@tourguide.com',
-      'contrasena_cifrada' => Usuario::cifrarContrasena('admin'),
+      'contrasena_cifrada' => Hash::make('admin'),
       'nombre'             => 'Administrador',
       'apellido'           => 'de TourGuide',
       'idioma'             => 'es',

@@ -1,12 +1,16 @@
 <?php namespace TourGuide\Http\Controllers;
 
-use Input;
+use Illuminate\Http\Response;
+use Auth;
 use Session;
 use Illuminate\Http\Request;
 use TourGuide\Models\Usuario;
 use TourGuide\Http\Controllers\Controller;
 
-class SesionesController extends Controller {
+/**
+ * Controlador de sesiones
+ */
+class SesionesController extends RecursoController {
 
   /**
    * Muestra el formulario de inicio de sesión.
@@ -25,11 +29,11 @@ class SesionesController extends Controller {
    *
    * @return Response
    */
-  public function entrar(Request $request) {
-    $usuario = Usuario::whereEmail( Input::get('email') )->first();
-    if ($usuario && $usuario->verificarContrasena( Input::get('contrasena') )) {
-      Session::put('usuario_id', $usuario->id);
-      return $this->mostrarPaginaDeInicio($request, $usuario);
+  public function store(Request $request) {
+    $credenciales = ['email'    => $request->get('email'),
+                     'password' => $request->get('contrasena')];
+    if (Auth::attempt($credenciales)) {
+      return $this->mostrarPaginaDeInicio($request, Auth::user());
     } else {
       return $this->mostrarUsuarioInvalido($request);
     }
@@ -40,9 +44,10 @@ class SesionesController extends Controller {
    *
    * @return Response
    */
-  public function salir() {
-    Session::flush();
-    return redirect()->route('sesiones.entrar');
+  public function destroy() {
+    Auth::logout();
+
+    return redirect()->route('login');
   }
 
   /**
@@ -82,7 +87,7 @@ class SesionesController extends Controller {
       return response('Unauthorized', 401);
     } else {
       return redirect()
-        ->route('sesiones.entrar')
+        ->route('login')
         ->with('error', 'Usuario o contraseña incorrectos.');
     }
   }

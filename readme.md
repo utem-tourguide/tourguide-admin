@@ -27,6 +27,7 @@ dependencias.
    renómbralo a `.env`.
 4. Crea un archivo vacío llamado `db.sqlite` en la raíz del repositorio.
 5. Ejecuta `php artisan migrate` para instalar la base de datos.
+5. Ejecuta `php artisan db:seed` para registrar el administrador por defecto.
 6. Ejecuta `php artisan serve` y déjalo correr.
 7. Visita `http://localhost:8000` en tu navegador y voilâ! ;)
 

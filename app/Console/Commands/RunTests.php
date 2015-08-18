@@ -6,7 +6,7 @@ use Illuminate\Contracts\Bus\SelfHandling;
 class RunTests extends Command implements SelfHandling {
 
   protected $name = 'test';
-  protected $description = 'Corre las suites de pruebas.';
+  protected $description = 'Corre las suites de pruebas';
 
   /**
    * Ejecuta las diversas suites que componen las pruebas de la aplicación.
@@ -16,7 +16,6 @@ class RunTests extends Command implements SelfHandling {
   public function handle() {
     $this->ejecutar('php vendor/bin/phpspec run --stop-on-failure -f dot');
     $this->ejecutar('php vendor/bin/phpunit --stop-on-failure');
-    $this->ejecutar('php vendor/bin/behat --stop-on-failure -f progress');
   }
 
   /**

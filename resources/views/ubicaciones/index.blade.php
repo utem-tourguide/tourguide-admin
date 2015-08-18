@@ -1,51 +1,47 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Ubicaciones turísticas - TourGuide Admin</title>
-  <link rel="stylesheet" type="text/css" href="/css/styles.css">
-</head>
-<body>
-  <div class="container-fluid">
-    <h1>Ubicaciones turísticas</h1>
+@extends('layouts.admin')
 
-    @if (Session::has('mensaje'))
-      <div class="alert alert-info">
-        <p>{{ Session::get('mensaje') }}</p>
-      </div>
-    @endif 
+@section('title', 'Administrar ubicaciones turísticas')
 
-    <div class="well well-sm">
-      {!! link_to_route('ubicaciones.create', 'Nuevo ubicacion', [], ['class' => "btn btn-primary"]) !!}
-    </div>
+@section('content')
+  <h1>Ubicaciones turísticas</h1>
 
-    <table class="table table-striped table-bordered">
-      <tr>
-        <th>Id</th>
-        <th>Nombre</th>
-        <th>Localización</th>
-        <th>Creada en</th>
-        <th>Modificada en</th>
-        <th>Acciones</th>
-      </tr>
-      @foreach ($ubicaciones as $ubicacion)
-        <tr>
-          <td>{{ $ubicacion->id }}</td>
-          <td>{{ $ubicacion->nombre }}</td>
-          <td>{{ $ubicacion->localizacion }}</td>
-          <td>{{ $ubicacion->created_at }}</td>
-          <td>{{ $ubicacion->updated_at }}</td>
-          <td>
-            <a class="btn btn-primary btn-sm" href="{{ route('ubicaciones.edit', [$ubicacion->id]) }}">Editar</a>
-
-            {!!  Form::open(['route' => ['ubicaciones.destroy', $ubicacion->id], 'method' => 'DELETE', 'style' => 'display: inline-block']) !!}
-              <input type="submit" class="btn btn-danger btn-sm" value="eliminar">
-            {!! Form::close()!!}
-          </td>
-        </tr>
-      @endforeach
-    </table>
-
-    {!! $ubicaciones->render() !!}
+  <div class="well well-sm">
+    <button id="nuevaUbicacion" class="btn btn-primary btn-sm">Nueva ubicación</button>
   </div>
-</body>
-</html>
+
+  <table id="ubicaciones" class="table table-striped table-hover" hidden>
+    <tr>
+      <th>Id</th>
+      <th>Nombre</th>
+      <th>Localización</th>
+      <th>Creada en</th>
+      <th>Modificada en</th>
+      <th>Acciones</th>
+    </tr>
+  </table>
+@endsection
+
+@section('scripts')
+  @parent
+  <script>
+    crud = new CRUDRecurso('ubicación turística',
+                            '{{ route('ubicaciones.index') }}',
+                            $('#ubicaciones'),
+                            ['id', 'nombre', 'localizacion', 'created_at', 'updated_at']);
+
+    crud.agregarAccionPersonalizada('Información', function(recurso, crud, boton) {
+      var url = ('{{ route('administrar.ubicaciones.informacion', ['placeholder']) }}');
+      url = url.replace('placeholder', recurso.id);
+
+      window.location = url; // ¡Esto causará un cambio de página!
+    }, 'info-sign');
+
+    crud.agregarAccionPersonalizada('Postales', function(recurso, crud, boton) {
+      var url = ('{{ route('administrar.ubicaciones.postales', ['id']) }}').replace('id', recurso.id);
+      window.location = url;
+    }, 'envelope');
+
+    crud.cargarTabla();
+    $('#nuevaUbicacion').on('click', function() { crud.mostrarDialogoNuevo() });
+  </script>
+@endsection

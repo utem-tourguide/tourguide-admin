@@ -1,8 +1,11 @@
 <?php namespace TourGuide\Models;
 
+use Hash;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
+use TourGuide\Contracts\Validable;
 
-class Usuario extends Model {
+class Usuario extends Model implements Authenticatable, Validable {
 
   protected $fillable = [
                          'email',
@@ -12,16 +15,46 @@ class Usuario extends Model {
                          'idioma',
                         ];
 
+  protected $hidden = ['contrasena_cifrada'];
+
+  protected $appends = ['rol'];
+
+  public static function reglasParaCrear() {
+    return [
+      'email'      => 'required|email|unique:usuarios,email',
+      'contrasena' => 'sometimes|min:5|confirmed',
+      'nombre'     => 'required',
+      'apellido'   => 'required',
+      'idioma'     => 'required',
+      'rol_id'     => 'required|numeric',
+    ];
+  }
+
+  public static function reglasParaActualizar() {
+    $reglas = self::reglasParaCrear();
+    $reglas['email'] = 'required|email';
+
+    return $reglas;
+  }
+
   /**
-   * Cifra una contraseña en texto plano y devuelve su versión cifrada.
+   * Obtiene el rol del usuario como una cadena de texto.
    *
-   * @param string $contrasena
    * @return string
    */
-  public static function cifrarContrasena($contrasena) {
-    $factor_cifrado = 31;
-    $salt = "$2y$$factor_cifrado" . substr(md5(uniqid(rand(), true)), 0, 22);
-    return crypt($contrasena, $salt);
+  public function getRolAttribute() {
+    $roles = [ROL_ADMINISTRADOR => 'administrador',
+              ROL_TURISTA       => 'turista'];
+
+    return $roles[$this->attributes['rol_id']];
+  }
+
+  public function getIdiomaAttribute() {
+    $idiomas = ['en' => 'inglés',
+                'es' => 'español',
+                'fr' => 'francés'];
+
+    return $idiomas[$this->attributes['idioma']];
   }
 
   /**
@@ -30,7 +63,7 @@ class Usuario extends Model {
    * @param string $valor Contraseña sin cifrar
    */
   public function setContrasenaAttribute($valor) {
-    $this->attributes['contrasena_cifrada'] = self::cifrarContrasena($valor);
+    $this->attributes['contrasena_cifrada'] = Hash::make($valor);
   }
 
   /**
@@ -40,8 +73,58 @@ class Usuario extends Model {
    * @return boolean
    */
   public function verificarContrasena($contrasena) {
-    $version_cifrada = crypt($contrasena, $this->contrasena_cifrada);
-    return $version_cifrada === $this->contrasena_cifrada;
+    return Hash::check($contrasena, $this->attributes['contrasena_cifrada']);
+  }
+
+  public function nombreCompleto() {
+    return $this->nombre . ' ' . $this->apellido;
+  }
+
+  /**
+   * Get the unique identifier for the user.
+   *
+   * @return string
+   */
+  public function getAuthIdentifier() {
+    return $this->attributes['id'];
+  }
+
+  /**
+   * Get the password for the user.
+   *
+   * @return string
+   */
+  public function getAuthPassword() {
+    return $this->attributes['contrasena_cifrada'];
+  }
+
+  /**
+   * Get the token value for the "remember me" session.
+   *
+   * @return string
+   */
+  public function getRememberToken() {
+    // TODO: Implement getRememberToken() method.
+  }
+
+  /**
+   * Set the token value for the "remember me" session.
+   *
+   * @param  string $value
+   *
+   * @return void
+   */
+  public function setRememberToken($value) {
+    // TODO: Implement setRememberToken() method.
+  }
+
+  /**
+   * Get the column name for the "remember me" token.
+   *
+   * @return string
+   */
+  public function getRememberTokenName() {
+    // TODO: Implement getRememberTokenName() method.
   }
 
 }
