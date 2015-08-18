@@ -1,8 +1,9 @@
 <?php namespace TourGuide\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use TourGuide\Contracts\Validable;
 
-class InformacionUbicacion extends Model {
+class InformacionUbicacion extends Model implements Validable {
 
   protected $table = 'informacion_de_ubicaciones';
   protected $fillable = ['idioma',
@@ -13,4 +14,12 @@ class InformacionUbicacion extends Model {
     return $this->belongsTo('TourGuide\Models\UbicacionTuristica');
   }
 
+  public static function reglasParaCrear() {
+    return ['contenido'    => 'required',
+            'idioma'       => 'required'];
+  }
+
+  public static function reglasParaActualizar() {
+    return self::reglasParaCrear();
+  }
 }
