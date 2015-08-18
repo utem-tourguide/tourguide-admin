@@ -11,9 +11,9 @@
     <div class="row">
 
       <div class="col-xs-12">
-        <img id="app-logo" src="{{ asset('images/logo.png') }}">
+        <img id="app-logo" class="animated rollIn" src="{{ asset('images/logo.png') }}">
 
-        <div id="login_form" class="well well-lg">
+        <div id="login_form" class="well well-lg animated bounceIn">
           @if (Session::has( 'error' ))
             <div class="alert alert-danger">{{ Session::get('error') }}</div>
           @endif
