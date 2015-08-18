@@ -88,7 +88,7 @@ CRUDRecurso.prototype.crearCeldaAcciones = function(recurso) {
   if (this.modificarRecursos) {
     $(document.createElement('button'))
       .attr('title', 'Modificar')
-      .addClass('btn btn-primary btn-sm')
+      .addClass('btn btn-primary btn-xs')
       .on('click', function () {
         self.mostrarDialogoEditar(recurso.id);
       }).append($('<span class="glyphicon glyphicon-edit"></span>'))
@@ -97,7 +97,7 @@ CRUDRecurso.prototype.crearCeldaAcciones = function(recurso) {
 
   $(document.createElement('button'))
     .attr('title', 'Eliminar')
-    .addClass('btn btn-danger btn-sm')
+    .addClass('btn btn-danger btn-xs')
     .on('click', function() { self.mostrarDialogoEliminar(recurso.id) })
     .append($('<span class="glyphicon glyphicon-remove"></span>'))
     .appendTo(toolbar);
@@ -113,7 +113,7 @@ CRUDRecurso.prototype.renderizarAccionesPersonalizadas = function(recurso, colum
   var boton;
   for (var accion in this.accionesPersonalizadas) {
     boton = $(document.createElement('button'))
-      .addClass('btn btn-success btn-sm')
+      .addClass('btn btn-success btn-xs')
       .appendTo(columna);
 
     var icon = self.accionesPersonalizadas[accion][1];
