@@ -17,7 +17,7 @@ Característica: Crear nuevo usuario
     Entonces debería haber 1 turista guardado
     Y debería haber 1 administrador guardado
 
-  @javascript @validacion
+  @javascript @validation
   Escenario: Creando un turista sin rellenar todos los campos
     Cuando hace clic en "Nuevo usuario"
     Y espera 1 segundo

@@ -10,7 +10,7 @@ Característica: Crear nueva ubicación
     Cuando registra la ubicación "La campana" en Colima, Colima
     Entonces debería haber 1 ubicación guardada
 
-  @javascript @validacion
+  @javascript @validation
   Escenario: Creando una ubicación sin rellenar todos los campos
     Cuando hace clic en "Nueva ubicación"
     Y espera 1 segundo
