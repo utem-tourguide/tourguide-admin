@@ -87,7 +87,7 @@ CRUDRecurso.prototype.crearCeldaAcciones = function(recurso) {
   if (this.modificarRecursos) {
     $(document.createElement('button'))
       .text('Modificar')
-      .addClass('btn btn-default')
+      .addClass('btn btn-default btn-sm')
       .on('click', function () {
         self.mostrarDialogoEditar(recurso.id);
       })
@@ -96,7 +96,7 @@ CRUDRecurso.prototype.crearCeldaAcciones = function(recurso) {
 
   $(document.createElement('button'))
     .text('Eliminar')
-    .addClass('btn btn-default')
+    .addClass('btn btn-default btn-sm')
     .on('click', function() { self.mostrarDialogoEliminar(recurso.id) })
     .appendTo(columna);
 
