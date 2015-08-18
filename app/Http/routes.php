@@ -1,42 +1,47 @@
 <?php
 
-Route::get ('',               ['as' => 'login',            'uses' => 'SesionesController@index']);
-Route::post('sesiones',       ['as' => 'sesiones.store',   'uses' => 'SesionesController@store']);
-Route::get ('sesiones/salir', ['as' => 'sesiones.destroy', 'uses' => 'SesionesController@destroy']);
+Route::get ('',               ['as' => 'login',          'uses' => 'SesionesController@index']);
+Route::post('sesiones',       ['as' => 'sesiones.store', 'uses' => 'SesionesController@store']);
 
-Route::get('/dashboard', ['as' => 'dashboard',   'uses' => 'DashboardController@index']);
-Route::get('/android',   ['as' => 'obtener_app', 'uses' => 'DashboardController@android']);
+Route::get('android',        ['as'   => 'obtener_app',  'uses' => 'DashboardController@android']);
 
-Route::resource('usuarios',                'UsuariosController');
-Route::resource('compras',                 'ComprasController',  ['only' => ['index', 'store']]);
-Route::resource('ubicaciones',             'UbicacionesController');
-Route::resource('ubicaciones.informacion', 'InformacionUbicacionesController');
+Route::group(['middleware' => ['auth', 'only_admins']], function() {
+  Route::get ('sesiones/salir', ['as' => 'sesiones.destroy', 'uses' => 'SesionesController@destroy']);
 
-Route::resource('ubicaciones.postales',    'PostalesController', ['except' => ['edit', 'update']]);
+  Route::get('dashboard', ['as' => 'dashboard',   'uses' => 'DashboardController@index']);
 
-Route::group(['prefix' => 'administrar', 'as' => 'administrar.'], function() {
-  Route::get('compras', [
-    'as'   => 'compras',
-    'uses' => 'AdministradorController@compras',
-  ]);
+  Route::resource('usuarios',                'UsuariosController');
+  Route::resource('compras',                 'ComprasController',  ['only' => ['index', 'store']]);
+  Route::resource('ubicaciones',             'UbicacionesController');
+  Route::resource('ubicaciones.informacion', 'InformacionUbicacionesController');
 
-  Route::get('ubicaciones', [
-    'as'   => 'ubicaciones',
-    'uses' => 'AdministradorController@ubicaciones'
-  ]);
+  Route::resource('ubicaciones.postales',    'PostalesController', ['except' => ['edit', 'update']]);
 
-  Route::get('ubicaciones/{id}/informacion', [
-    'as'   => 'ubicaciones.informacion',
-    'uses' => 'AdministradorController@informacion',
-  ]);
+  Route::group(['prefix' => 'administrar', 'as' => 'administrar.'], function() {
+    Route::get('compras', [
+      'as'   => 'compras',
+      'uses' => 'AdministradorController@compras',
+    ]);
 
-  Route::get('ubicaciones/{id}/postales', [
-    'as'   => 'ubicaciones.postales',
-    'uses' => 'AdministradorController@postales',
-  ]);
+    Route::get('ubicaciones', [
+      'as'   => 'ubicaciones',
+      'uses' => 'AdministradorController@ubicaciones'
+    ]);
 
-  Route::get('usuarios', [
-    'as'   => 'usuarios',
-    'uses' => 'AdministradorController@usuarios',
-  ]);
+    Route::get('ubicaciones/{id}/informacion', [
+      'as'   => 'ubicaciones.informacion',
+      'uses' => 'AdministradorController@informacion',
+    ]);
+
+    Route::get('ubicaciones/{id}/postales', [
+      'as'   => 'ubicaciones.postales',
+      'uses' => 'AdministradorController@postales',
+    ]);
+
+    Route::get('usuarios', [
+      'as'   => 'usuarios',
+      'uses' => 'AdministradorController@usuarios',
+    ]);
+  });
+
 });

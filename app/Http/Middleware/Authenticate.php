@@ -1,24 +1,22 @@
 <?php namespace TourGuide\Http\Middleware;
 
+use Auth;
 use Closure;
+use Illuminate\Http\Response;
 
 class Authenticate {
 
   /**
-   * Comprueba si existe una sesión iniciada. Si no existe, redirige a la página
-   * de inicio de sesión.
+   * Comprueba si existe una sesión iniciada. Si no existe, redirige a la página de inicio de
+   * sesión.
    *
    * @param  \Illuminate\Http\Request  $request
    * @param  \Closure  $next
-   * @return mixed
+   *
+   * @return Response
    */
   public function handle($request, Closure $next) {
-    if (Session::has( 'usuario_id' )) {
-      // La petición sigue adelante...
-      return $next($request);
-    } else {
-      return redirect()->route('login');
-    }
+    return Auth::check() ? $next($request) : redirect()->route('login');
   }
 
 }
