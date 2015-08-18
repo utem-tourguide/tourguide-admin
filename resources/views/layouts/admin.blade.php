@@ -26,7 +26,7 @@
         </p>
       </div>
     </aside>
-    <main class="col-md-10">
+    <main class="col-md-10 animated fadeIn">
       @yield('content')
     </main>
   </div>
