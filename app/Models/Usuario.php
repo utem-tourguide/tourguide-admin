@@ -3,17 +3,9 @@
 use Hash;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
+use TourGuide\Contracts\Validable;
 
-class Usuario extends Model implements Authenticatable {
-
-  public static $reglas = [
-    'email'      => 'required|email|unique:usuarios,email',
-    'contrasena' => 'sometimes|min:5|confirmed',
-    'nombre'     => 'required',
-    'apellido'   => 'required',
-    'idioma'     => 'required',
-    'rol_id'     => 'required|numeric',
-  ];
+class Usuario extends Model implements Authenticatable, Validable {
 
   protected $fillable = [
                          'email',
@@ -26,6 +18,24 @@ class Usuario extends Model implements Authenticatable {
   protected $hidden = ['contrasena_cifrada'];
 
   protected $appends = ['rol'];
+
+  public static function reglasParaCrear() {
+    return [
+      'email'      => 'required|email|unique:usuarios,email',
+      'contrasena' => 'sometimes|min:5|confirmed',
+      'nombre'     => 'required',
+      'apellido'   => 'required',
+      'idioma'     => 'required',
+      'rol_id'     => 'required|numeric',
+    ];
+  }
+
+  public static function reglasParaActualizar() {
+    $reglas = self::reglasParaCrear();
+    $reglas['email'] = 'required|email';
+
+    return $reglas;
+  }
 
   /**
    * Obtiene el rol del usuario como una cadena de texto.
@@ -66,7 +76,7 @@ class Usuario extends Model implements Authenticatable {
     return Hash::check($contrasena, $this->attributes['contrasena_cifrada']);
   }
 
-  public function nombre_completo() {
+  public function nombreCompleto() {
     return $this->nombre . ' ' . $this->apellido;
   }
 
@@ -115,4 +125,6 @@ class Usuario extends Model implements Authenticatable {
    */
   public function getRememberTokenName() {
     // TODO: Implement getRememberTokenName() method.
-  }}
+  }
+
+}

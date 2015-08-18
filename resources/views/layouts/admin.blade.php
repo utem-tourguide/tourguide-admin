@@ -18,7 +18,7 @@
       </nav>
 
       <div id="usuario">
-        <strong>{{ Auth::user()->nombre_completo() }}</strong>
+        <strong>{{ Auth::user()->nombreCompleto() }}</strong>
         <strong>{{ ucfirst(Auth::user()->rol) }}</strong>
         <p>
           <span class="pull-left">Perfil</span>
