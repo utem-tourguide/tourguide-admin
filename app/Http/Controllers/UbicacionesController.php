@@ -36,7 +36,7 @@ class UbicacionesController extends RecursoController {
    * @return Response
    */
   public function store(Request $peticion) {
-    $this->validate($peticion, UbicacionTuristica::$reglas);
+    $this->validate($peticion, UbicacionTuristica::reglasParaCrear());
 
     return UbicacionTuristica::create(Input::all());
   }
@@ -73,7 +73,7 @@ class UbicacionesController extends RecursoController {
    * @return Response
    */
   public function update($id, Request $peticion) {
-    $this->validate($peticion, UbicacionTuristica::$reglas);
+    $this->validate($peticion, UbicacionTuristica::reglasParaActualizar());
 
     $ubicacion = UbicacionTuristica::find($id);
     $ubicacion -> update( array('nombre' => Input::get('nombre'), 'localizacion'=> Input::get('localizacion')));
