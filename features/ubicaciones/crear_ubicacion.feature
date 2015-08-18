@@ -9,3 +9,11 @@ Característica: Crear nueva ubicación
   Escenario: Creando una ubicación
     Cuando registra la ubicación "La campana" en Colima, Colima
     Entonces debería haber 1 ubicación guardada
+
+  @javascript @validacion
+  Escenario: Creando una ubicación sin rellenar todos los campos
+    Cuando hace clic en "Nueva ubicación"
+    Y espera 1 segundo
+    Y hace clic en "Guardar"
+    Entonces debería haber 0 ubicaciones guardadas
+    Y debería ver "El campo nombre es obligatorio"

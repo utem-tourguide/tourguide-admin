@@ -31,9 +31,13 @@ class UbicacionesController extends RecursoController {
   /**
    * Almacena una nueva ubicación turística en la base de datos.
    *
+   * @param Request $peticion
+   *
    * @return Response
    */
-  public function store() {
+  public function store(Request $peticion) {
+    $this->validate($peticion, UbicacionTuristica::$reglas);
+
     return UbicacionTuristica::create(Input::all());
   }
 
@@ -56,19 +60,25 @@ class UbicacionesController extends RecursoController {
    */
   public function edit($id) {
     $datos = ['ubicacion' => UbicacionTuristica::find($id)];
+
     return view('ubicaciones.create', $datos);
   }
 
   /**
    * Actualiza la ubicación turística espećíficada en la base de datos
    *
-   * @param  int  $id
+   * @param int     $id
+   * @param Request $peticion
+   *
    * @return Response
    */
-  public function update($id) {
+  public function update($id, Request $peticion) {
+    $this->validate($peticion, UbicacionTuristica::$reglas);
+
     $ubicacion = UbicacionTuristica::find($id);
     $ubicacion -> update( array('nombre' => Input::get('nombre'), 'localizacion'=> Input::get('localizacion')));
     $ubicacion -> save();
+
     return $ubicacion;
   }
 

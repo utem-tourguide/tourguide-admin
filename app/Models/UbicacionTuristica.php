@@ -4,6 +4,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class UbicacionTuristica extends Model {
 
+  public static $reglas = [
+    'nombre'       => 'required|unique:ubicaciones_turisticas,nombre',
+    'localizacion' => 'required',
+  ];
+
   protected $table = 'ubicaciones_turisticas';
   protected $fillable = ['nombre', 'localizacion'];
 
