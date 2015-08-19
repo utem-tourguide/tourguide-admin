@@ -72,7 +72,7 @@
 			</table>
 		</div>
 		<div class="col-md-5 col-sm-12">
-			<p>Últimas usuarios añadidos</p>
+			<p>Últimos usuarios añadidos</p>
 			<table class="table table-striped table-hover">
 				<tr>
 					<td>
