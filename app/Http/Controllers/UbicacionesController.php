@@ -7,6 +7,7 @@ use Input;
 use TourGuide\Http\Requests;
 use TourGuide\Models\UbicacionTuristica;
 use TourGuide\Http\Controllers\Controller;
+use Endroid\QrCode\QrCode;
 
 class UbicacionesController extends RecursoController {
 
@@ -96,4 +97,20 @@ class UbicacionesController extends RecursoController {
     }
   }
 
+  /**
+   * Muestra el código QR para la ubicación específicada.
+   *
+   * @param  int $id
+   * @return Response
+   */
+  public function qrcode($id) {
+    $ubicacion = UbicacionTuristica::findOrFail($id);
+    $qr = with(new QrCode())->setText($ubicacion->id)
+                            ->setSize(300)
+                            ->setPadding(10)
+                            ->setImageType(QrCode::IMAGE_TYPE_PNG)
+                            ->render();
+
+    return response('')->header('Content-Type', 'image/png');
+  }
 }

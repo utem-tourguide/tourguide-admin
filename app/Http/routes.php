@@ -13,10 +13,6 @@ Route::resource('compras',                 'ComprasController',  ['only' => ['in
 Route::resource('ubicaciones',             'UbicacionesController');
 Route::resource('ubicaciones.informacion', 'InformacionUbicacionesController');
 Route::resource('ubicaciones.postales',    'PostalesController', ['except' => ['edit', 'update']]);
-Route::get('ubicaciones/{ubicaciones}/qrcode', [
-  'as'   => 'ubicaciones.qrcode',
-  'uses' => 'UbicacionesController@qrcode',
-]);
 
 Route::group(['prefix' => 'administrar', 'as' => 'administrar.'], function() {
   Route::get('compras', [
@@ -37,6 +33,11 @@ Route::group(['prefix' => 'administrar', 'as' => 'administrar.'], function() {
   Route::get('ubicaciones/{id}/postales', [
     'as'   => 'ubicaciones.postales',
     'uses' => 'AdministradorController@postales',
+  ]);
+
+  Route::get('ubicaciones/{id}/qrcode', [
+    'as'   => 'ubicaciones.qrcode',
+    'uses' => 'UbicacionesController@qrcode',
   ]);
 
   Route::get('usuarios', [
