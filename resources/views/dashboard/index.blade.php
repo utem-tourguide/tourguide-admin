@@ -39,6 +39,7 @@
 	<br>
 	<div>
 		<div class="col-md-4 col-sm-12">
+			<p>Últimas ubicaciones añadidas</p>
 			<table class="table table-striped table-hover">
 				<tr>
 					<td>
@@ -55,7 +56,8 @@
 				</tr>
 			</table>
 		</div>
-		<div class="col-md-2 col-sm-12">
+		<div class="col-md-3 col-sm-12">
+			<p>Últimas postales añadidas</p>
 			<table class="table table-striped table-hover">
 				<tr>
 					<td>
@@ -69,7 +71,8 @@
 				</tr>
 			</table>
 		</div>
-		<div class="col-md-6 col-sm-12">
+		<div class="col-md-5 col-sm-12">
+			<p>Últimas usuarios añadidos</p>
 			<table class="table table-striped table-hover">
 				<tr>
 					<td>
