@@ -15,7 +15,6 @@ class Kernel extends HttpKernel {
 		'Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse',
 		'Illuminate\Session\Middleware\StartSession',
 		'Illuminate\View\Middleware\ShareErrorsFromSession',
-		'TourGuide\Http\Middleware\VerifyCsrfToken',
 	];
 
 	/**
@@ -24,9 +23,10 @@ class Kernel extends HttpKernel {
 	 * @var array
 	 */
 	protected $routeMiddleware = [
-		'auth' => 'TourGuide\Http\Middleware\Authenticate',
+		'auth'       => 'TourGuide\Http\Middleware\Authenticate',
 		'auth.basic' => 'Illuminate\Auth\Middleware\AuthenticateWithBasicAuth',
-		'guest' => 'TourGuide\Http\Middleware\RedirectIfAuthenticated',
+		'guest'      => 'TourGuide\Http\Middleware\RedirectIfAuthenticated',
+		'csrf'       => 'TourGuide\Http\Middleware\VerifyCsrfToken',
 	];
 
 }

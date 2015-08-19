@@ -15,14 +15,20 @@ return [
       'password'  => env('DB_PASSWORD', ''),
       'charset'   => 'utf8',
       'collation' => 'utf8_unicode_ci',
-      'prefix'    => '',
       'strict'    => false,
     ],
     'sqlite_testing' => [
       'driver'   => 'sqlite',
-      'database' => ':memory:',
-      'prefix'   => '',
+      'database' => base_path('testing.sqlite'),
     ],
+    'sqlite_acceptance' => [
+      'driver'   => 'sqlite',
+      'database' => base_path('acceptance.sqlite'),
+    ],
+    'sqlite_base' => [
+      'driver'   => 'sqlite',
+      'database' => base_path('.db_base.sqlite'),
+    ]
   ],
 
 ];
