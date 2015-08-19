@@ -47,7 +47,7 @@ class FeatureContext extends MinkContext {
   }
 
   /**
-   * @Given /^(?:que )?visita la página (?:para|de) (.*)$/
+   * @Given /^(?:que )?visita la página (?:para|de|del) (.*)$/
    */
   public function visitar_pagina($pagina) {
     $this->visitar_url($this->obtener_url_para_pagina($pagina));
