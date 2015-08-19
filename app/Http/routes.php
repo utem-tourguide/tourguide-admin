@@ -9,10 +9,14 @@ Route::get('/android',   ['as' => 'obtener_app', 'uses' => 'DashboardController@
 
 Route::resource('usuarios',                'UsuariosController');
 Route::resource('compras',                 'ComprasController',  ['only' => ['index', 'store']]);
+
 Route::resource('ubicaciones',             'UbicacionesController');
 Route::resource('ubicaciones.informacion', 'InformacionUbicacionesController');
-
 Route::resource('ubicaciones.postales',    'PostalesController', ['except' => ['edit', 'update']]);
+Route::get('ubicaciones/{ubicaciones}/qrcode', [
+  'as'   => 'ubicaciones.qrcode',
+  'uses' => 'UbicacionesController@qrcode',
+]);
 
 Route::group(['prefix' => 'administrar', 'as' => 'administrar.'], function() {
   Route::get('compras', [
