@@ -34,6 +34,7 @@ class Usuario extends Model implements Authenticatable, Validable {
     $reglas = self::reglasParaCrear();
     $reglas['email']      = 'required|email';
     $reglas['contrasena'] = 'sometimes|min:5|confirmed';
+    $reglas['rol_id']     = 'sometimes|numeric';
 
     return $reglas;
   }

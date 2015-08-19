@@ -69,7 +69,7 @@ class UsuariosController extends RecursoController {
    * @return Response
    */
   public function show($id) {
-    return Usuario::find($id) ?: error_404();
+    return Usuario::find($id) ?: abort(404);
   }
 
   /**
@@ -84,7 +84,7 @@ class UsuariosController extends RecursoController {
     $this->validate($peticion, Usuario::reglasParaActualizar());
 
     $usuario = Usuario::find($id);
-    $usuario->rol_id = $peticion->get('rol_id');
+    if ($peticion->has('rol_id')) $usuario->rol_id = $peticion->get('rol_id');
     $usuario->update($peticion->except(['rol_id', '_token']));
 
     return $usuario;
