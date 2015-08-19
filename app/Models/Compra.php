@@ -10,4 +10,8 @@ class Compra extends Model {
 		return $this->belongsTo('TourGuide\Models\Usuario');
 	}
 
+	public function sumaDePostalesVendidas{
+		
+	}
+
 }
