@@ -3,23 +3,23 @@
 @section('title', 'Dashboard')
 
 @section('content')
-	<div class="col-md-6">
+	<div class="col-md-6 col-sm-12">
 		<strong>Bienvenido:  {{ Auth::user()->nombreCompleto() }}</strong>
 	</div>
-	<div class="col-md-6">
+	<div class="col-md-6 col-sm-12">
 		<strong>Monto acumulado de la venta de postales:</strong>
 	</div>
 	<br>
 	<br>
 	<div>
-	  <div class="col-md-4" id="ubicaciones">
+	  <div class="col-md-4 col-sm-12" id="ubicaciones">
 	  	<p>Ubiciones turísticas más visitadas</p>
 		<div id="compras">
 			<canvas id="ubicacionesGrafico" width="100" height="100">
 		</div>
 	  </div>
 
-	  <div class="col-md-4">
+	  <div class="col-md-4 col-sm-12">
 	  	<p>Postales más vendidas</p>
 	  	<div id="postales">
 			<canvas id="postalesGrafico" width="100" height="100">
@@ -38,7 +38,7 @@
 	<hr style="">
 	<br>
 	<div>
-		<div class="col-md-4">
+		<div class="col-md-4 col-sm-12">
 			<table class="table table-striped table-hover">
 				<tr>
 					<td>
@@ -55,7 +55,7 @@
 				</tr>
 			</table>
 		</div>
-		<div class="col-md-2">
+		<div class="col-md-2 col-sm-12">
 			<table class="table table-striped table-hover">
 				<tr>
 					<td>
@@ -69,7 +69,7 @@
 				</tr>
 			</table>
 		</div>
-		<div class="col-md-6">
+		<div class="col-md-6 col-sm-12">
 			<table class="table table-striped table-hover">
 				<tr>
 					<td>
