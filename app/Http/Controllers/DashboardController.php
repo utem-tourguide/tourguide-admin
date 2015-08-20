@@ -1,5 +1,8 @@
 <?php namespace TourGuide\Http\Controllers;
 use Illuminate\Http\Response;
+use TourGuide\Models\Postal;
+use TourGuide\Models\UbicacionTuristica;
+use TourGuide\Models\Usuario;
 
 /**
  * Controlador para el dashboard de la aplicación.
@@ -16,7 +19,13 @@ class DashboardController extends Controller {
    * @return Response
    */
   public function index() {
-    return view('dashboard.index');
+    $datos = [
+      'ubicaciones' => UbicacionTuristica::latest()->take(5)->get(),
+      'postales'    => Postal::with('ubicacion')->latest()->take(5)->get(),
+      'usuarios'    => Usuario::latest()->take(5)->get(),
+    ];
+
+    return view('dashboard.index', $datos);
   }
 
   /**

@@ -3,9 +3,7 @@
 @section('title', 'Dashboard')
 
 @section('content')
-	<div class="col-md-6 col-sm-12">
-		<strong>Bienvenido:  {{ Auth::user()->nombreCompleto() }}</strong>
-	</div>
+	<h3>Bienvenido, {{ Auth::user()->nombreCompleto() }}</h3>
 	<div class="col-md-6 col-sm-12">
 		<strong>Monto acumulado de la venta de postales:</strong>
 	</div>
@@ -38,94 +36,42 @@
 	<hr style="">
 	<br>
 	<div>
-		<div class="col-md-4 col-sm-12">
+
+		<div class="col-md-4 col-sm-12 well well-sm">
 			<p>Últimas ubicaciones añadidas</p>
-			<table class="table table-striped table-hover">
-				<tr>
-					<td>
-						ID
-					</td>
-					<td>
-						Nombre
-					</td>
-					<td>
-						Localización
-					</td>
-				</tr>
-				<tr>
-				</tr>
+			<table class="table table-striped table-condensed">
+				@foreach($ubicaciones as $ubicacion)
+					<tr>
+						<td>{{ $ubicacion->nombre }}</td>
+						<td>{{ $ubicacion->localizacion }}</td>
+					</tr>
+				@endforeach
 			</table>
 		</div>
+
 		<div class="col-md-3 col-sm-12">
 			<p>Últimas postales añadidas</p>
-			<table class="table table-striped table-hover">
-				<tr>
-					<td>
-						ID
-					</td>
-					<td>
-						Nombre
-					</td>
-				</tr>
-				<tr>
-				</tr>
-			</table>
+			@foreach($postales as $postal)
+				<div class="thumbnail">
+					<img class="img-responsive" src="{{ $postal->obtenerImagenUrl() }}">
+					<div class="caption">
+						{{ $postal->ubicacion->nombre }}
+					</div>
+				</div>
+			@endforeach
 		</div>
-		<div class="col-md-5 col-sm-12">
+
+		<div class="col-md-5 col-sm-12 well well-sm">
 			<p>Últimos usuarios añadidos</p>
-			<table class="table table-striped table-hover">
-				<tr>
-					<td>
-						ID
-					</td>
-					<td>
-						Nombre
-					</td>
-					<td>
-						Apellido
-					</td>
-					<td>
-						Idioma
-					</td>
-					<td>
-						Email
-					</td>
-				</tr>
-				<tr>
-				</tr>
+			<table class="table table-striped table-condensed">
+				@foreach($usuarios as $usuario)
+					<tr>
+						<td>{{ $usuario->email }}</td>
+						<td>{{ $usuario->rol }}</td>
+					</tr>
+				@endforeach
 			</table>
 		</div>
+
 	</div>
 @endsection
-@section('scripts')
-			<script>
-			window.onload = cargarGraficaUbicaciones;
-
-			var chart;
-			Chart.defaults.global.responsive = true;
-
-			function cargarGraficaUbicaciones() {
-				$.ajax({
-					method: 'GET',
-					url: '{{ route('ubicaciones.index') }}',
-					data: $('#filtros').serialize(),
-					success: function(ubiciones) {
-						mostrarGraficaUbicaciones(Ubiciones);
-					}
-				});
-			}
-
-			function mostrarGraficaUbicaciones(datos) {
-				if (chart) chart.destroy();
-
-				var contexto = $('#ubicacionesGrafico').get(0).getContext('2d');
-				chart = new Chart(contexto).Line(datos);
-			}
-
-			$('#filtros').submit(function(e) {
-				e.preventDefault();
-
-				cargarGraficaUbicaciones();
-			});
-			</script>
-			@endsection
