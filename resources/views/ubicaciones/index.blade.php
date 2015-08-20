@@ -41,6 +41,13 @@
       window.location = url;
     }, 'envelope');
 
+    crud.agregarAccionPersonalizada('QR', function(recurso, crud, boton) {
+      var url = ('{{ route('administrar.ubicaciones.qrcode', ['id']) }}').replace('id', recurso.id);
+
+      var ventana = window.open(url);
+      ventana.print();
+    }, 'print');
+
     crud.cargarTabla();
     $('#nuevaUbicacion').on('click', function() { crud.mostrarDialogoNuevo() });
   </script>

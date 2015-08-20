@@ -103,6 +103,8 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'contrasena' => 'contraseña'
+    ],
 
 ];

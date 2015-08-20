@@ -12,3 +12,12 @@ Característica: Crear nueva información de ubicación
     Cuando registra "It is an archeological zone" como información de La Campana en inglés
     Entonces debería haber 1 entrada de información para La Campana en español
     Entonces debería haber 1 entrada de información para La Campana en inglés
+
+  @javascript @validation
+  Escenario: Creando información sin contenido
+    Dado que hace clic en "Nueva entrada"
+    Y espera 1 segundo
+    Cuando hace clic en "Guardar"
+    Y espera 1 segundo
+    Entonces debería haber 0 entradas de información para La Campana en español
+    Y debería ver "El campo contenido es obligatorio"

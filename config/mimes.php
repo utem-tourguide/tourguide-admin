@@ -2,8 +2,9 @@
 
 return [
 
-  'jpg' => 'image/jpeg',
-  'png' => 'image/png',
-  'gif' => 'image/gif',
+  'jpg'  => 'image/jpg',
+  'jpeg' => 'image/jpeg',
+  'png'  => 'image/png',
+  'gif'  => 'image/gif',
 
 ];

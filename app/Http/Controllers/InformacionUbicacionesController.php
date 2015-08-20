@@ -36,6 +36,8 @@ class InformacionUbicacionesController extends RecursoController {
    * @return Response
    */
   public function store(Request $request, $ubicacion_id) {
+    $this->validate($request, InformacionUbicacion::reglasParaCrear());
+
     $datos = $request->all() + ['ubicacion_id' => $ubicacion_id];
     return InformacionUbicacion::create($datos);
   }
@@ -78,6 +80,8 @@ class InformacionUbicacionesController extends RecursoController {
    * @return Response
    */
   public function update(Request $request, $ubicacion_id, $id) {
+    $this->validate($request, InformacionUbicacion::reglasParaActualizar());
+
     $informacion = InformacionUbicacion::find($id);
     $informacion->update($request->all());
 

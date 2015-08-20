@@ -108,24 +108,32 @@ CRUDRecurso.prototype.crearCeldaAcciones = function(recurso) {
 };
 
 CRUDRecurso.prototype.renderizarAccionesPersonalizadas = function(recurso, columna) {
-  var self = this;
-
   var boton;
+
   for (var accion in this.accionesPersonalizadas) {
-    boton = $(document.createElement('button'))
-      .addClass('btn btn-success btn-xs')
-      .appendTo(columna);
-
-    var icon = self.accionesPersonalizadas[accion][1];
-    if (icon) {
-      boton.attr('title', accion)
-           .append('<span class="glyphicon glyphicon-' + icon + '"></span>');
-    } else {
-      boton.text(accion);
-    }
-
-    boton.on('click', function() { self.accionesPersonalizadas[accion][0](recurso, self, boton) })
+    boton = this.crearBotonDeAccion(recurso,
+                                    accion,
+                                    this.accionesPersonalizadas[accion][0],
+                                    this.accionesPersonalizadas[accion][1]);
+    boton.appendTo(columna);
   }
+};
+
+CRUDRecurso.prototype.crearBotonDeAccion = function(recurso, titulo, accion, icono) {
+  var boton = $(document.createElement('button')).addClass('btn btn-success btn-xs');
+
+  if (icono) {
+    boton.attr('title', titulo).append('<span class="glyphicon glyphicon-' + icono + '"></span>');
+  } else {
+    boton.text(titulo);
+  }
+
+  var self = this;
+  boton.on('click', function() {
+    accion(recurso, self, boton);
+  });
+
+  return boton;
 };
 
 CRUDRecurso.prototype.mostrarDialogoNuevo = function() {

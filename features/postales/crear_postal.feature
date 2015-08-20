@@ -6,7 +6,7 @@ Característica: Crear nueva postal
     Y que admin@tourguide.com inicia sesión con contraseña "admin"
     Y que visita la página para administrar postales de La Campana
 
-  @javascript
+  @javascript @images
   Escenario: Creando una postal
     Cuando registra una postal
     Entonces debería haber 1 postal guardada para La Campana
