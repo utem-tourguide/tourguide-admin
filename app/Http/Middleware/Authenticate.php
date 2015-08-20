@@ -8,7 +8,7 @@ class Authenticate {
 
   /**
    * Comprueba si existe una sesión iniciada. Si no existe, redirige a la página de inicio de
-   * sesión.
+   * sesión. Este filtro no hace nada si la petición se genera desde la aplicación móvil.
    *
    * @param  \Illuminate\Http\Request  $request
    * @param  \Closure  $next
@@ -16,7 +16,11 @@ class Authenticate {
    * @return Response
    */
   public function handle($request, Closure $next) {
-    return Auth::check() ? $next($request) : redirect()->route('login');
+    if ($request->ajax() || $request->wantsJson()) {
+      return $next($request);
+    } else {
+      return Auth::check() ? $next($request) : redirect()->route('login');
+    }
   }
 
 }
