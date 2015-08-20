@@ -126,6 +126,13 @@ class FeatureContext extends MinkContext {
   }
 
   /**
+   * @Given /^(?:que )?no hay sesión iniciada$/
+   */
+  public function cerrar_sesion() {
+    Auth::logout();
+  }
+
+  /**
    * @When /^escribe "(.*)" en el campo "(.*)"$/
    */
   public function escribir_en_campo($valor, $campo) {
