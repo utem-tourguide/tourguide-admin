@@ -58,4 +58,8 @@ class Postal extends Model implements Validable {
     return asset(self::IMAGENES_PATH."/{$this->id}");
   }
 
+  public function ubicacion() {
+    return $this->belongsTo('TourGuide\Models\UbicacionTuristica', 'ubicacion_id');
+  }
+
 }
