@@ -4,15 +4,19 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use TourGuide\Http\Requests;
 use TourGuide\Models\Postal;
+use TourGuide\Models\UbicacionTuristica;
 
 class PostalesController extends RecursoController {
 
   /**
    * Muestra una lista de postales.
+   *
+   * @param int ubicacion_id
+   *
    * @return Response
    */
-  public function index() {
-    return Postal::all();
+  public function index($ubicacion_id) {
+    return UbicacionTuristica::findOrFail($ubicacion_id)->postales;
   }
 
   /**
