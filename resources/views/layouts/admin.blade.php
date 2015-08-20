@@ -2,7 +2,7 @@
 
 @section('body')
   <div class="row">
-    <aside class="col-md-2">
+    <aside class="col-xs-2 col-xl-1">
       <div class="text-center">
         <img id="logo" class="img-responsive center-block" src="{{ asset('images/logo.png') }}">
         <h5>TourGuide</h5>
@@ -26,7 +26,7 @@
         </p>
       </div>
     </aside>
-    <main class="col-md-10 animated fadeIn">
+    <main class="col-xs-10 col-xl-11 animated fadeIn">
       @yield('content')
     </main>
   </div>
